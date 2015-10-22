@@ -1,2 +1,8 @@
-thirdparties
-schematics/*.workspace
+/thirdparties
+/schematics/*.workspace
+/piccode/*.ccspjt
+/piccode/mpl/*
+!/piccode/mpl/nbproject
+!/piccode/mpl/Makefile
+/piccode/mpl/nbproject/*
+!/piccode/mpl/nbproject/*.xml
