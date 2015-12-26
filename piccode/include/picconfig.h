@@ -7,6 +7,12 @@
 
 #include <24FJ32GA002.h>
 
+//FUSES HERE
+
+#elif defined(USE_PIC24FV16KM202)
+
+#include <24FV16KM202.h>
+
 #else
 
 #error Define one microcotroller type
