@@ -1,6 +1,14 @@
 /thirdparties
 /schematics/*.workspace
+/schematics/*.pdsbak
+/schematics/*/*.cof
+/schematics/*/*.err
+/schematics/*/*.lst
+/schematics/*/*.sym
 /piccode/*.ccspjt
+/piccode/src/*.err
+/piccode/src/*.o
+/piccode/src/*.osym
 /piccode/mpl/*
 !/piccode/mpl/nbproject
 !/piccode/mpl/Makefile
