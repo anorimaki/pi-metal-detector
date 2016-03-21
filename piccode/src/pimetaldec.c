@@ -10,5 +10,7 @@ void pi_init(){
 
 
 void pi_doPulse() {
-    
+    output_high( PI_COIL_PIN );
+    delay_us( 200 );
+    output_low( PI_COIL_PIN );
 }

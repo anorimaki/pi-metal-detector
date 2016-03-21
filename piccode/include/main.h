@@ -5,7 +5,7 @@
 /*******************************************************/
 // TARGET HW
 /*******************************************************/
-#define USE_PIC24FJ32GA002
+#define USE_PIC18F26K80
 //#define USE_PIC24FV16KM202
 
 #include "picconfig.h"
@@ -21,12 +21,18 @@
 
 #define PI_COIL_PIN PIN_B1
 
+#elif defined(USE_PIC18F26K80)
+
+#define PI_COIL_PIN PIN_B1
+
 #endif
 
 
-#USE DELAY( clock=CLOCK_MHZ )
-#USE FAST_IO( A )
-#USE FAST_IO( B )
+
+#use delay(clock=CLOCK_HZ,crystal=4000000)
+#use fast_io( A )
+#use fast_io( B )
+#use fast_io( C )
 
 #endif
 

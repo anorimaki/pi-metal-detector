@@ -20,14 +20,16 @@ void init() {
 }
 
 void main_loop() {
-    pi_doPulse();
-    
+    while( TRUE ) {
+        pi_doPulse();
+        
+        delay_ms( 10 );
+    }
 }
 
 void main() {
     init();
     
-    while( TRUE ) {
-        main_loop();
-    }
+    
+    main_loop();
 }
