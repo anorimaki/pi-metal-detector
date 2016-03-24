@@ -44,7 +44,7 @@ int16 pi_sample() {
     clear_interrupt(INT_AD);
     enable_interrupts(INT_AD); //We want the ADC to wake from sleep
     
-#if 0
+#if 1
     read_adc(ADC_START_ONLY);
 #asm
     SLEEP   
