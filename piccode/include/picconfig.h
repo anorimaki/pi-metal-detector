@@ -17,6 +17,7 @@
 
 #include <18F26K80.h>
 
+#FUSES NOWDT                    //No Watch Dog Timer
 #FUSES VREGSLEEP             	//Ultra low-power regulator is disabled
 #FUSES SOSC_DIG              	//Digital mode, I/O port functionality of RC0 and RC1
 #FUSES NOXINST               	//Extended set extension and Indexed Addressing mode disabled (Legacy mode)
@@ -24,7 +25,6 @@
 #FUSES IESO                  	//Internal External Switch Over mode enabled
 #FUSES NOPUT                 	//No Power Up Timer
 #FUSES NOBROWNOUT            	//No brownout reset
-#FUSES BORV18                	//Brownout reset at 1.8V
 #FUSES ZPBORM                	//Zero-Power BOR
 #FUSES CANB                  	//CANTX and CANRX pins are located on RB2 and RB3
 #FUSES MSSPMSK7              	//MSSP uses 7 bit Masking mode
@@ -40,6 +40,9 @@
 #FUSES NOWRTD                	//Data EEPROM not write protected
 #FUSES NOEBTR                	//Memory not protected from table reads
 #FUSES NOEBTRB               	//Boot block not protected from table reads
+
+#byte OSCCON = 0xFD3
+#bit IDLEN = OSCCON.7
 
 #else
 

@@ -23,7 +23,8 @@
 
 #elif defined(USE_PIC18F26K80)
 
-#define PI_COIL_PIN PIN_B1
+#define PI_COIL_PIN             PIN_B1
+#define PI_INTEGRATE_CTRL_PIN   PIN_B2
 
 #endif
 

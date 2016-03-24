@@ -160,7 +160,7 @@
         <property key="programoptions.testmodeentrymethod" value="VDDFirst"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="programoptions.uselvpprogramming" value="false"/>
-        <property key="voltagevalue" value="3.25"/>
+        <property key="voltagevalue" value="5.0"/>
       </PICkit3PlatformTool>
       <ccscompiler>
         <property key="close-after-compile" value="true"/>
