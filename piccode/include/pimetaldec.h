@@ -1,19 +1,17 @@
 #ifndef PICMETALDEC_H
 #define PICMETALDEC_H
 
-#define PULSE_WIDTH_US          100
-#define INTEGRATION_START_US    80
-#define INTEGRATION_TIME_US     80
-
 struct PiDetector{
-    int32 sampleDeplay;
+    int16 pulse_time;            //In us
+    int8 integration_start;     //In us after coil pulse ends
+    int8 integration_time;      //In us
 };
 
 extern struct PiDetector pi_data;
 
 void pi_init();
-void pi_doPulse();
-void pi_integrate();
+void pi_coil_pulse();
+void pi_set_start_integration();
 int16 pi_sample();
 
 #endif

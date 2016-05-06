@@ -9,6 +9,7 @@
       <itemPath>../include/pimetaldec.h</itemPath>
       <itemPath>C:/Program Files (x86)/PICC/Devices/24FV16KM202.h</itemPath>
       <itemPath>C:/Program Files (x86)/PICC/Devices/18F26K80.h</itemPath>
+      <itemPath>../include/display.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -27,6 +28,8 @@
                    projectFiles="true">
       <itemPath>../src/main.c</itemPath>
       <itemPath>../src/pimetaldec.c</itemPath>
+      <itemPath>../src/lcd.c</itemPath>
+      <itemPath>../src/display.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -74,6 +77,10 @@
         <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
+      <item path="../src/lcd.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
       <ICD3PlatformTool>
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
@@ -123,6 +130,7 @@
       </PICkit2PlatformTool>
       <PICkit3PlatformTool>
         <property key="AutoSelectMemRanges" value="auto"/>
+        <property key="Freeze Peripherals" value="true"/>
         <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>
         <property key="ToolFirmwareFilePath"
                   value="Press to browse for a specific firmware version"/>

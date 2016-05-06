@@ -1,5 +1,6 @@
 #include "main.h"
 #include "pimetaldec.h"
+#include "display.h"
 
 #use rs232( UART1, baud=9600, parity=N, bits=8 )
 
@@ -19,6 +20,7 @@ void init() {
     output_drive( PIN_C6 );    //UART TX
 
     pi_init();
+    dsp_init();
     
     enable_interrupts(GLOBAL);
 }
@@ -26,20 +28,20 @@ void init() {
 
 void main_loop() {
     int16 sample;
-            
+    
     while( TRUE ) {
-        pi_doPulse();
-        delay_us( INTEGRATION_START_US );
-        pi_integrate();
+        pi_coil_pulse();
+        delay_us( pi_data.integration_start );
         sample = pi_sample();
         
-        delay_ms( 5 );
-        printf( "Sample: %Ld\r\n", sample );
+        delay_ms( 50 );
+        
     }
 }
 
 
 void main() {
     init();
+    dsp_hello();
     main_loop();
 }
