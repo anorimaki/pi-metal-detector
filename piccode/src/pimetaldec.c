@@ -1,13 +1,13 @@
 #include "main.h"
 #include "pimetaldec.h"
+#include "config.h"
 #include "picconfig.h"
 
-#define MIN_INTEGRATION_RESULT 10
+#define MIN_INTEGRATION_RESULT 2
 //#define ADC_IN_SLEEP
-//#use rs232( UART1, baud=19200, parity=N, bits=8, DISABLE_INTS )
 
 
-struct PiDetector pi_data;
+struct Config config;
 
 void pi_init(){
     IDLEN = 0;
@@ -23,9 +23,8 @@ void pi_init(){
     setup_adc(ADC_OFF);
     disable_interrupts(INT_AD);
     
-    pi_data.pulse_time = 350;       //In us
-    pi_data.integration_time = 80;
-    pi_set_start_integration();
+    
+  //  pi_set_start_integration();
 }
 
 
@@ -33,31 +32,31 @@ void pi_set_start_integration() {
     int8 i;
     int8 value;
     
-    value = -1;
-    for( i=10; (i<50) && (value < MIN_INTEGRATION_RESULT); i=+2 ) {
+    value = 255;
+    for( i=10; (i<50) && (value > MIN_INTEGRATION_RESULT); i+=2 ) {
         pi_coil_pulse();
         delay_us( i );
         value = pi_sample();
     }
     
-    pi_data.integration_start = i;
+    config.start_sample_delay = i;
 }
 
 
 void pi_coil_pulse() {
     output_high( PI_COIL_CTRL_PIN );
-    delay_us( pi_data.pulse_time );
+    delay_us( config.pulse_time );
     output_low( PI_COIL_CTRL_PIN );
 }
 
 
-int16 pi_sample() {
+int8 pi_sample() {
     int16 ret;
     
     set_adc_channel(PI_INTEGRATION_SIGNAL_CH);
                 
     output_high( PI_INTEGRATE_CTRL_PIN );       //Start integration
-    delay_us( pi_data.integration_time );
+    delay_us( config.sample_time );
     
     //Internal A/D clock must be selected to use A/D in sleep mode (better acuracy)
     //Acquisition Time (TACQT) = TAD*4 = 4us * 4 = 16us
@@ -82,6 +81,12 @@ int16 pi_sample() {
     output_low( PI_INTEGRATE_CTRL_PIN );      //Stop integration
       
     setup_adc(ADC_OFF);
+    
+    ret = 4096 - ret;
+    ret = ret * 10;
+    ret >>= 6;
+    ret *= 10;
+    ret >>= 6;
 
     return ret;
 }
