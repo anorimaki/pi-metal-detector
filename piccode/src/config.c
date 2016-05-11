@@ -32,7 +32,7 @@ void cnf_load() {
 
 void cnf_save_coil_pulse() {
     write_eeprom( PULSE_TIME_ADDR, config.pulse_time >> 8 );
-    write_eeprom( PULSE_TIME_ADDR, config.pulse_time );
+    write_eeprom( PULSE_TIME_ADDR+1, config.pulse_time );
 }
 
 

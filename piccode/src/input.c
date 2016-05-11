@@ -1,6 +1,9 @@
 #include "main.h"
 #include "input.h"
 
+#define CHANGE_CONFIDENT_THRESHOLD 100
+
+struct Switch in_switches[SWITCHES_SIZE];
 
 void in_init() {
     output_float( PI_BUTTON_MODE_PIN );
@@ -10,29 +13,54 @@ void in_init() {
     
     RBPU = 1;                              //Enable pull-up resistors on PORT B
     WPUB = PI_BUTTON_PULLUP_RESISTORS;     //Enable pull-ups for buttons
+    
+    //At 16Mhz increments every 64us and overflows every 16.384ms
+    setup_timer_0( T0_INTERNAL | T0_DIV_256 | T0_8_BIT );
+    set_timer0(0);
+    enable_interrupts(INT_TIMER0);
 }
+
 
 #INT_TIMER0
 void isr_timer0 {
-    int i;
+    int8 i;
+	bool current_state;
     
     for( i=0; i<SWITCHES_SIZE; ++i ) {
-        Switch* sw = in.switches[i];
+        Switch* sw = in_switches[i];
         
         current_state = input_state( sw->pin );
-        if ( current_state ) {
-            sw->count_low++;
-            sw->count_high = 0;
-        }
-        else {
-            
-        }
+		
+		if ( current_state == sw->state ) {
+			sw->change_confident_count = 0;
+		}
+		else {
+			if ( sw->change_confident_count++ == CHANGE_CONFIDENT_THRESHOLD ) {
+				sw->state = current_state;
+			}
+		}
     }
 }
 
-Option in_read() {
-    if ( in.switches[SWITCH_MODE].state ) {
-        
+/*
+ * Wait to switch release and return true
+ * if switch has been pressed for more than
+ * 2 seconds.
+ */
+bool in_is_long_pulse( int8 sw ) {
+	int8 counter;
+    
+    counter = 20;
+    while( in_switches[sw].state ) {
+        if ( counter > 0 ) 
+            --counter;
+        delay_ms( 100 );
     }
-        
+
+    return counter == 0;
+}
+
+
+void in_wait_for_release( int8 sw ) {
+	while( in_switches[sw].state );
 }

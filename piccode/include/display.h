@@ -11,7 +11,8 @@
 void dsp_init();
 void dsp_clear();
 void dsp_hello();
-void dsp_data( int16 value );
+void dsp_setup_coil_pulse( int16 coil_volts );
+void dsp_sample( int8 sample1_strength, int8 sample2_strength );
 
 #endif	/* DISPLAY_H */
 

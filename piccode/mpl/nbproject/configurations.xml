@@ -12,6 +12,7 @@
       <itemPath>../include/display.h</itemPath>
       <itemPath>../include/input.h</itemPath>
       <itemPath>../include/config.h</itemPath>
+      <itemPath>../include/setup.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -34,6 +35,7 @@
       <itemPath>../src/display.c</itemPath>
       <itemPath>../src/input.c</itemPath>
       <itemPath>../src/config.c</itemPath>
+      <itemPath>../src/setup.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
