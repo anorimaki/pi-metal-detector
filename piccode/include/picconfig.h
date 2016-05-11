@@ -41,8 +41,28 @@
 #FUSES NOEBTR                	//Memory not protected from table reads
 #FUSES NOEBTRB               	//Boot block not protected from table reads
 
+//OSCCON register (Register 3-1) controls the main
+//  aspects of the device clock?s operation
 #byte OSCCON = 0xFD3
-#bit IDLEN = OSCCON.7
+
+//Idle Enable bit.
+// 1 = Device enters an Idle mode when a SLEEP instruction is executed
+// 0 = Device enters Sleep mode when a SLEEP instruction is executed
+#bit IDLEN = OSCCON.7           
+
+//WPUB register: Weak pull-up PORT_B enable
+// WPUB<7:0>: Weak Pull-Up Enable Register bits
+// 1 = Pull-up enabled on corresponding PORTB pin when RBPU = 0 and the pin is an input
+// 0 = Pull-up disabled on corresponding PORTB pin
+#byte WPUB = 0xF5B
+
+//INTCON2 register: Interrupt control register
+#byte INTCON2 = 0xFF1
+
+//RBPU: PORTB Pull-up Enable bit
+// 1 = All PORTB pull-ups are disabled
+// 0 = PORTB pull-ups are enabled by individual port latch values
+#bit RBPU = INTCON2.7
 
 #else
 

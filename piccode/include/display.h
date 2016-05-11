@@ -11,6 +11,7 @@
 void dsp_init();
 void dsp_clear();
 void dsp_hello();
+void dsp_data( int16 value );
 
 #endif	/* DISPLAY_H */
 

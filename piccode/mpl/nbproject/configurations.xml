@@ -10,6 +10,8 @@
       <itemPath>C:/Program Files (x86)/PICC/Devices/24FV16KM202.h</itemPath>
       <itemPath>C:/Program Files (x86)/PICC/Devices/18F26K80.h</itemPath>
       <itemPath>../include/display.h</itemPath>
+      <itemPath>../include/input.h</itemPath>
+      <itemPath>../include/config.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -30,6 +32,8 @@
       <itemPath>../src/pimetaldec.c</itemPath>
       <itemPath>../src/lcd.c</itemPath>
       <itemPath>../src/display.c</itemPath>
+      <itemPath>../src/input.c</itemPath>
+      <itemPath>../src/config.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

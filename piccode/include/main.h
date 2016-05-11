@@ -31,8 +31,14 @@
 #define PI_COIL_VOLTAGE_PIN         sAN1        //RA1
 #define PI_COIL_VOLTAGE_CH          1
 
+#define PI_BUTTON_MODE_PIN          PIN_B0
+#define PI_BUTTON_AUTO_PIN          PIN_B1
+#define PI_BUTTON_INC_PIN           PIN_B2
+#define PI_BUTTON_DEC_PIN           PIN_B3
+#define PI_BUTTON_PULLUP_RESISTORS  0x0F
+
 #if 1
-#define LCD_DATA_PORT           getenv("SFR:PORTB")
+#define LCD_DATA_PORT           getenv("SFR:PORTC")
 #else
 #define LCD_RW_PIN  				PIN_B2
 #define LCD_ENABLE_PIN  			PIN_B0
