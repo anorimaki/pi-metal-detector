@@ -3,7 +3,7 @@
 
 #define CHANGE_CONFIDENT_THRESHOLD 100
 
-struct Switch in_switches[SWITCHES_SIZE];
+struct InSwitch in_switches[SWITCHES_SIZE];
 
 void in_init() {
     output_float( PI_BUTTON_MODE_PIN );
@@ -14,6 +14,11 @@ void in_init() {
     RBPU = 1;                              //Enable pull-up resistors on PORT B
     WPUB = PI_BUTTON_PULLUP_RESISTORS;     //Enable pull-ups for buttons
     
+    in_switches[SWITCH_MODE].pin = PI_BUTTON_MODE_PIN;
+    in_switches[SWITCH_AUTOSET].pin = PI_BUTTON_AUTO_PIN;
+    in_switches[SWITCH_INCREMENT].pin = PI_BUTTON_INC_PIN;
+    in_switches[SWITCH_DECREMENT].pin = PI_BUTTON_DEC_PIN;
+    
     //At 16Mhz increments every 64us and overflows every 16.384ms
     setup_timer_0( T0_INTERNAL | T0_DIV_256 | T0_8_BIT );
     set_timer0(0);
@@ -21,13 +26,13 @@ void in_init() {
 }
 
 
-#INT_TIMER0
-void isr_timer0 {
+#int_timer0
+void isr_timer0() {
     int8 i;
-	bool current_state;
+	int1 current_state;
     
     for( i=0; i<SWITCHES_SIZE; ++i ) {
-        Switch* sw = in_switches[i];
+        struct InSwitch* sw = in_switches[i];
         
         current_state = input_state( sw->pin );
 		
@@ -47,7 +52,7 @@ void isr_timer0 {
  * if switch has been pressed for more than
  * 2 seconds.
  */
-bool in_is_long_pulse( int8 sw ) {
+int1 in_is_long_pulse( int8 sw ) {
 	int8 counter;
     
     counter = 20;

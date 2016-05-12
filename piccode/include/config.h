@@ -8,14 +8,7 @@
 #ifndef CONFIG_H
 #define	CONFIG_H
 
-struct Config {
-    int16 pulse_time;                   //In us
-    int8 start_sample_delay;            //In us after coil pulse ends
-    int8 sample_time;                   //In us
-    int8 start_second_sample_delay;     //In us
-};
 
-extern struct Config config;
 
 void cnf_load();
 void cnf_save_coil_pulse();

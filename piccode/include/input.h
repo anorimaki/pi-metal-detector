@@ -9,9 +9,10 @@
 #define	INPUT_H
 
 
-struct Switch {
-    bool state;
+struct InSwitch {
+    int1 state;
 	int8 change_confident_count;
+    int16 pin;
 };
 
 
@@ -22,11 +23,11 @@ struct Switch {
 #define SWITCH_DECREMENT 	2
 #define SWITCH_AUTOSET 		3
 
-extern struct Switch in_switches[SWITCHES_SIZE];
+extern struct InSwitch in_switches[SWITCHES_SIZE];
 
 
 void in_init();
-bool in_is_long_pulse( int8 sw );
+int1 in_is_long_pulse( int8 sw );
 void in_wait_for_release( int8 sw );
 
 

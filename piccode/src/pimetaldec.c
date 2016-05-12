@@ -7,7 +7,7 @@
 //#define ADC_IN_SLEEP
 
 
-struct Config config;
+struct Config pi;
 
 void pi_init(){
     IDLEN = 0;      //Enter in Sleep mode if SLEEP is executed
@@ -31,7 +31,7 @@ void pi_init(){
 */
 void pi_coil_pulse() {
     output_high( PI_COIL_CTRL_PIN );
-    delay_us( config.pulse_time );
+    delay_us( pi.pulse_time );
     output_low( PI_COIL_CTRL_PIN );
 }
 
@@ -52,9 +52,9 @@ int16 a2d_converter() {
     disable_interrupts(INT_AD);
 #else
     //TAD: 1us for a 16Mhz clock
-    //Acquisition Time (TACQT) = TAD*4 = 1us * 4 = 1us
+    //Acquisition Time (TACQT) = TAD*4 = 1us * 4 = 4us
     setup_adc(ADC_CLOCK_DIV_16|ADC_TAD_MUL_4);
-    return read_adc(ADC_START_AND_READ);
+    return read_adc(ADC_START_AND_READ); //Conv. time: 13 TADs -> 13*1 = 13us
 #endif   
 }
 
@@ -67,7 +67,7 @@ int8 pi_sample() {
     set_adc_channel(PI_INTEGRATION_SIGNAL_CH);
                 
     output_high( PI_INTEGRATE_CTRL_PIN );       //Start integration
-    delay_us( config.sample_time );
+    delay_us( pi.sample_time );
     
     ret = a2d_converter();
     
@@ -85,11 +85,30 @@ int8 pi_sample() {
 }
 
 
-int16 pi_peak_coil_sample() {
+int16 pi_read_peak_coil_volts() {
     int16 ret;
-    
-	set_adc_channel(PI_COIL_VOLTAGE_CH);
+   
+    set_adc_channel(PI_COIL_VOLTAGE_CH);
     ret = a2d_converter();
+    setup_adc(ADC_OFF);
     
+    return ret;
+}
+
+/*
+ * Returns value in vols
+ */
+int16 pi_read_peak_coil_volts( int16 reference_5v ) {
+    int16 ret;
+   
+         //Disable interrupts for good timing accuracy.
+    disable_interrupts(GLOBAL);
     
+    pi_coil_pulse();
+    ret = pi_read_peak_coil_volts();
+				
+		//Enable interrupts to capture read input switches
+    disable_interrupts(GLOBAL);
+    
+    return (ret*5) / reference_5v;
 }

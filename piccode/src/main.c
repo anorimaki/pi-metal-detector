@@ -2,6 +2,8 @@
 #include "pimetaldec.h"
 #include "display.h"
 #include "input.h"
+#include "config.h"
+#include "setup.h"
 
 //#use rs232( UART1, baud=9600, parity=N, bits=8 )
 
@@ -41,11 +43,11 @@ void sampling() {
         pi_coil_pulse();
         
                     //Main sample to read metal objects
-        delay_us( config.start_sample_delay );
+        delay_us( pi.start_sample_delay );
         sample1 = pi_sample();
         
                     //Second sample to cancel earth effect
-        delay_us( config.start_second_sample_delay );
+        delay_us( pi.start_second_sample_delay );
         sample2 = pi_sample();
 		
 				//Enable interrupts to capture read input switches

@@ -1,5 +1,8 @@
 #include "main.h"
 #include "setup.h"
+#include "display.h"
+#include "pimetaldec.h"
+#include "config.h"
 #include "input.h"
 
 
@@ -7,31 +10,32 @@
 #define MIN_PULSE_TIME	10		//in us
 
 
-bool setup_coil_pulse() {
+int1 setup_coil_pulse() {
     int16 coil_volts;
-	
-	dsp_setup_coil_pulse( 0 );
+    int8 i;
+    int16 reference_5v;
+    
+	       // Calculates reference for 5 volts with the mean of 8 samples 
+    reference_5v=0;
+    for( i=0; i<8; i++ )
+        reference_5v += pi_read_peak_coil_volts();
+    reference_5v >>= 3;
+    
+    dsp_setup_coil_pulse_ref( reference_5v );
     
     while( TRUE ) {
         if ( in_switches[SWITCH_MODE].state ) 
 			return in_is_long_pulse( SWITCH_MODE );
 		
 		if ( in_switches[SWITCH_INCREMENT].state && 
-					(config.pulse_time < MAX_PULSE_TIME) )
-			++config.pulse_time;
+					(pi.pulse_time < MAX_PULSE_TIME) )
+			++pi.pulse_time;
 		
 		if ( in_switches[SWITCH_DECREMENT].state && 
-					(config.pulse_time > MIN_PULSE_TIME) )
-			--config.pulse_time;
+					(pi.pulse_time > MIN_PULSE_TIME) )
+			--pi.pulse_time;
         
-			//Disable interrupts for good timing confidence.
-		disable_interrupts(GLOBAL);
-				
-		pi_coil_pulse();
-		coil_volts = pi_peak_coil_sample();
-        
-			//Enable interrupts to capture read input switches
-		disable_interrupts(GLOBAL);
+		coil_volts = pi_read_peak_coil_volts( reference_5v );
 		
 		dsp_setup_coil_pulse( coil_volts );
 		
@@ -40,8 +44,8 @@ bool setup_coil_pulse() {
 }
 
 
-bool setup_start_sample_delay() {
-	return true;
+int1 setup_start_sample_delay() {
+	return TRUE;
 }
 
 
