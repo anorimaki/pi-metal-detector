@@ -19,6 +19,7 @@ void init() {
     
     dsp_init();
     pi_init();
+    in_init();
     
     enable_interrupts(GLOBAL);
 }
@@ -36,7 +37,7 @@ void sampling() {
 			in_wait_for_release(SWITCH_MODE);
 			return;
 		}
-        
+    /*    
 				//disable interrupts for good timing confidence.
 		disable_interrupts(GLOBAL);
 		
@@ -51,7 +52,7 @@ void sampling() {
         sample2 = pi_sample();
 		
 				//Enable interrupts to capture read input switches
-		enable_interrupts(GLOBAL);
+		enable_interrupts(GLOBAL); */
         
         dsp_sample( sample1, sample2 );
         

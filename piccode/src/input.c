@@ -34,7 +34,7 @@ void isr_timer0() {
     for( i=0; i<SWITCHES_SIZE; ++i ) {
         struct InSwitch* sw = in_switches[i];
         
-        current_state = input_state( sw->pin );
+        current_state = input( sw->pin );
 		
 		if ( current_state == sw->state ) {
 			sw->change_confident_count = 0;

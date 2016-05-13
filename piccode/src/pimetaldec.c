@@ -85,7 +85,7 @@ int8 pi_sample() {
 }
 
 
-int16 pi_read_peak_coil_volts() {
+int16 pi_read_peak_coil_ref() {
     int16 ret;
    
     set_adc_channel(PI_COIL_VOLTAGE_CH);
@@ -98,14 +98,14 @@ int16 pi_read_peak_coil_volts() {
 /*
  * Returns value in vols
  */
-int16 pi_read_peak_coil_volts( int16 reference_5v ) {
+int8 pi_read_peak_coil( int16 reference_5v ) {
     int16 ret;
    
          //Disable interrupts for good timing accuracy.
     disable_interrupts(GLOBAL);
     
     pi_coil_pulse();
-    ret = pi_read_peak_coil_volts();
+    ret = pi_read_peak_coil_ref();
 				
 		//Enable interrupts to capture read input switches
     disable_interrupts(GLOBAL);

@@ -18,7 +18,7 @@ int1 setup_coil_pulse() {
 	       // Calculates reference for 5 volts with the mean of 8 samples 
     reference_5v=0;
     for( i=0; i<8; i++ )
-        reference_5v += pi_read_peak_coil_volts();
+        reference_5v += pi_read_peak_coil_ref();
     reference_5v >>= 3;
     
     dsp_setup_coil_pulse_ref( reference_5v );
@@ -35,7 +35,7 @@ int1 setup_coil_pulse() {
 					(pi.pulse_time > MIN_PULSE_TIME) )
 			--pi.pulse_time;
         
-		coil_volts = pi_read_peak_coil_volts( reference_5v );
+		coil_volts = pi_read_peak_coil( reference_5v );
 		
 		dsp_setup_coil_pulse( coil_volts );
 		

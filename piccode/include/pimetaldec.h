@@ -12,7 +12,11 @@ extern struct Config pi;
 
 void pi_init();
 void pi_coil_pulse();
-int8 pi_sample();             //Returns a 0-100 vale indicating signal strength
-int16 pi_read_peak_coil_volts();  //Return value in volts
+
+//Returns a 0-100 vale indicating signal strength
+int8 pi_read_peak_coil( int16 ref );   
+
+//Return value in volts
+int16 pi_read_peak_coil_ref();  
 
 #endif
