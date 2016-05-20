@@ -27,7 +27,7 @@
 #define PI_INTEGRATE_CTRL_PIN       PIN_A5
 
 #define PI_INTEGRATION_SIGNAL_PIN   sAN0        //RA0
-#define PI_INTEGRATION_SIGNAL_CH    0
+#define PI_DECAY_SIGNAL_CH    0
 #define PI_COIL_VOLTAGE_PIN         sAN1        //RA1
 #define PI_COIL_VOLTAGE_CH          1
 

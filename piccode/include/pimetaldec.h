@@ -14,9 +14,13 @@ void pi_init();
 void pi_coil_pulse();
 
 //Returns a 0-100 vale indicating signal strength
-int8 pi_read_peak_coil( int16 ref );   
+int8 pi_sample();
 
 //Return value in volts
+int16 pi_read_peak_coil( int16 ref );   
+
+//Return 5V reference to calculate coil voltage
 int16 pi_read_peak_coil_ref();  
+
 
 #endif

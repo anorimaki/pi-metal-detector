@@ -21,7 +21,7 @@ void dsp_hello() {
 void dsp_setup_coil_pulse_ref( int16 reference_5v ) {
 	lcd_putc( '\f' );
 	printf( lcd_putc, "SET: coil pulse\n" );
-	printf( lcd_putc, "5V ref.: %LuV", reference_5v );
+	printf( lcd_putc, "5V ref.: %Lu", reference_5v );
 }
 
 
@@ -32,10 +32,16 @@ void dsp_setup_coil_pulse( int16 coil_volts ) {
 }
 
 
-void dsp_sample( int8 sample1_strength, int8 sample2_strength ) {
+void dsp_setup_sample_delay( int8 strength ) {
 	lcd_putc( '\f' );
-	printf( lcd_putc, "Strenght: %u\n", sample1_strength );
-	printf( lcd_putc, "Strenght: %u", sample2_strength );
+	printf( lcd_putc, "SET: samp. delay\n" );
+	printf( lcd_putc, "%uus  -->  %u", pi.start_sample_delay, strength );
+}
+
+
+void dsp_sample( int8 strength ) {
+	lcd_putc( '\f' );
+	printf( lcd_putc, "Strenght: %u", strength );
 }
 
 

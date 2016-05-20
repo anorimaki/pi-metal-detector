@@ -10,7 +10,7 @@
 #define START_SECOND_SAMPLE_DELAY_ADDR     SAMPLE_TIME_ADDR + 1
 
 #rom getenv("EEPROM_ADDRESS") = {    \
-        0x01,0x5E,      /*Initial pulse time = 350us*/ \
+        0x00,0x50,      /*Initial pulse time = 80us*/ \
         15,             /*Sample delay*/ \
         80,             /*Sample time*/ \
         80}             /*Second sample deplay*/
@@ -19,7 +19,7 @@
 void cnf_load() {
     pi.pulse_time = read_eeprom( PULSE_TIME_ADDR );
     pi.pulse_time <<= 8;
-    pi.pulse_time = read_eeprom( PULSE_TIME_ADDR );
+    pi.pulse_time += read_eeprom( PULSE_TIME_ADDR+1 );
     
     pi.start_sample_delay = read_eeprom( START_SAMPLE_DELAY_ADDR );
     

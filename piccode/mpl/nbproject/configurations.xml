@@ -83,7 +83,27 @@
         <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
+      <item path="../src/config.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
+      <item path="../src/display.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
+      <item path="../src/input.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
       <item path="../src/lcd.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
+      <item path="../src/pimetaldec.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
+      <item path="../src/setup.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
       </item>
@@ -191,11 +211,11 @@
         <property key="keep-if-errors" value="false"/>
         <property key="keep-if-no-errors" value="false"/>
         <property key="keep-scratch-files-on-disk" value="true"/>
-        <property key="list-file" value="+LN"/>
+        <property key="list-file" value="+LY"/>
         <property key="list-file-extension" value=""/>
         <property key="old-error-file-format" value="false"/>
         <property key="opt-level" value="9"/>
-        <property key="output-flags" value=""/>
+        <property key="output-flags" value="+DS +DM"/>
         <property key="preprocessor-macros" value=""/>
       </ccscompiler>
     </conf>

@@ -25,38 +25,19 @@ void init() {
 }
 
 
-/*
- * Sampling state: Normal operation state
- */
+//
+// Sampling state: Normal operation state
+//
 void sampling() {
-    int8 sample1;
-    int8 sample2;
-    
     while( TRUE ) {
-        if ( in_switches[SWITCH_MODE].state ) {
-			in_wait_for_release(SWITCH_MODE);
+		if ( in_switches[SWITCH_MODE].state )
 			return;
-		}
-    /*    
-				//disable interrupts for good timing confidence.
-		disable_interrupts(GLOBAL);
-		
-        pi_coil_pulse();
+		  
+        int8 sample = pi_sample();
         
-                    //Main sample to read metal objects
-        delay_us( pi.start_sample_delay );
-        sample1 = pi_sample();
+        dsp_sample( sample );
         
-                    //Second sample to cancel earth effect
-        delay_us( pi.start_second_sample_delay );
-        sample2 = pi_sample();
-		
-				//Enable interrupts to capture read input switches
-		enable_interrupts(GLOBAL); */
-        
-        dsp_sample( sample1, sample2 );
-        
-        delay_ms( 100 );
+        delay_ms( 300 );
     }
 }
 
@@ -75,3 +56,11 @@ void main() {
         setup();
     }
 }
+
+#if 1
+#include "config.c"
+#include "display.c"
+#include "input.c"
+#include "pimetaldec.c"
+#include "setup.c"
+#endif
