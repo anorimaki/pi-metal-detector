@@ -25,20 +25,34 @@ void init() {
 }
 
 
+
+void autoset_sample_zero_point() {
+	
+	
+}
+
+
 //
 // Sampling state: Normal operation state
 //
 void sampling() {
-    while( TRUE ) {
+	while (TRUE) {
 		if ( in_switches[SWITCH_MODE].state )
 			return;
-		  
-        int8 sample = pi_sample();
-        
-        dsp_sample( sample );
-        
-        delay_ms( 300 );
-    }
+		
+		if ( in_switches[SWITCH_AUTOSET].state ) {
+			pi.sample_zero_point = pi_raw_sample();
+		}
+		
+		pi.start_sample_delay = setup_incremental_variable( pi.start_sample_delay, 
+										MIN_SAMPLE_DELAY, MAX_SAMPLE_DELAY );
+
+		signed int8 strength = pi_sample();
+		
+		dsp_sample( strength );
+		
+		delay_ms( 100 );
+	}
 }
 
 

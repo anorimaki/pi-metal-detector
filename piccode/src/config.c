@@ -27,6 +27,8 @@ void cnf_load() {
     
     pi.start_second_sample_delay = 
                     read_eeprom( START_SECOND_SAMPLE_DELAY_ADDR );
+	
+	pi.sample_zero_point = INITIAL_SAMPLE_ZERO_POINT;
 }
 
 

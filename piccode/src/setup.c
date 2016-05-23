@@ -9,9 +9,6 @@
 #define MAX_PULSE_TIME	500		//In us
 #define MIN_PULSE_TIME	10		//in us
 
-#define MAX_SAMPLE_DELAY	50		//In us
-#define MIN_SAMPLE_DELAY	10		//in us
-
 
 #inline
 int8 pulse_time_increment( int16 switch_on_time ) {
@@ -20,7 +17,7 @@ int8 pulse_time_increment( int16 switch_on_time ) {
 }
 
 
-int16 update( int16 current, int16 min, int16 max ) {
+int16 setup_incremental_variable( int16 current, int16 min, int16 max ) {
 	if ( in_switches[SWITCH_INCREMENT].state ) {
 		int16 inc = pulse_time_increment( in_switches[SWITCH_INCREMENT].state_time );
 		current = ((max-current)>inc) ? current+inc : max;
@@ -37,32 +34,61 @@ int16 update( int16 current, int16 min, int16 max ) {
 }
 
 
+int16 get_peak_coil_ref() {
+	int16 ret = 0;
+	for (int8 i = 0; i < 8; i++)
+		ret += pi_read_peak_coil_ref();
+	ret >>= 3;
+	
+	dsp_setup_coil_pulse_ref(ret);
+	
+	delay_ms(1500);
+	
+	return ret;
+}
+
+
 int1 setup_coil_pulse()
 {
 	// Calculates reference for 5 volts with the mean of 8 samples 
-	int8 i;
-	int16 reference_5v = 0;
-	for (i = 0; i < 8; i++)
-		reference_5v += pi_read_peak_coil_ref();
-	reference_5v >>= 3;
-
-	dsp_setup_coil_pulse_ref(reference_5v);
+	int8 reference_5v;
 	
-	delay_ms(3000);
+	reference_5v = get_peak_coil_ref();
 	
 	while (TRUE) {
-		if (in_switches[SWITCH_MODE].state)
+		if ( in_switches[SWITCH_MODE].state )
 			return in_wait_for_release_timeout( SWITCH_MODE, 2000 );
 		
-		pi.pulse_time = update( pi.pulse_time, MIN_PULSE_TIME, MAX_PULSE_TIME );
+		if ( in_switches[SWITCH_AUTOSET].state ) {
+			delay_ms(100);
+			reference_5v = get_peak_coil_ref();
+		}
+		
+		pi.pulse_time = setup_incremental_variable( pi.pulse_time,
+											MIN_PULSE_TIME, MAX_PULSE_TIME );
 
 		int16 coil_volts = 0;
-		for (i = 0; i < 4; i++) {
-			delay_ms(100);
+		for (int8 i = 0; i < 4; i++) {
 			coil_volts += pi_read_peak_coil(reference_5v);
+			delay_ms(100);
 		}
 		coil_volts >>= 2;
+		
 		dsp_setup_coil_pulse(coil_volts);
+	}
+}
+
+
+void autoset_sample_delay() {
+	pi.sample_zero_point = INITIAL_SAMPLE_ZERO_POINT;
+	pi.start_sample_delay = MIN_SAMPLE_DELAY;
+	while( pi.start_sample_delay < MAX_SAMPLE_DELAY ) {
+		signed int8 strength = pi_sample();
+		dsp_setup_sample_delay( strength );
+		if( strength <= 0 )
+			return;
+		++pi.start_sample_delay;
+		delay_ms( 100 );
 	}
 }
 
@@ -70,27 +96,28 @@ int1 setup_coil_pulse()
 int1 setup_start_sample_delay()
 {
 	while (TRUE) {
-		if (in_switches[SWITCH_MODE].state)
+		if ( in_switches[SWITCH_MODE].state )
 			return in_wait_for_release_timeout( SWITCH_MODE, 2000 );
 		
-		pi.start_sample_delay = update( pi.start_sample_delay, 
+		if ( in_switches[SWITCH_AUTOSET].state )
+			autoset_sample_delay();
+		
+		pi.start_sample_delay = setup_incremental_variable( pi.start_sample_delay, 
 										MIN_SAMPLE_DELAY, MAX_SAMPLE_DELAY );
 
-		int8 sample = pi_sample();
-        dsp_setup_sample_delay( sample );
+		signed int8 strength = pi_sample();
+		dsp_setup_sample_delay( strength );
 	}
 }
 
 
 void setup()
 {
-	if (!setup_coil_pulse()) {
-		cnf_save_coil_pulse();
+	if ( setup_coil_pulse() ) {
 		return;
 	}
 
-	if (!setup_start_sample_delay()) {
-		cnf_save_start_sample_delay();
+	if ( setup_start_sample_delay() ) {
 		return;
 	}
 	/*

@@ -1,0 +1,1 @@
+- Con el amplificador no inversor (LM318) se consigue una mayor impedancia de entrada y el voltaje en la bobina es mayor para un pulso igual de largo. Es decir, con el amplificador inversor se requiere un pulso más largo para conseguir el mismo voltaje que con el amplificador no-iversor (aprox. 100V de diferencia).

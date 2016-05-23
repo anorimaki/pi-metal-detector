@@ -16,11 +16,11 @@ void pi_init()
 	output_low(PI_COIL_CTRL_PIN);
 	output_drive(PI_COIL_CTRL_PIN);
 
-	output_low(PI_INTEGRATE_CTRL_PIN);
-	output_drive(PI_INTEGRATE_CTRL_PIN);
+	output_low(PI_ADC_INDICATOR_PIN);
+	output_drive(PI_ADC_INDICATOR_PIN);
 
 	//VREF-: VSS, VREF+: VDD
-	setup_adc_ports(PI_INTEGRATION_SIGNAL_PIN | PI_COIL_VOLTAGE_PIN, VSS_VDD);
+	setup_adc_ports(PI_DECAY_SIGNAL_PIN | PI_COIL_VOLTAGE_PIN, VSS_VDD);
 	setup_adc(ADC_OFF);
 	disable_interrupts(INT_AD);
 }
@@ -56,7 +56,10 @@ int16 a2d_converter()
 	//TAD: 1us for a 16Mhz clock
 	//Acquisition Time (TACQT) = TAD*4 = 1us * 4 = 4us
 	setup_adc(ADC_CLOCK_DIV_16 | ADC_TAD_MUL_4);
-	return read_adc(ADC_START_AND_READ); //Conv. time: 13 TADs -> 13*1 = 13us
+//	output_high(PI_ADC_INDICATOR_PIN);
+	int16 ret = read_adc(ADC_START_AND_READ); //Conv. time: 13 TADs -> 13*1 = 13us
+//	output_low(PI_ADC_INDICATOR_PIN);
+	return (ret & 0x8000) ? 0 : ret;
 #endif   
 }
 
@@ -88,10 +91,8 @@ int16 pi_read_peak_coil(int16 reference_5v)
 	return ret / reference_5v;
 }
 
-//
-// Returns signal strength
-//
-int8 pi_sample()
+
+int16 pi_raw_signle_sample()
 {
 	//Disable interrupts for good timing accuracy.
 	disable_interrupts(GLOBAL);
@@ -102,17 +103,39 @@ int8 pi_sample()
 	
 	delay_us( pi.start_sample_delay );
 	
-	int16 ret = a2d_converter();
+	int16 sample = a2d_converter();
 	
 	setup_adc(ADC_OFF);
 	
 	enable_interrupts(GLOBAL);
+	
+	return sample;
+}
 
-	ret = 4096 - ret;
-	ret = ret * 10;
-	ret >>= 6;
-	ret *= 10;
-	ret >>= 6;
+
+//
+// 
+//
+int16 pi_raw_sample()
+{
+	int16 ret = 0;
+	for (int8 i = 0; i < 4; i++) {
+		ret += pi_raw_signle_sample();
+		delay_ms(100);
+	}
+	ret >>= 2;
+	return ret;
+}
+
+
+signed int8 pi_sample() 
+{
+	signed int32 ret = pi.sample_zero_point;
+	
+	ret -= pi_raw_sample();
+	
+	ret *= 100;
+	ret /= pi.sample_zero_point;
 
 	return ret;
 }
