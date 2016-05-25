@@ -1,6 +1,12 @@
 #ifndef COIL_H
 #define COIL_H
 
+#define COIL_MAX_ADC_VALUE              4095
+#define COIL_PULSE_PERIOD               50      //In ms
+#define COIL_MAX_SAMPLE_DELAY           50		//In us
+#define COIL_MIN_SAMPLE_DELAY           0		//in us
+#define COIL_CALCULATE_MIN_ZERO_DELAY   COIL_MAX_SAMPLE_DELAY*4		//in us
+
 struct Coil {
     int16 pulse_length;             //In us
     int8 sample_delay;              //In us after coil pulse ends
@@ -11,18 +17,10 @@ extern struct Coil coil;
 
 void coil_init();
 
-//Returns a [-100..100] value indicating signal strength
-signed int8 coil_sample();
+int8 coil_peak_ref();
+int16 coil_peak();
 
-int16 pi_raw_sample( int8 delay_us );
-
-int16 pi_raw_sample();
-
-//Return value in volts
-int16 pi_read_peak_coil( int16 ref );   
-
-//Return 5V reference to calculate coil voltage
-int16 pi_read_peak_coil_ref();  
-
+signed int16 coil_sample();
+int16 coil_raw_sample( int8 delay, int8 n );
 
 #endif

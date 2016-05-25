@@ -6,7 +6,6 @@
                    projectFiles="true">
       <itemPath>../include/main.h</itemPath>
       <itemPath>../include/picconfig.h</itemPath>
-      <itemPath>../include/pimetaldec.h</itemPath>
       <itemPath>C:/Program Files (x86)/PICC/Devices/24FV16KM202.h</itemPath>
       <itemPath>C:/Program Files (x86)/PICC/Devices/18F26K80.h</itemPath>
       <itemPath>../include/display.h</itemPath>
@@ -14,6 +13,7 @@
       <itemPath>../include/config.h</itemPath>
       <itemPath>../include/setup.h</itemPath>
       <itemPath>../include/samples.h</itemPath>
+      <itemPath>../include/coil.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -31,13 +31,13 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>../src/main.c</itemPath>
-      <itemPath>../src/pimetaldec.c</itemPath>
       <itemPath>../src/lcd.c</itemPath>
       <itemPath>../src/display.c</itemPath>
       <itemPath>../src/input.c</itemPath>
       <itemPath>../src/config.c</itemPath>
       <itemPath>../src/setup.c</itemPath>
       <itemPath>../src/samples.c</itemPath>
+      <itemPath>../src/coil.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -86,8 +86,6 @@
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
       <item path="../src/coil.c" ex="true" overriding="false">
-        <ccscompiler>
-        </ccscompiler>
       </item>
       <item path="../src/config.c" ex="true" overriding="false">
         <ccscompiler>
@@ -104,6 +102,8 @@
       <item path="../src/lcd.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
+      </item>
+      <item path="../src/samples.c" ex="true" overriding="false">
       </item>
       <item path="../src/setup.c" ex="true" overriding="false">
         <ccscompiler>

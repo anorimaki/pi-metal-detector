@@ -18,33 +18,25 @@ void init() {
     set_tris_c( 0xFFFF );      //All inputs by default
     
     dsp_init();
-    pi_init();
+    coil_init();
     in_init();
     
     enable_interrupts(GLOBAL);
 }
 
 
-
-void autoset_sample_zero_point() {
-	
-	
-}
-
-
-
-
 //
 // Sampling state: Normal operation state
 //
 void sampling() {
-	int16 sample = 0;
+	signed int16 sample = 0;
 	while (TRUE) {
 		if ( in_switches[SWITCH_MODE].state )
 			return;
 		
 		if ( in_switches[SWITCH_AUTOSET].state ) {
-			int16 min_zero = coil_min_zero();
+			int16 min_zero = 
+					coil_raw_sample( COIL_CALCULATE_MIN_ZERO_DELAY, 1 );
 			coil.zero += sample;
 			dsp_setup_zero_point( min_zero );
 			delay_ms(1000);
@@ -54,7 +46,7 @@ void sampling() {
 		
 		dsp_sample( sample );
 		
-		delay_ms( 100 );
+		delay_ms( COIL_PULSE_PERIOD );
 	}
 }
 
@@ -78,6 +70,7 @@ void main() {
 #include "config.c"
 #include "display.c"
 #include "input.c"
-#include "pimetaldec.c"
+#include "coil.c"
 #include "setup.c"
+#include "samples.c"
 #endif

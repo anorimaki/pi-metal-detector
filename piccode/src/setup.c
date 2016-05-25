@@ -17,7 +17,7 @@ int8 pulse_time_increment( int16 switch_on_time ) {
 }
 
 
-signed int16 get_increment( int16 current, int16 min, int16 max ) {
+signed int16 setup_get_increment( int16 current, int16 min, int16 max ) {
 	signed int16 increment;
 	
 	if ( in_switches[SWITCH_INCREMENT].state ) {
@@ -57,26 +57,20 @@ int1 setup_coil_pulse()
 			delay_ms(1000);
 		}
 		
-		signed int16 inc = get_increment( coil.pulse_length,
+		coil.pulse_length += setup_get_increment( coil.pulse_length,
 										MIN_PULSE_TIME, MAX_PULSE_TIME );
-		if ( inc != 0 ) {
-			coil.pulse_length += inc;
-			coil_reset_history();
-		}
-		
+
 		int16 peak = coil_peak();
-		
 		dsp_setup_coil_pulse(peak, reference_5v);
 		
-		delay_ms(100);
+		delay_ms( COIL_PULSE_PERIOD );
 	}
 }
 
 
 int1 setup_zero_point() 
 {
-			//Delay to calculate min zero: 3/2 of MAX_SAMPLE_DELAY
-	int16 min_zero = coil_sample();
+	int16 min_zero = coil_raw_sample( COIL_CALCULATE_MIN_ZERO_DELAY, 3 );
 	
 	while (TRUE) {
 		if ( in_switches[SWITCH_MODE].state )
@@ -87,7 +81,7 @@ int1 setup_zero_point()
 			coil.zero = min_zero - (min_zero/10);
 		}
 
-		coil.zero += get_increment( coil.zero, 0, min_zero );
+		coil.zero += setup_get_increment( coil.zero, 0, min_zero );
 
 		dsp_setup_zero_point( min_zero );
 		
@@ -97,14 +91,15 @@ int1 setup_zero_point()
 
 
 int16 autoset_sample_delay() {
-	int16 ret = MIN_SAMPLE_DELAY;
-	while( ret < MAX_SAMPLE_DELAY ) {
-		int16 sample = coil_sample( ret, 3 );
+	int16 ret = COIL_MIN_SAMPLE_DELAY;
+	while( ret < COIL_MAX_SAMPLE_DELAY ) {
+		signed int16 sample = coil_raw_sample( ret, 3 );
+		sample -= coil.zero;
 		dsp_setup_sample_delay( sample );
 		if( sample <= 0 )
 			return ret;
 		++ret;
-		delay_ms( 100 );
+		delay_ms( COIL_PULSE_PERIOD );
 	}
 	return ret;
 }
@@ -118,18 +113,15 @@ int1 setup_sample_delay()
 		
 		if ( in_switches[SWITCH_AUTOSET].state ) {
 			coil.sample_delay = autoset_sample_delay();
-			coil_reset_history();
 		}
 		
-		signed int16 inc = get_increment( coil.sample_delay, 
-										MIN_SAMPLE_DELAY, MAX_SAMPLE_DELAY );
-		if ( inc != 0 ) {
-			coil.sample_delay += inc;
-			coil_reset_history();
-		}
-
-		signed int8 strength = pi_sample();
-		dsp_setup_sample_delay( strength );
+		coil.sample_delay += setup_get_increment( coil.sample_delay, 
+								COIL_MIN_SAMPLE_DELAY, COIL_MAX_SAMPLE_DELAY );
+		
+		signed int16 sample = coil_sample();
+		dsp_setup_sample_delay( sample );
+		
+		delay_ms( COIL_PULSE_PERIOD );
 	}
 }
 
@@ -145,7 +137,7 @@ void setup()
 		return;
 	}
 	
-	if ( setup_start_sample_delay() ) {
+	if ( setup_sample_delay() ) {
 		return;
 	}
 	/*

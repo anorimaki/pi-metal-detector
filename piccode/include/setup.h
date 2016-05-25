@@ -8,12 +8,7 @@
 #ifndef SETUP_STATES_H
 #define	SETUP_STATES_H
 
-#define MAX_SAMPLE_DELAY	50		//In us
-#define MIN_SAMPLE_DELAY	0		//in us
-
 void setup();
-
-int16 get_increment( int16 current, int16 min, int16 max );
 
 #endif	/* CONFIG_H */
 

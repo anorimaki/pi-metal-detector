@@ -13,32 +13,23 @@
 
 
 void cnf_load() {
-    pi.pulse_time = read_eeprom( PULSE_TIME_ADDR );
-    pi.pulse_time <<= 8;
-    pi.pulse_time += read_eeprom( PULSE_TIME_ADDR+1 );
+    coil.pulse_length = read_eeprom( PULSE_TIME_ADDR );
+	coil.pulse_length <<= 8;
+    coil.pulse_length += read_eeprom( PULSE_TIME_ADDR+1 );
     
-    pi.start_sample_delay = read_eeprom( START_SAMPLE_DELAY_ADDR );
+    coil.sample_delay = read_eeprom( START_SAMPLE_DELAY_ADDR );
     
-	pi.sample_zero_point = INITIAL_SAMPLE_ZERO_POINT;
+	coil.zero = INITIAL_SAMPLE_ZERO_POINT;
 }
 
 
 void cnf_save_coil_pulse() {
-    write_eeprom( PULSE_TIME_ADDR, pi.pulse_time >> 8 );
-    write_eeprom( PULSE_TIME_ADDR+1, pi.pulse_time );
+    write_eeprom( PULSE_TIME_ADDR, coil.pulse_length >> 8 );
+    write_eeprom( PULSE_TIME_ADDR+1, coil.pulse_length );
 }
 
 
 void cnf_save_start_sample_delay() {
-    write_eeprom( START_SAMPLE_DELAY_ADDR, pi.start_sample_delay );
+    write_eeprom( START_SAMPLE_DELAY_ADDR, coil.sample_delay );
 }
 
-
-void cnf_save_sample_time() {
-    
-}
-
-
-void cnf_save_start_second_sample_delay() {
-    
-}
