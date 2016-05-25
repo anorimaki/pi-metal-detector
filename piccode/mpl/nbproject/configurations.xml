@@ -13,6 +13,7 @@
       <itemPath>../include/input.h</itemPath>
       <itemPath>../include/config.h</itemPath>
       <itemPath>../include/setup.h</itemPath>
+      <itemPath>../include/samples.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -36,6 +37,7 @@
       <itemPath>../src/input.c</itemPath>
       <itemPath>../src/config.c</itemPath>
       <itemPath>../src/setup.c</itemPath>
+      <itemPath>../src/samples.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -83,6 +85,10 @@
         <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
+      <item path="../src/coil.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
       <item path="../src/config.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
@@ -96,10 +102,6 @@
         </ccscompiler>
       </item>
       <item path="../src/lcd.c" ex="true" overriding="false">
-        <ccscompiler>
-        </ccscompiler>
-      </item>
-      <item path="../src/pimetaldec.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
       </item>
@@ -161,6 +163,7 @@
         <property key="ToolFirmwareFilePath"
                   value="Press to browse for a specific firmware version"/>
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

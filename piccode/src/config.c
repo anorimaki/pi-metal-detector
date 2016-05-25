@@ -1,19 +1,15 @@
 #include "main.h"
 #include "config.h"
-#include "pimetaldec.h"
+#include "coil.h"
 
 
 
 #define PULSE_TIME_ADDR                    0
 #define START_SAMPLE_DELAY_ADDR            2
-#define SAMPLE_TIME_ADDR                   START_SAMPLE_DELAY_ADDR + 1
-#define START_SECOND_SAMPLE_DELAY_ADDR     SAMPLE_TIME_ADDR + 1
 
 #rom getenv("EEPROM_ADDRESS") = {    \
         0x00,0x50,      /*Initial pulse time = 80us*/ \
-        15,             /*Sample delay*/ \
-        80,             /*Sample time*/ \
-        80}             /*Second sample deplay*/
+        15}             /*Second sample deplay*/
 
 
 void cnf_load() {
@@ -23,11 +19,6 @@ void cnf_load() {
     
     pi.start_sample_delay = read_eeprom( START_SAMPLE_DELAY_ADDR );
     
-    pi.sample_time = read_eeprom( SAMPLE_TIME_ADDR );
-    
-    pi.start_second_sample_delay = 
-                    read_eeprom( START_SECOND_SAMPLE_DELAY_ADDR );
-	
 	pi.sample_zero_point = INITIAL_SAMPLE_ZERO_POINT;
 }
 

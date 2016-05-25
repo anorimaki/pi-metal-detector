@@ -43,7 +43,8 @@ void isr_timer0() {
 		
 		if ( current_state == sw->state ) {
 			sw->change_confident_count = 0;
-			sw->state_time += TIMER_PERIOD_MS;
+			if ( sw->state_time < (0xFFFF - TIMER_PERIOD_MS) )
+				sw->state_time += TIMER_PERIOD_MS;
 		}
 		else {
 			if ( ++sw->change_confident_count == CHANGE_CONFIDENT_THRESHOLD ) {

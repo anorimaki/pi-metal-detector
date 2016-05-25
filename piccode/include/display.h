@@ -17,6 +17,8 @@ void dsp_setup_coil_pulse( int16 coil_volts );
 
 void dsp_setup_sample_delay( signed int8 strength );
 
+void dsp_setup_zero_point( int16 min_zero );
+
 void dsp_sample( signed int8 strength );
 
 #endif	/* DISPLAY_H */

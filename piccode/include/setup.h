@@ -13,7 +13,7 @@
 
 void setup();
 
-int16 setup_incremental_variable( int16 current, int16 min, int16 max );
+int16 get_increment( int16 current, int16 min, int16 max );
 
 #endif	/* CONFIG_H */
 

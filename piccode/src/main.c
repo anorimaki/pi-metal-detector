@@ -1,5 +1,5 @@
 #include "main.h"
-#include "pimetaldec.h"
+#include "coil.h"
 #include "display.h"
 #include "input.h"
 #include "config.h"
@@ -32,24 +32,27 @@ void autoset_sample_zero_point() {
 }
 
 
+
+
 //
 // Sampling state: Normal operation state
 //
 void sampling() {
+	int16 sample = 0;
 	while (TRUE) {
 		if ( in_switches[SWITCH_MODE].state )
 			return;
 		
 		if ( in_switches[SWITCH_AUTOSET].state ) {
-			pi.sample_zero_point = pi_raw_sample();
+			int16 min_zero = coil_min_zero();
+			coil.zero += sample;
+			dsp_setup_zero_point( min_zero );
+			delay_ms(1000);
 		}
+	
+		sample = coil_sample();
 		
-		pi.start_sample_delay = setup_incremental_variable( pi.start_sample_delay, 
-										MIN_SAMPLE_DELAY, MAX_SAMPLE_DELAY );
-
-		signed int8 strength = pi_sample();
-		
-		dsp_sample( strength );
+		dsp_sample( sample );
 		
 		delay_ms( 100 );
 	}

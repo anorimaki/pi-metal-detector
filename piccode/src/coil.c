@@ -1,5 +1,5 @@
 #include "main.h"
-#include "pimetaldec.h"
+#include "coil.h"
 #include "config.h"
 #include "picconfig.h"
 
@@ -92,7 +92,7 @@ int16 pi_read_peak_coil(int16 reference_5v)
 }
 
 
-int16 pi_raw_signle_sample()
+int16 pi_raw_signle_sample( int8 delay )
 {
 	//Disable interrupts for good timing accuracy.
 	disable_interrupts(GLOBAL);
@@ -116,15 +116,21 @@ int16 pi_raw_signle_sample()
 //
 // 
 //
-int16 pi_raw_sample()
+int16 pi_raw_sample( int8 delay )
 {
 	int16 ret = 0;
 	for (int8 i = 0; i < 4; i++) {
-		ret += pi_raw_signle_sample();
+		ret += pi_raw_signle_sample( delay );
 		delay_ms(100);
 	}
 	ret >>= 2;
 	return ret;
+}
+
+
+int16 pi_raw_sample()
+{
+	return pi_raw_sample( pi.start_sample_delay );
 }
 
 
