@@ -3,7 +3,7 @@
 
 
 
-#define SAMPLES_HISTORY_SIZE_LOG	3
+#define SAMPLES_HISTORY_SIZE_LOG	4
 #define SAMPLES_UNDEFINED_VALUE		0xFFFF
 
 struct Samples
@@ -21,6 +21,7 @@ void samples_init()
 	for( int8 i = 0; i<SAMPLES_HISTORY_SIZE; ++i )
 		samples.values[i] = SAMPLES_UNDEFINED_VALUE;
 	samples.position = 0;
+	samples.sum = 0;
 }
 
 

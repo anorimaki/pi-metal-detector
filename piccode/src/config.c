@@ -2,10 +2,9 @@
 #include "config.h"
 #include "coil.h"
 
-
-
-#define PULSE_TIME_ADDR                    0
-#define START_SAMPLE_DELAY_ADDR            2
+#define INITIAL_SAMPLE_ZERO_POINT			400
+#define PULSE_TIME_ADDR						0
+#define START_SAMPLE_DELAY_ADDR				2
 
 #rom getenv("EEPROM_ADDRESS") = {    \
         0x00,0x50,      /*Initial pulse time = 80us*/ \

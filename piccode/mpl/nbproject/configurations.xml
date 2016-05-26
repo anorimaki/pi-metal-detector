@@ -14,6 +14,7 @@
       <itemPath>../include/setup.h</itemPath>
       <itemPath>../include/samples.h</itemPath>
       <itemPath>../include/coil.h</itemPath>
+      <itemPath>../include/tone.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -38,6 +39,7 @@
       <itemPath>../src/setup.c</itemPath>
       <itemPath>../src/samples.c</itemPath>
       <itemPath>../src/coil.c</itemPath>
+      <itemPath>../src/tone.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -86,6 +88,8 @@
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
       <item path="../src/coil.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
       </item>
       <item path="../src/config.c" ex="true" overriding="false">
         <ccscompiler>
@@ -104,6 +108,8 @@
         </ccscompiler>
       </item>
       <item path="../src/samples.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
       </item>
       <item path="../src/setup.c" ex="true" overriding="false">
         <ccscompiler>

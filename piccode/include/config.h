@@ -8,8 +8,6 @@
 #ifndef CONFIG_H
 #define	CONFIG_H
 
-#define INITIAL_SAMPLE_ZERO_POINT 4080
-
 
 void cnf_load();
 void cnf_save_coil_pulse();

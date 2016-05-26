@@ -35,7 +35,7 @@ void dsp_setup_coil_pulse_ref(int16 reference_5v)
 }
 
 
-void dsp_setup_coil_pulse(int16 measure, int8 reference_5v)
+void dsp_setup_coil_pulse(int16 measure, int16 reference_5v)
 {
 	lcd_putc('\f');
 	printf(lcd_putc, "SET: coil pulse\n");
@@ -48,19 +48,20 @@ void dsp_setup_coil_pulse(int16 measure, int8 reference_5v)
 
 void dsp_setup_zero_point(int16 min_zero)
 {
+	int16 max_value = COIL_MAX_ADC_VALUE - min_zero;
+	int8 drift = ((int32)(coil.zero-min_zero) * 100) / max_value;
+	
 	lcd_putc('\f');
-
-	int8 drift = ((int32) coil.zero * 100) / min_zero;
 	printf(lcd_putc, "SET: zero (%u%%)\n", drift);
-
 	printf(lcd_putc, "%Lu (Min: %Lu)", coil.zero, min_zero);
 }
 
 
-int8 dsp_decay_strength( signed int32 sample )
+signed int8 dsp_decay_strength( signed int32 sample )
 {
 	int16 max_value = COIL_MAX_ADC_VALUE - coil.zero;
 	
+	sample -= coil.zero;
 	sample *= 100;
 	sample /= max_value;
 	
@@ -68,7 +69,7 @@ int8 dsp_decay_strength( signed int32 sample )
 }
 
 
-void dsp_setup_sample_delay( signed int16 sample )
+void dsp_setup_sample_delay( int16 sample )
 {
 	lcd_putc('\f');
 	printf(lcd_putc, "SET: delay\n");
@@ -80,11 +81,13 @@ void dsp_setup_sample_delay( signed int16 sample )
 }
 
 
-void dsp_sample( signed int16 sample )
+void dsp_sample( int16 sample )
 {
 	lcd_putc('\f');
 	printf(lcd_putc, "Delay: %uus\n",
 		coil.sample_delay + SAMPLE_DELAY_CORRECTION);
 	signed int8 strength = dsp_decay_strength(sample);
 	printf(lcd_putc, "Strenght: %d", strength);
+	
+	
 }

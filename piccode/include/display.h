@@ -13,13 +13,13 @@ void dsp_clear();
 void dsp_hello();
 
 void dsp_setup_coil_pulse_ref( int16 reference_5v );
-void dsp_setup_coil_pulse( int16 coil_volts );
+void dsp_setup_coil_pulse(int16 measure, int16 reference_5v);
 
-void dsp_setup_sample_delay( signed int8 strength );
+void dsp_setup_sample_delay( int16 sample );
 
-void dsp_setup_zero_point( int16 min_zero );
+void dsp_setup_zero_point(int16 min_zero);
 
-void dsp_sample( signed int8 strength );
+void dsp_sample( int16 sample );
 
 #endif	/* DISPLAY_H */
 
