@@ -19,6 +19,7 @@ void init() {
     set_tris_c( 0xFFFF );      //All inputs by default
     
     dsp_init();
+	tone_init();
     coil_init();
     in_init();
     
@@ -79,4 +80,5 @@ void main() {
 #include "coil.c"
 #include "setup.c"
 #include "samples.c"
+#include "tone.c"
 #endif

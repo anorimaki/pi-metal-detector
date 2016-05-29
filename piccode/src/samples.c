@@ -2,8 +2,6 @@
 #include "samples.h"
 
 
-
-#define SAMPLES_HISTORY_SIZE_LOG	4
 #define SAMPLES_UNDEFINED_VALUE		0xFFFF
 
 struct Samples

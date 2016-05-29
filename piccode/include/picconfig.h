@@ -64,6 +64,34 @@
 // 0 = PORTB pull-ups are enabled by individual port latch values
 #bit RBPU = INTCON2.7
 
+//T1CON: TIMER1 CONTROL REGISTER
+#byte T1CON = 0xFCD
+
+//TMR1ON: Timer1 On bit
+//  1 = Enables Timer1
+//  0 = Stops Timer1
+#bit TMR1ON = T1CON.0
+
+//ENHANCED CAPTURE/COMPARE/PWM1 CONTROL
+#byte CCP1CON = 0xFBB
+
+//ENHANCED PWM CONTROL REGISTER
+#byte ECCP1DEL = 0xFBE
+
+//ECCP1 AUTO-SHUTDOWN CONTROL REGISTER
+#byte ECCP1AS = 0xFBF
+
+//PULSE STEERING CONTROL
+#byte PSTR1CON = 0xF9C
+
+//CCP TIMER SELECT REGISTER
+#byte CCPTMRS = 0xF99
+
+//C1TSEL: CCP1 Timer Selection bit
+//  0 = ECCP1 is based off of TMR1/TMR2
+//  1 = ECCP1 is based off of TMR3/TMR4
+#bit C1TSEL = CCPTMRS.0
+
 #else
 
 #error Define one microcotroller type

@@ -7,7 +7,7 @@
 #define START_SAMPLE_DELAY_ADDR				2
 
 #rom getenv("EEPROM_ADDRESS") = {    \
-        0x00,0x50,      /*Initial pulse time = 80us*/ \
+        0x00,0x96,      /*Initial pulse time = 150us*/ \
         15}             /*Second sample deplay*/
 
 

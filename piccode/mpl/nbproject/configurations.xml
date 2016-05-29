@@ -115,6 +115,10 @@
         <ccscompiler>
         </ccscompiler>
       </item>
+      <item path="../src/tone.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
       <ICD3PlatformTool>
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="SecureSegment.SegmentProgramming" value="FullChipProgramming"/>

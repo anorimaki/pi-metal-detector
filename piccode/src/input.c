@@ -25,10 +25,11 @@ void in_init() {
     in_switches[SWITCH_DECREMENT].pin = PI_BUTTON_DEC_PIN;
 	
 	for( int8 i=0; i<SWITCHES_SIZE; ++i ) {
+		in_switches[i].state = FALSE;
 		in_switches[i].changed = FALSE;
+		in_switches[i].change_confident_count = 0;
 	}
-    
-    
+        
     setup_timer_0( T0_INTERNAL | T0_DIV_256 | T0_8_BIT );
     set_timer0(TIMER_INIT_TIME);
     enable_interrupts(INT_TIMER0);

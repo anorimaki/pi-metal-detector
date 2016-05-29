@@ -57,18 +57,6 @@ void dsp_setup_zero_point(int16 min_zero)
 }
 
 
-signed int8 dsp_decay_strength( signed int32 sample )
-{
-	int16 max_value = COIL_MAX_ADC_VALUE - coil.zero;
-	
-	sample -= coil.zero;
-	sample *= 100;
-	sample /= max_value;
-	
-	return sample;
-}
-
-
 void dsp_setup_sample_delay( int16 sample )
 {
 	lcd_putc('\f');
@@ -76,7 +64,7 @@ void dsp_setup_sample_delay( int16 sample )
 	printf(lcd_putc, "%uus",
 		coil.sample_delay + SAMPLE_DELAY_CORRECTION);
 	lcd_gotoxy(7, 2);
-	signed int8 strength = dsp_decay_strength(sample);
+	signed int8 strength = coil_normalize(sample, 100);
 	printf(lcd_putc, "-->  %d", strength );
 }
 
@@ -86,8 +74,6 @@ void dsp_sample( int16 sample )
 	lcd_putc('\f');
 	printf(lcd_putc, "Delay: %uus\n",
 		coil.sample_delay + SAMPLE_DELAY_CORRECTION);
-	signed int8 strength = dsp_decay_strength(sample);
+	signed int8 strength = coil_normalize(sample, 100);
 	printf(lcd_putc, "Strenght: %d", strength);
-	
-	
 }
