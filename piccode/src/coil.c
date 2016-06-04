@@ -42,7 +42,7 @@ void coil_init()
 //
 // Precondition: interrupts sould be disabled for good timing confidence
 //
-
+#inline
 void coil_pulse()
 {
 	output_high(PI_COIL_CTRL_PIN);
@@ -50,7 +50,7 @@ void coil_pulse()
 	output_low(PI_COIL_CTRL_PIN);
 }
 
-
+#inline
 int16 a2d_converter()
 {
 #if defined(ADC_IN_SLEEP)
@@ -70,11 +70,12 @@ int16 a2d_converter()
 	//TAD: 1us for a 16Mhz clock
 	//Acquisition Time (TACQT) = TAD*4 = 1us * 4 = 4us
 	setup_adc(ADC_CLOCK_DIV_16 | ADC_TAD_MUL_4);
-	//	output_high(PI_ADC_INDICATOR_PIN);
+	//output_high(PI_ADC_INDICATOR_PIN);
 	int16 ret = read_adc(ADC_START_AND_READ); //Conv. time: 13 TADs -> 13*1 = 13us
-	//	output_low(PI_ADC_INDICATOR_PIN);
+	//output_low(PI_ADC_INDICATOR_PIN);
+	
+#endif 
 	return (ret & 0x8000) ? 0 : ret;
-#endif   
 }
 
 

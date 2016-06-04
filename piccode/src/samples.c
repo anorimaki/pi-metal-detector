@@ -42,4 +42,19 @@ int16 samples_add( int16 value )
 	return samples.sum >> SAMPLES_HISTORY_SIZE_LOG; 
 }
 	
+
+int16 samples_upper_deviation() {
+	int16 average = (samples.sum >> SAMPLES_HISTORY_SIZE_LOG);
+	
+	int16 deviation = 0;
+	for( int8 i = 0; i<SAMPLES_HISTORY_SIZE; ++i ) {
+		int current = samples.values[i];
+		if ( current == SAMPLES_UNDEFINED_VALUE )
+			return 0;		//Buffer not full: Return 0
+		
+		deviation += (average>current) ? 0 : current-average;
+	}
+		
+	return deviation >> SAMPLES_HISTORY_SIZE_LOG; 
+}
 	

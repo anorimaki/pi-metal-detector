@@ -1,1 +1,32 @@
-- Con el amplificador no inversor (LM318) se consigue una mayor impedancia de entrada y el voltaje en la bobina es mayor para un pulso igual de largo. Es decir, con el amplificador inversor se requiere un pulso más largo para conseguir el mismo voltaje que con el amplificador no-iversor (aprox. 100V de diferencia).
+Aplificador inversor o no inversor para el LM318
+-------------------------------------------------
+Con el amplificador no inversor (LM318) se consigue una mayor impedancia de entrada y el voltaje en la bobina es mayor para un pulso igual de largo. Es decir, con el amplificador inversor se requiere un pulso más largo para conseguir el mismo voltaje que con el amplificador no-iversor (aprox. 100V de diferencia).
+
+
+IRF740 vs 7n65
+---------------------------------
+El 7n65 tiene un V_DS mayor (650V vs 400V) pero con el IRF740 se consigue un mayor voltaje con un pulso más pequeño (apox 100V para el mismo pulso).
+Quzás sea por la menor R_DS(on) que tiene el IRF740.
+-> Se escoje el IRF740.
+
+
+Distribución de la aplificación
+---------------------------------
+Se han probado dos alternativas:
+	1. x500 en el LM318 y x2 en el Tl082
+	2. x1000 en el LM318 y x1 en el Tl082
+	3. x1000 en el LM318 y >x1 en el Tl082
+	
+La segunda ofrece unos resultados mejores:
+	- Comparado con 1, la resistencia de amortiguación en paralelo con la bobina pude ser mayor. Con x500 y 320 homios, se producía un valle al final de la señal de caída. Con x1000 e incrementando a 6,6pF el condensador en paralelo a la resistencia de feeedback del aplificador se consigue una señal de caida límpia. Queda pendiente ajustar mejor en valor del condensador (probar con 5 y 6 pF)
+	
+	- Con la 3 se aplifica tanto el ruido que implica un threshold (implementado en el software) más alto por lo que la supuesta ganacia se pierde.
+	
+
+Acoplamiento AC de la señal aplificada del LM318
+------------------------------------------------
+La señal no se puede acoplar en AC ya que la aplitud de la señal supera los 5V del uC (la excusión del voltaje de salida del LM318 es toda la que ofrece el operacional, es decir unos 12V) y los diodos de protección de los puertos del uC empiezan a conducir. Los diodos no permiten que el condensador de acoplamiento funcione correctamente.
+Así que, la alternativa es invertir la señal para que la parte relevante entre en el rango de 0..-5V a los que está alimentado el uC.
+	
+
+ 

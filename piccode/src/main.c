@@ -4,6 +4,7 @@
 #include "input.h"
 #include "config.h"
 #include "setup.h"
+#include "samples.h"
 #include "tone.h"
 
 //#use rs232( UART1, baud=9600, parity=N, bits=8 )
@@ -27,6 +28,7 @@ void init() {
 }
 
 
+
 //
 // Sampling state: Normal operation state
 //
@@ -43,8 +45,9 @@ void sampling() {
 					
 		if ( in_button_pressed(SWITCH_AUTOSET) ) {
 			int16 min_zero = 
-					coil_custom_sample( COIL_CALCULATE_MIN_ZERO_DELAY, 1 );
-			coil.zero = sample;
+					coil_custom_sample( COIL_CALCULATE_MIN_ZERO_DELAY, 3 );
+						//Set it a little greater than sample
+			coil.zero = sample + samples_upper_deviation();	
 			dsp_setup_zero_point( min_zero );
 			delay_ms(1000);
 		}
@@ -56,9 +59,6 @@ void sampling() {
 		delay_ms( COIL_PULSE_PERIOD );
 	}
 }
-
-
-
 
 
 void main() {

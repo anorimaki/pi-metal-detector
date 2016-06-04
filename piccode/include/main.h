@@ -57,7 +57,8 @@
 
 
 
-#use delay(clock=CLOCK_HZ,crystal=4000000)
+//#use delay(clock=CLOCK_HZ,crystal=4000000)
+#use delay(clock=CLOCK_HZ,internal=4000000)
 #use fast_io( A )
 #use fast_io( B )
 #use fast_io( C )

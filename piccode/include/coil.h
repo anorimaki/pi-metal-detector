@@ -10,7 +10,7 @@
 // 'The Present Frequency of Operation is 300 Hz.'
 
 
-#define COIL_PULSE_PERIOD               20      //In ms
+#define COIL_PULSE_PERIOD               15      //In ms
 #define COIL_MAX_SAMPLE_DELAY           50		//In us
 #define COIL_MIN_SAMPLE_DELAY           0		//in us
 #define COIL_CALCULATE_MIN_ZERO_DELAY   COIL_MAX_SAMPLE_DELAY*4		//in us

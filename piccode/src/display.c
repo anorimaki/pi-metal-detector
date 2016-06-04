@@ -5,7 +5,7 @@
 
 //Time wasted in uP instructions (measured with Proteus-Isis)
 //This is the real minimum delay
-#define SAMPLE_DELAY_CORRECTION		5		//In us
+#define SAMPLE_DELAY_CORRECTION		4		//In us
 
 void dsp_init()
 {

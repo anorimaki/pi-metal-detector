@@ -67,12 +67,11 @@ int1 setup_zero_point()
 int16 autoset_sample_delay() {
 	int16 ret = COIL_MIN_SAMPLE_DELAY;
 	while( ret < COIL_MAX_SAMPLE_DELAY ) {
-		int16 sample = coil_custom_sample( ret, 3 );
+		int16 sample = coil_custom_sample( ret, 4 );
 		dsp_setup_sample_delay( sample );
-		if( sample >= coil.zero )
+		if( sample <= coil.zero )
 			return ret;
 		++ret;
-		delay_ms( COIL_PULSE_PERIOD );
 	}
 	return ret;
 }
