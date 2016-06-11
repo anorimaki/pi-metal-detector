@@ -11,10 +11,11 @@
       <itemPath>../include/display.h</itemPath>
       <itemPath>../include/input.h</itemPath>
       <itemPath>../include/config.h</itemPath>
-      <itemPath>../include/setup.h</itemPath>
       <itemPath>../include/samples.h</itemPath>
       <itemPath>../include/coil.h</itemPath>
       <itemPath>../include/tone.h</itemPath>
+      <itemPath>../include/usermodes.h</itemPath>
+      <itemPath>../include/modesetup.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -36,10 +37,11 @@
       <itemPath>../src/display.c</itemPath>
       <itemPath>../src/input.c</itemPath>
       <itemPath>../src/config.c</itemPath>
-      <itemPath>../src/setup.c</itemPath>
       <itemPath>../src/samples.c</itemPath>
       <itemPath>../src/coil.c</itemPath>
       <itemPath>../src/tone.c</itemPath>
+      <itemPath>../src/usermodes.c</itemPath>
+      <itemPath>../src/modesetup.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -107,15 +109,19 @@
         <ccscompiler>
         </ccscompiler>
       </item>
+      <item path="../src/modesetup.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
       <item path="../src/samples.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
       </item>
-      <item path="../src/setup.c" ex="true" overriding="false">
+      <item path="../src/tone.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
       </item>
-      <item path="../src/tone.c" ex="true" overriding="false">
+      <item path="../src/usermodes.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
       </item>

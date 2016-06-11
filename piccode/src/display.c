@@ -49,10 +49,10 @@ void dsp_setup_coil_pulse(int16 measure, int16 reference_5v)
 void dsp_setup_zero_point(int16 min_zero)
 {
 	int16 max_value = COIL_MAX_ADC_VALUE - min_zero;
-	int8 drift = ((int32)(coil.zero-min_zero) * 100) / max_value;
+	signed int8 drift = ((signed int32)(coil.zero-min_zero) * 100) / max_value;
 	
 	lcd_putc('\f');
-	printf(lcd_putc, "SET: zero (%u%%)\n", drift);
+	printf(lcd_putc, "SET: zero (%d%%)\n", drift);
 	printf(lcd_putc, "%Lu (Min: %Lu)", coil.zero, min_zero);
 }
 

@@ -90,8 +90,8 @@ void tone_apply( int16 value )
 	freq += TONE_MIN_FREQUENCY;
 	
 	int16 ccp = (int32)250000/freq;			//1000000*2/8 = 250000
-	CCP_1 = ccp;
-	CCP_2 = ccp;
+	CCP_1 = ccp;		//Set toggle delay
+	CCP_2 = ccp;		//Set reset delay (period)
 	
 	TMR1ON = 1;
 }

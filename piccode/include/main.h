@@ -31,10 +31,10 @@
 #define PI_COIL_VOLTAGE_PIN         sAN1        //RA1
 #define PI_COIL_VOLTAGE_CH          1
 
-#define PI_BUTTON_MODE_PIN          PIN_B0
-#define PI_BUTTON_AUTO_PIN          PIN_B1
-#define PI_BUTTON_INC_PIN           PIN_B2
-#define PI_BUTTON_DEC_PIN           PIN_B3
+#define PI_CHARLIEPLEX_SWITCH_1_PIN PIN_B0
+#define PI_CHARLIEPLEX_SWITCH_2_PIN PIN_B1
+#define PI_CHARLIEPLEX_SWITCH_3_PIN PIN_B2
+#define PI_CHARLIEPLEX_SWITCH_4_PIN PIN_B3
 #define PI_BUTTON_PULLUP_RESISTORS  0x0F
 
 #define PI_TONE_PIN                 PIN_B4

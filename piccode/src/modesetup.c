@@ -1,5 +1,5 @@
 #include "main.h"
-#include "setup.h"
+#include "usermodes.h"
 #include "display.h"
 #include "coil.h"
 #include "input.h"
@@ -10,8 +10,7 @@
 #define MIN_PULSE_TIME	10		//in us
 
 
-
-int1 setup_coil_pulse()
+void mode_setup_pulse()
 {
 	// Calculates reference for 5 volts with the mean of 8 samples 
 	int16 reference_5v = coil_peak_ref();
@@ -19,10 +18,11 @@ int1 setup_coil_pulse()
 	in_init_increment( MIN_PULSE_TIME, MAX_PULSE_TIME, INCREMENT_AUTO_RATE );
 	
 	while (TRUE) {
-		if ( in_button_pressed(SWITCH_MODE) )
-			return in_wait_for_release_timeout( SWITCH_MODE, 2000 );
+		if ( mode_changed() ) {
+			return;
+		}
 		
-		if ( in_button_pressed(SWITCH_AUTOSET) ) {
+		if ( in_button_pressed(SWITCH_AUTO) ) {
 			reference_5v = coil_peak_ref();
 			dsp_setup_coil_pulse_ref( reference_5v );
 			delay_ms(1000);
@@ -38,7 +38,7 @@ int1 setup_coil_pulse()
 }
 
 
-int1 setup_zero_point() 
+void mode_setup_zero() 
 {
 	int16 min_zero = coil_custom_sample( COIL_CALCULATE_MIN_ZERO_DELAY, 3 );
 	
@@ -46,10 +46,11 @@ int1 setup_zero_point()
 					 INCREMENT_AUTO_RATE );
 	
 	while (TRUE) {
-		if ( in_button_pressed(SWITCH_MODE) )
-			return in_wait_for_release_timeout( SWITCH_MODE, 2000 );
+		if ( mode_changed() ) {
+			return;
+		}
 		
-		if ( in_button_pressed(SWITCH_AUTOSET) ) {
+		if ( in_button_pressed(SWITCH_AUTO) ) {
 			//Set to 10% of max value
 			int16 max_value = COIL_MAX_ADC_VALUE - min_zero;
 			coil.zero = min_zero + (max_value/10);
@@ -77,16 +78,17 @@ int16 autoset_sample_delay() {
 }
 
 
-int1 setup_sample_delay()
+void mode_setup_delay()
 {
 	in_init_increment( COIL_MIN_SAMPLE_DELAY, COIL_MAX_SAMPLE_DELAY,
 						INCREMENT_AUTO_RATE );
 			
 	while (TRUE) {
-		if ( in_button_pressed(SWITCH_MODE) )
-			return in_wait_for_release_timeout( SWITCH_MODE, 2000 );
+		if ( mode_changed() ) {
+			return;
+		}
 		
-		if ( in_button_pressed(SWITCH_AUTOSET) ) {
+		if ( in_button_pressed(SWITCH_AUTO) ) {
 			coil.sample_delay = autoset_sample_delay();
 		}
 		
@@ -97,32 +99,4 @@ int1 setup_sample_delay()
 		
 		delay_ms( COIL_PULSE_PERIOD );
 	}
-}
-
-
-
-void setup()
-{
-	if ( setup_coil_pulse() ) {
-		return;
-	}
-
-	if ( setup_zero_point() ) {
-		return;
-	}
-	
-	if ( setup_sample_delay() ) {
-		return;
-	}
-	/*
-		if ( !setup_sample_time() ) {
-			cnf_save_sample_time();
-			return;
-		}        
-
-		if ( !setup_start_second_sample_delay() ) {
-			cnf_start_second_sample_delay();
-			return;
-		}
-	 */
 }

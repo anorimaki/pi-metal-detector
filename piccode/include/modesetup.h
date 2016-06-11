@@ -8,7 +8,11 @@
 #ifndef SETUP_STATES_H
 #define	SETUP_STATES_H
 
-void setup();
+#include "usermodes.h"
+
+void mode_setup_zero();
+void mode_setup_pulse();
+void mode_setup_delay();
 
 #endif	/* CONFIG_H */
 

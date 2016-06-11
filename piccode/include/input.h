@@ -14,16 +14,19 @@ struct InSwitch {
     int1 changed;
     int16 state_time;           // ms that switch has been in this state
 	int8 change_confident_count;
-    int16 pin;
 };
 
 
-#define SWITCHES_SIZE 		4
+#define SWITCHES_SIZE 		7
 
-#define SWITCH_MODE 		0
-#define SWITCH_AUTOSET 		1
-#define SWITCH_INCREMENT 	2
-#define SWITCH_DECREMENT 	3
+#define SWITCH_MAIN 		0
+#define SWITCH_SETUP_DELAY	1
+#define SWITCH_SETUP_ZERO	2
+#define SWITCH_SETUP_PULSE	3
+#define SWITCH_INCREMENT 	4
+#define SWITCH_DECREMENT 	5
+#define SWITCH_AUTO     	6
+
 
 #define INCREMENT_AUTO_RATE 0xFFFF
 
