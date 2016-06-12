@@ -10,7 +10,7 @@
 
 #include "usermodes.h"
 
-void mode_setup_zero();
+void mode_setup_autozero_threshold();
 void mode_setup_pulse();
 void mode_setup_delay();
 

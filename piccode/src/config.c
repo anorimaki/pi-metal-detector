@@ -19,6 +19,8 @@ void cnf_load() {
     coil.sample_delay = read_eeprom( SAMPLE_DELAY_ADDR );
     
 	coil.zero = INITIAL_SAMPLE_ZERO_POINT;
+	
+	coil.auto_zero_threshold = 0;
 }
 
 

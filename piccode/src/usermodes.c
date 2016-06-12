@@ -24,7 +24,7 @@ int1 mode_changed()
 	else if (in_button_pressed(SWITCH_SETUP_DELAY))
 		mode_next = mode_setup_delay;
 	else if (in_button_pressed(SWITCH_SETUP_ZERO))
-		mode_next = mode_setup_zero;
+		mode_next = mode_setup_autozero_threshold;
 	else if (in_button_pressed(SWITCH_SETUP_PULSE))
 		mode_next = mode_setup_pulse;
 
@@ -49,6 +49,8 @@ void mode_main()
 {
 	int16 sample = 0;
 
+	in_init_increment( 0, COIL_MAX_ADC_VALUE, INCREMENT_AUTO_RATE );
+	
 	tone_begin();
 
 	while (TRUE) {
@@ -61,10 +63,12 @@ void mode_main()
 			int16 min_zero =
 					coil_custom_sample(COIL_CALCULATE_MIN_ZERO_DELAY, 3);
 			//Set it a little greater than sample
-			coil.zero = sample + samples_upper_deviation();
-			dsp_setup_zero_point(min_zero);
+			coil.zero = sample + coil.auto_zero_threshold;
+			dsp_show_zero(min_zero);
 			delay_ms(1000);
 		}
+		
+		coil.zero += in_increment( coil.zero );
 
 		sample = coil_sample();
 		dsp_sample(sample);

@@ -17,7 +17,9 @@ void dsp_setup_coil_pulse(int16 measure, int16 reference_5v);
 
 void dsp_setup_sample_delay( int16 sample );
 
-void dsp_setup_zero_point(int16 min_zero);
+void dsp_show_zero( int16 min_zero ) ;
+
+void dsp_setup_autozero_threshold(int16 noise);
 
 void dsp_sample( int16 sample );
 

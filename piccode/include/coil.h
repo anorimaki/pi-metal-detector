@@ -19,6 +19,8 @@ struct Coil {
     int16 pulse_length;             //In us
     int8 sample_delay;              //In us after coil pulse ends
     int16 zero;                     //In ADC units
+    int16 auto_zero_threshold;      //In ADC units (should be set based on 
+                                    //  the environment noise)
 };
 
 extern struct Coil coil;
@@ -31,6 +33,6 @@ int16 coil_peak();
 int16 coil_sample();
 int16 coil_custom_sample( int8 delay, int8 n );
 
-signed int32 coil_normalize( int16 sample, int16 new_max_value );
+signed int32 coil_normalize( int16 sample, int16 zero, int16 new_max_value );
 
 #endif

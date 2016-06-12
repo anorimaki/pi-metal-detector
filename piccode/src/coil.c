@@ -181,11 +181,11 @@ int16 coil_sample()
 	(val>=0) ? val>>n : -((-val)>>n)
 
 
-signed int32 coil_normalize( int16 sample, int16 new_max_value )
+signed int32 coil_normalize( int16 sample, int16 zero, int16 new_max_value )
 {
-	int16 max_value = COIL_MAX_ADC_VALUE - coil.zero;
+	int16 max_value = COIL_MAX_ADC_VALUE - zero;
 	
-	signed int32 ret = (signed int16)sample - coil.zero;
+	signed int32 ret = (signed int16)sample - zero;
 	ret *= new_max_value;	//Can't overlay (12bits * 16bits = 28bits)
 	ret <<= 3;				//Multiply x8 to round final value (31 bits)
 	ret /= max_value;

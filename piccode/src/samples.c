@@ -48,7 +48,7 @@ int16 samples_upper_deviation() {
 	
 	int16 deviation = 0;
 	for( int8 i = 0; i<SAMPLES_HISTORY_SIZE; ++i ) {
-		int current = samples.values[i];
+		int16 current = samples.values[i];
 		if ( current == SAMPLES_UNDEFINED_VALUE )
 			return 0;		//Buffer not full: Return 0
 		

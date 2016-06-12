@@ -80,7 +80,7 @@ void tone_end()
 // value is the range of 0..4095
 void tone_apply( int16 value )
 {
-	signed int16 freq = coil_normalize( value, 
+	signed int16 freq = coil_normalize( value, coil.zero,
 						TONE_MAX_FREQUENCY-TONE_MIN_FREQUENCY );
 	if ( freq <= 0 ) {
 		TMR1ON = 0;		//Stops timer1 -> stops output signal
@@ -95,3 +95,4 @@ void tone_apply( int16 value )
 	
 	TMR1ON = 1;
 }
+

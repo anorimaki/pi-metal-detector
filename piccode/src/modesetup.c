@@ -38,29 +38,27 @@ void mode_setup_pulse()
 }
 
 
-void mode_setup_zero() 
+void mode_setup_autozero_threshold() 
 {
-	int16 min_zero = coil_custom_sample( COIL_CALCULATE_MIN_ZERO_DELAY, 3 );
+	in_init_increment( 0, COIL_MAX_ADC_VALUE/2, INCREMENT_AUTO_RATE );
 	
-	in_init_increment( min_zero, (COIL_MAX_ADC_VALUE*80)/100, 
-					 INCREMENT_AUTO_RATE );
-	
+	int16 noise = 0;
 	while (TRUE) {
 		if ( mode_changed() ) {
 			return;
 		}
 		
 		if ( in_button_pressed(SWITCH_AUTO) ) {
-			//Set to 10% of max value
-			int16 max_value = COIL_MAX_ADC_VALUE - min_zero;
-			coil.zero = min_zero + (max_value/10);
+			coil.auto_zero_threshold = noise;
 		}
 
-		coil.zero += in_increment( coil.zero  );
-
-		dsp_setup_zero_point( min_zero );
+		coil.auto_zero_threshold += in_increment( coil.auto_zero_threshold  );
 		
-		delay_ms(100);
+		coil_sample();
+		noise = samples_upper_deviation();
+		dsp_setup_autozero_threshold( noise );
+		
+		delay_ms( COIL_PULSE_PERIOD );
 	}
 }
 
