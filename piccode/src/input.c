@@ -6,7 +6,7 @@
 //At 16Mhz counter increments every 64us:
 //	- For 250 counts, overflows every 16ms
 //	- For 78 counts, overflows every 5ms
-#define TIMER_INIT_TIME (255-78)
+#define TIMER_INIT_TIME (255-8)
 #define TIMER_PERIOD_MS 5
 
 struct InSwitch in_switches[SWITCHES_SIZE];

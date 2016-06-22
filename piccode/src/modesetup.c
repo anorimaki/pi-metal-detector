@@ -40,7 +40,7 @@ void mode_setup_pulse()
 
 void mode_setup_autozero_threshold() 
 {
-	in_init_increment( 0, COIL_MAX_ADC_VALUE/2, INCREMENT_AUTO_RATE );
+	in_init_increment( 0, COIL_MAX_ADC_VALUE/10, INCREMENT_AUTO_RATE );
 	
 	int16 noise = 0;
 	while (TRUE) {

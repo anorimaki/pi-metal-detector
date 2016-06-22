@@ -176,28 +176,29 @@ int16 coil_sample()
 }
 
 
-//CCS compiler does not do aritmetic shift with >> operator (GRRR..)
-#define ARITMETIC_LEFT_SHIFT(val, n) \
-	(val>=0) ? val>>n : -((-val)>>n)
-
-
-signed int32 coil_normalize( int16 sample, int16 zero, int16 new_max_value )
+signed int32 coil_normalize(int16 sample, int16 zero, int16 new_max_value)
 {
-	int16 max_value = COIL_MAX_ADC_VALUE - zero;
-	
-	signed int32 ret = (signed int16)sample - zero;
-	ret *= new_max_value;	//Can't overlay (12bits * 16bits = 28bits)
-	ret <<= 3;				//Multiply x8 to round final value (31 bits)
-	ret /= max_value;
-	
-	int8 remainder = ret & 0b00000111 ;
-	ret = ARITMETIC_LEFT_SHIFT( ret, 3 );
-	
-	if ( remainder > 0b011 )
-		++ret;
-	
-	if ( ret < -(signed int32)new_max_value )
-		ret = -(signed int32)new_max_value;
-	
-	return ret;
-}
+        int16 max_value = COIL_MAX_ADC_VALUE - zero;
+
+        int1 negative = zero > sample;
+
+        int32 ret = negative ? zero - sample : sample - zero;
+
+        ret *= new_max_value;        //Can't overlay (12bits * 16bits = 28bits)
+        ret <<= 3;                                //Multiply x8 to round final value (31 bits)
+        ret /= max_value;
+
+        int8 remainder = ret & 0x07;
+        ret >>= 3;
+
+        if ( remainder > 0x03 )
+                ++ret;
+
+        if (negative) {
+                if (ret > new_max_value)
+                        ret = new_max_value;
+                return -(signed int32)ret;
+        }
+
+        return ret;
+} 

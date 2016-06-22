@@ -247,18 +247,13 @@ void dsp_show_zero_range( int8 line ) {
 	lcd_putc(CHAR_END_RANGE);
 	
 	signed int8 percent = coil_normalize(coil.zero, 0, 100);
-/*	if ( percent<100 ) {
-		lcd_putc(' ');
-	}
-	if ( percent<10 ) {
-		lcd_putc(' ');
-	} */
 	printf(lcd_putc, "%3d%%", percent);
 }
 
 // 12 LCD position
 //	6 possibles values per position
-#define STRENGTH_POSITIONS 12*6
+#define STRENGTH_CHARACTERS	11
+#define STRENGTH_POSITIONS	STRENGTH_CHARACTERS*6
 void dsp_show_signal_strength( int8 line, int16 sample )
 {
 	signed int8 mark = coil_normalize(sample, coil.zero, STRENGTH_POSITIONS);
@@ -277,7 +272,7 @@ void dsp_show_signal_strength( int8 line, int16 sample )
 		lcd_putc(CHAR_FULL_SIGNAL);
 	}
 	lcd_putc(CHAR_END_SIGNAL);
-	for( i=mark_pos+1; i<12; ++i ) {
+	for( i=mark_pos+1; i<STRENGTH_CHARACTERS; ++i ) {
 		lcd_putc(' ');
 	}
 	
@@ -285,13 +280,11 @@ void dsp_show_signal_strength( int8 line, int16 sample )
 	if ( percent == -100 ) {
 		percent = -99;
 	}
-/*	if ( (percent<100) && (percent>0) ) {
-		lcd_putc(' ');
-	}
-	if ( (percent<10) && (percent>-10) ) {
-		lcd_putc(' ');
-	} */
+
 	printf(lcd_putc, "%3d%%", percent);
+	
+	signed int16 ret = (signed int16)sample - coil.zero;
+	printf(lcd_putc, " %4Ld", ret);
 }
 
 

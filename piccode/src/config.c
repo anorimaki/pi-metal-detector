@@ -8,7 +8,7 @@
 
 #rom getenv("EEPROM_ADDRESS") = {    \
         0x00,0x82,      /*Initial pulse time = 130us*/ \
-        18}             /*Sample deplay*/
+        23}             /*Sample deplay*/
 
 
 void cnf_load() {
