@@ -16,6 +16,7 @@
       <itemPath>../include/tone.h</itemPath>
       <itemPath>../include/usermodes.h</itemPath>
       <itemPath>../include/modesetup.h</itemPath>
+      <itemPath>../src/secure_math.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"

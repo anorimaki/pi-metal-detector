@@ -17,16 +17,13 @@ struct InSwitch {
 };
 
 
-#define SWITCHES_SIZE 		7
+#define SWITCHES_SIZE       5
 
 #define SWITCH_MAIN 		0
 #define SWITCH_SETUP_DELAY	1
 #define SWITCH_SETUP_ZERO	2
 #define SWITCH_SETUP_PULSE	3
-#define SWITCH_INCREMENT 	4
-#define SWITCH_DECREMENT 	5
-#define SWITCH_AUTO     	6
-
+#define SWITCH_AUTO     	4
 
 #define INCREMENT_AUTO_RATE 0xFFFF
 
