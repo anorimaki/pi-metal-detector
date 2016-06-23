@@ -2,6 +2,7 @@
 #include "coil.h"
 #include "display.h"
 #include "input.h"
+#include "inbuttons.h"
 #include "config.h"
 #include "usermodes.h"
 #include "tone.h"
@@ -20,6 +21,7 @@ void init() {
 	tone_init();
     coil_init();
     in_init();
+	buttons_init();
 	mode_init();
     
     enable_interrupts(GLOBAL);
@@ -42,6 +44,8 @@ void main() {
 #include "config.c"
 #include "display.c"
 #include "input.c"
+#include "inencoder.c"
+#include "inbuttons.c"
 #include "coil.c"
 #include "modesetup.c"
 #include "samples.c"

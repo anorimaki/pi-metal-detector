@@ -16,7 +16,9 @@
       <itemPath>../include/tone.h</itemPath>
       <itemPath>../include/usermodes.h</itemPath>
       <itemPath>../include/modesetup.h</itemPath>
-      <itemPath>../src/secure_math.h</itemPath>
+      <itemPath>../include/inencoder.h</itemPath>
+      <itemPath>../include/mathov.h</itemPath>
+      <itemPath>../include/inbuttons.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -43,6 +45,8 @@
       <itemPath>../src/tone.c</itemPath>
       <itemPath>../src/usermodes.c</itemPath>
       <itemPath>../src/modesetup.c</itemPath>
+      <itemPath>../src/inencoder.c</itemPath>
+      <itemPath>../src/inbuttons.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -99,6 +103,10 @@
         </ccscompiler>
       </item>
       <item path="../src/display.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
+      <item path="../src/inencoder.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
       </item>
@@ -180,7 +188,6 @@
         <property key="ToolFirmwareFilePath"
                   value="Press to browse for a specific firmware version"/>
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
-        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

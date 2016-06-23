@@ -15,20 +15,20 @@ void mode_setup_pulse()
 	// Calculates reference for 5 volts with the mean of 8 samples 
 	int16 reference_5v = coil_peak_ref();
 	
-	in_init_increment( MIN_PULSE_TIME, MAX_PULSE_TIME, INCREMENT_AUTO_RATE );
+	encoder_set_increment( MIN_PULSE_TIME, MAX_PULSE_TIME, INCREMENT_AUTO_RATE );
 	
 	while (TRUE) {
 		if ( mode_changed() ) {
 			return;
 		}
 		
-		if ( in_button_pressed(SWITCH_AUTO) ) {
+		if ( buttons_is_pressed(SWITCH_AUTO) ) {
 			reference_5v = coil_peak_ref();
 			dsp_setup_coil_pulse_ref( reference_5v );
 			delay_ms(1000);
 		}
 		
-		coil.pulse_length += in_increment( coil.pulse_length );
+		coil.pulse_length += encoder_increment( coil.pulse_length );
 
 		int16 peak = coil_peak();
 		dsp_setup_coil_pulse(peak, reference_5v);
@@ -40,7 +40,7 @@ void mode_setup_pulse()
 
 void mode_setup_autozero_threshold() 
 {
-	in_init_increment( 0, COIL_MAX_ADC_VALUE/10, INCREMENT_AUTO_RATE );
+	encoder_set_increment( 0, COIL_MAX_ADC_VALUE/10, INCREMENT_AUTO_RATE );
 	
 	int16 noise = 0;
 	while (TRUE) {
@@ -48,11 +48,11 @@ void mode_setup_autozero_threshold()
 			return;
 		}
 		
-		if ( in_button_pressed(SWITCH_AUTO) ) {
+		if ( buttons_is_pressed(SWITCH_AUTO) ) {
 			coil.auto_zero_threshold = noise;
 		}
 
-		coil.auto_zero_threshold += in_increment( coil.auto_zero_threshold  );
+		coil.auto_zero_threshold += encoder_increment( coil.auto_zero_threshold  );
 		
 		coil_sample();
 		noise = samples_upper_deviation();
@@ -78,7 +78,7 @@ int16 autoset_sample_delay() {
 
 void mode_setup_delay()
 {
-	in_init_increment( COIL_MIN_SAMPLE_DELAY, COIL_MAX_SAMPLE_DELAY,
+	encoder_set_increment( COIL_MIN_SAMPLE_DELAY, COIL_MAX_SAMPLE_DELAY,
 						INCREMENT_AUTO_RATE );
 			
 	while (TRUE) {
@@ -86,11 +86,11 @@ void mode_setup_delay()
 			return;
 		}
 		
-		if ( in_button_pressed(SWITCH_AUTO) ) {
+		if ( buttons_is_pressed(SWITCH_AUTO) ) {
 			coil.sample_delay = autoset_sample_delay();
 		}
 		
-		coil.sample_delay += in_increment( coil.sample_delay );
+		coil.sample_delay += encoder_increment( coil.sample_delay );
 		
 		int16 sample = coil_sample();
 		dsp_setup_sample_delay( sample );
