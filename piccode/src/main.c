@@ -6,7 +6,7 @@
 #include "usermodes.h"
 #include "tone.h"
 
-//#use rs232( UART1, baud=9600, parity=N, bits=8 )
+#use rs232( UART2, baud=9600, parity=N, bits=8 )
 
 void init() {
     setup_adc_ports(NO_ANALOGS);

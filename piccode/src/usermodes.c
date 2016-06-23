@@ -68,13 +68,18 @@ void mode_main()
 			delay_ms(1000);
 		}
 		
-		coil.zero += in_increment( coil.zero );
+//		coil.zero += in_increment( coil.zero );
+		
+		
+		signed int16 increment = in_increment( coil.zero );
+		lcd_putc('\f');
+		printf(lcd_putc, "INC: %Ld\n", increment );
 
 		sample = coil_sample();
-		dsp_sample(sample);
+//		dsp_sample(sample);
 		tone_apply(sample);
 
-		delay_ms(COIL_PULSE_PERIOD);
+		delay_ms(30);
 	}
 }
 

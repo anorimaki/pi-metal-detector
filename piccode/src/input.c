@@ -1,7 +1,11 @@
 #include "main.h"
 #include "input.h"
+#include "mathov.h"
 
-#define CHANGE_CONFIDENT_THRESHOLD 2
+void in_update_encoder( int1 channelA, int1 channelB ) ;
+void in_update_switches( int8 switches_state );
+
+
 
 //At 16Mhz counter increments every 64us:
 //	- For 250 counts, overflows every 16ms
@@ -9,29 +13,6 @@
 #define TIMER_INIT_TIME (255-8)
 #define TIMER_PERIOD_MS 5
 
-#define INPUTS_SIZE					7
-
-#define ROTATORY_INPUT_CHANNEL_A	4
-#define ROTATORY_INPUT_CHANNEL_B	5
-
-struct InSwitch in_switches[SWITCHES_SIZE];
-
-
-#define ENCODER_STATE_IDLE		0
-#define ENCODER_STATE_INC_0		0x01		//A=0, B=1 after ENCODER_STATE_IDLE
-#define ENCODER_STATE_INC_1		0x02		//A=0, B=0 after ENCODER_STATE_INC_0
-#define ENCODER_STATE_INC_2		0x04		//A=1, B=0 after ENCODER_STATE_INC_X
-#define ENCODER_STATE_DEC_0		0x10		//A=1, B=0 after ENCODER_STATE_IDLE
-#define ENCODER_STATE_DEC_1		0x20		//A=0, B=0 after ENCODER_STATE_DEC_0
-#define ENCODER_STATE_DEC_2		0x40		//A=1, B=0 after ENCODER_STATE_INC_X
-
-#define 
-
-struct InEncoder {
-	int8 state;
-};
-
-struct InSwitch in_encoder;
 
 void in_init()
 {
@@ -53,8 +34,6 @@ void in_init()
 		in_switches[i].change_confident_count = 0;
 	}
 
-	in_encoder.state = ENCODER_STATE_IDLE;
-	
 	setup_timer_0(T0_INTERNAL | T0_DIV_256 | T0_8_BIT);
 	set_timer0(TIMER_INIT_TIME);
 	enable_interrupts(INT_TIMER0);
@@ -95,44 +74,6 @@ int8 in_read_inputs()
 }
 
 
-void in_update_encoder( int1 channelA, int1 channelB ) 
-{
-	if ( channelA && channelB ) {
-		if ( in_encoder.state & (ENCODER_STATE_INC_1|ENCODER_STATE_INC_2) ) {
-			in_encoder.speed = CHECKED_SUM( in_encoder.speed, 
-										 in_encoder.current_speed,
-										 ENCODER_MAX_SPEED );
-			in_encoder.pulses++;
-			in_encoder.current_speed = ENCODER_MAX_SPEED;
-		}
-		if ( in_encoder.state & (ENCODER_STATE_DEC_1|ENCODER_STATE_DEC_2) ) {
-			in_encoder.speed = CHECKED_SUB( in_encoder.speed, 
-										 in_encoder.current_speed,
-										 ENCODER_MIN_SPEED );
-			in_encoder.pulses++;
-			in_encoder.current_speed = ENCODER_MAX_SPEED;
-		}
-		in_encoder.state = ENCODER_STATE_IDLE;
-		return;
-	}
-	if ( !channelA && channelB ) {
-		if ( in_encoder.state & (ENCODER_STATE_INC_1|ENCODER_STATE_INC_2) ) {
-			in_encoder.speed = CHECKED_SUM( in_encoder.speed, 
-										 in_encoder.current_speed,
-										 ENCODER_MAX_SPEED );
-			in_encoder.pulses++;
-			in_encoder.current_speed = ENCODER_MAX_SPEED;
-		}
-		if ( in_encoder.state & (ENCODER_STATE_DEC_1|ENCODER_STATE_DEC_2) ) {
-			in_encoder.speed = CHECKED_SUB( in_encoder.speed, 
-										 in_encoder.current_speed,
-										 ENCODER_MIN_SPEED );
-			in_encoder.pulses++;
-			in_encoder.current_speed = ENCODER_MAX_SPEED;
-		}
-	}
-}
-
 
 #int_timer0
 void isr_timer0()
@@ -145,15 +86,27 @@ void isr_timer0()
 	current_states >>= 1;
 	int1 channelB = current_states & 0x01;
 	current_states >>= 1;
-	
 	in_update_encoder( channelA, channelB );
+	
+	in_update_switches( current_states );
+}
 
+
+///////////////////////////////////////////////////////////////
+// Switches
+///////////////////////////////////////////////////////////////
+#define CHANGE_CONFIDENT_THRESHOLD 2
+
+struct InSwitch in_switches[SWITCHES_SIZE];
+
+void in_update_switches( int8 switches_state )
+{
 	int8 i;
-	for (i = 0; i < INPUTS_SIZE; ++i ) {
+	for (i = 0; i < SWITCHES_SIZE; ++i ) {
 		struct InSwitch* sw = &in_switches[i];
 
-		int1 current_state = current_states & 0x01;
-		current_states >>= 1;
+		int1 current_state = switches_state & 0x01;
+		switches_state >>= 1;
 	
 		if (current_state == sw->state) {
 			sw->change_confident_count = 0;
@@ -169,8 +122,6 @@ void isr_timer0()
 		}
 	}
 }
-
-
 
 // Wait until button releases or it has been pressed for more than 
 // max_push_time ms. Returns true if max_push_time has been 
@@ -199,8 +150,31 @@ int1 in_button_pressed(int8 sw)
 
 
 ///////////////////////////////////////////////////////////////
-// Increment switches
+// Encoder
 ///////////////////////////////////////////////////////////////
+#define ENCODER_STATE_IDLE		0
+#define ENCODER_STATE_INC_0		1		//A=0, B=1 after ENCODER_STATE_IDLE
+#define ENCODER_STATE_INC_1		2		//A=0, B=0 after ENCODER_STATE_INC_0
+#define ENCODER_STATE_INC_2		3		//A=1, B=0 after ENCODER_STATE_INC_X
+#define ENCODER_STATE_DEC_0		4		//A=1, B=0 after ENCODER_STATE_IDLE
+#define ENCODER_STATE_DEC_1		5		//A=0, B=0 after ENCODER_STATE_DEC_0
+#define ENCODER_STATE_DEC_2		6		//A=1, B=0 after ENCODER_STATE_INC_X
+#define ENCODER_STATE_A0B0		7
+#define ENCODER_STATE_A0B1		8
+#define ENCODER_STATE_A1B0		9
+
+#define ENCODER_MAX_ACCUMULATED_SPEED	0x7FFF
+#define ENCODER_MIN_ACCUMULATED_SPEED	0x8000
+
+#define ENCODER_INITIAL_SPEED	8
+
+struct InEncoder {
+	int8 state;
+	int16 time_periods;
+	signed int8 pulses;
+};
+
+struct InEncoder in_encoder;
 
 struct
 {
@@ -209,11 +183,97 @@ struct
 	int16 rate;
 } in_increment_state;
 
+
+void in_update_encoder( int1 channelA, int1 channelB ) 
+{
+	in_encoder.time_periods++;
+	if ( channelA && channelB ) {
+		if ( (in_encoder.state == ENCODER_STATE_INC_1) ||
+			(in_encoder.state == ENCODER_STATE_INC_2) ) {
+			in_encoder.pulses++;
+		}
+		else if ( (in_encoder.state == ENCODER_STATE_DEC_1) ||
+				 (in_encoder.state == ENCODER_STATE_DEC_2) ) {
+			in_encoder.pulses--;
+		}
+		else if ( in_encoder.state == ENCODER_STATE_IDLE ) {
+		}
+		else {
+			printf( "L" );
+		}
+		in_encoder.state = ENCODER_STATE_IDLE;
+		return;
+	}
+	if ( !channelA && channelB ) {
+		if ( in_encoder.state == ENCODER_STATE_IDLE ) {
+			in_encoder.state = ENCODER_STATE_INC_0;
+		}
+		else if ( in_encoder.state == ENCODER_STATE_INC_2 ) {
+			in_encoder.state = ENCODER_STATE_INC_0;
+			in_encoder.pulses++;
+		}
+		else if ( (in_encoder.state==ENCODER_STATE_DEC_0) ||
+				 (in_encoder.state==ENCODER_STATE_DEC_1) ||
+				 (in_encoder.state==ENCODER_STATE_A0B0) ) {
+			in_encoder.state = ENCODER_STATE_DEC_2;
+		}
+        else if ( (in_encoder.state==ENCODER_STATE_INC_0) ||
+				 (in_encoder.state==ENCODER_STATE_DEC_2) ) {
+        }
+		else {
+			in_encoder.state = ENCODER_STATE_A0B1;
+		}
+		return;
+	}
+	if ( channelA && !channelB ) {
+		if ( in_encoder.state == ENCODER_STATE_IDLE ) {
+			in_encoder.state = ENCODER_STATE_DEC_0;
+		}
+		else if ( in_encoder.state == ENCODER_STATE_DEC_2 ) {
+			in_encoder.state = ENCODER_STATE_DEC_0;
+			in_encoder.pulses--;
+		}
+		else if ( (in_encoder.state==ENCODER_STATE_INC_0) ||
+				 (in_encoder.state==ENCODER_STATE_INC_1) ||
+				 (in_encoder.state==ENCODER_STATE_A0B0) ) {
+			in_encoder.state = ENCODER_STATE_INC_2;
+		}
+        else if ( (in_encoder.state==ENCODER_STATE_DEC_0) ||
+				 (in_encoder.state==ENCODER_STATE_INC_2) ) {
+        }
+		else {
+			in_encoder.state = ENCODER_STATE_A1B0;
+		}
+		return;
+	}
+	if ( !channelA && !channelB ) {
+		if ( (in_encoder.state == ENCODER_STATE_INC_0) ||
+			(in_encoder.state == ENCODER_STATE_A0B1) ) {
+			in_encoder.state = ENCODER_STATE_INC_1;
+		}
+		else if ( in_encoder.state == ENCODER_STATE_DEC_0 ||
+			(in_encoder.state == ENCODER_STATE_A1B0) ) {
+			in_encoder.state = ENCODER_STATE_DEC_1;
+		}
+        else if ( (in_encoder.state==ENCODER_STATE_DEC_1) ||
+				 (in_encoder.state==ENCODER_STATE_INC_1) ) {
+        }
+		else {
+			in_encoder.state = ENCODER_STATE_A0B0;
+		}
+		return;
+	}
+}
+
+
 void in_init_increment(int16 min, int16 max, int16 rate)
 {
-	in_switches[SWITCH_INCREMENT].state_time = 0;
-	in_switches[SWITCH_DECREMENT].state_time = 0;
-
+	disable_interrupts(INT_TIMER0);
+	in_encoder.time_periods=0;
+	in_encoder.pulses=0;
+	in_encoder.state=ENCODER_STATE_IDLE;
+	enable_interrupts(INT_TIMER0);
+	
 	in_increment_state.min = min;
 	in_increment_state.max = max;
 
@@ -223,28 +283,32 @@ void in_init_increment(int16 min, int16 max, int16 rate)
 	in_increment_state.rate = rate;
 }
 
-int8 pulse_time_increment(int8 sw)
-{
-	int8 ret = in_switches[sw].state_time / in_increment_state.rate;
-	in_switches[sw].state_time -= (ret * in_increment_state.rate);
-	return ret;
-}
 
 signed int16 in_increment(int16 current)
 {
-	signed int16 increment = 0;
-
-	if (in_switches[SWITCH_INCREMENT].state) {
-		int16 raw_inc = pulse_time_increment(SWITCH_INCREMENT);
-		increment = in_increment_state.max - current;
-		increment = (increment > raw_inc) ? raw_inc : increment;
+	disable_interrupts(INT_TIMER0);
+	signed int16 pulses = in_encoder.pulses;
+	int16 time_periods = in_encoder.time_periods;
+	in_encoder.time_periods=0;
+	in_encoder.pulses=0;
+	enable_interrupts(INT_TIMER0);
+	
+	printf( "P: %Ld\r\n", pulses );
+	
+	signed int16 increment = (pulses<<7) / time_periods;
+	
+	if ( pulses>0 ) {
+		if ( pulses>increment ) {
+			increment = pulses;
+		}
+		int16 max_increment = in_increment_state.max - current;
+		return max_increment > increment ? increment : max_increment;
 	}
-
-	if (in_switches[SWITCH_DECREMENT].state) {
-		int16 raw_dec = pulse_time_increment(SWITCH_DECREMENT);
-		increment = current - in_increment_state.min;
-		increment = (increment > raw_dec) ? -raw_dec : -increment;
+	
+	if ( pulses<increment ) {
+		increment = pulses;
 	}
-
-	return increment;
+	signed int16 max_decrement = in_increment_state.min - current;
+	return max_decrement < increment ? increment : max_decrement;
 }
+	
