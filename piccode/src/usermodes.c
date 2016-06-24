@@ -24,7 +24,7 @@ int1 mode_changed()
 		mode_next = mode_main;
 	else if (buttons_is_pressed(BUTTON_SETUP_DELAY))
 		mode_next = mode_setup_delay;
-	else if (buttons_is_pressed(BUTTON_SETUP_ZERO))
+	else if (buttons_is_pressed(BUTTON_SETUP_AUTOZERO))
 		mode_next = mode_setup_autozero_threshold;
 	else if (buttons_is_pressed(BUTTON_SETUP_PULSE))
 		mode_next = mode_setup_pulse;
@@ -59,6 +59,10 @@ void mode_main()
 			tone_end();
 			return;
 		}
+		
+		if (buttons_is_pressed(BUTTON_AUTO)) {
+			
+		}
 
 		if (buttons_is_pressed(BUTTON_AUTO)) {
 			int16 min_zero =
@@ -69,14 +73,10 @@ void mode_main()
 			delay_ms(1000);
 		}
 		
-//		coil.zero += in_increment( coil.zero );
+		coil.zero += encoder_increment( coil.zero );
 		
-		signed int16 increment = encoder_increment( coil.zero );
-		lcd_putc('\f');
-		printf(lcd_putc, "INC: %Ld\n", increment );
-
 		sample = coil_sample();
-//		dsp_sample(sample);
+		dsp_sample(sample);
 		tone_apply(sample);
 
 		delay_ms( COIL_PULSE_PERIOD );

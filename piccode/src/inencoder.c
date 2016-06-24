@@ -1,6 +1,7 @@
 #include "main.h"
 #include "inencoder.h"
 #include "mathov.h"
+#include <stdlib.h>
 
 
 ///////////////////////////////////////////////////////////////
@@ -157,18 +158,17 @@ signed int16 encoder_increment(int16 current)
 	enable_interrupts(INT_TIMER0);
 	
 	int16 pulse_count = abs(pulses);
-	
-	int16 increment;
-	if ( pulse_count ) {
-		increment = pulses;
-	}
-	else {
-		increment = pulse_count<<8;
+
+	int16 increment = pulse_count;
+	if ( pulse_count!=1 ) {
+		increment <<= 6;
 		increment /= time_periods;
-	}
-	
-	if ( pulse_count>increment ) {
-		increment = pulse_count;
+		if ( pulse_count>increment ) {
+			increment = pulse_count;
+		}
+		if ( pulse_count != increment ) {
+			increment *= encoder_settings.rate;
+		}
 	}
 	
 	if ( pulses>0 ) {
