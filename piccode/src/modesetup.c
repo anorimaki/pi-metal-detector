@@ -2,7 +2,8 @@
 #include "usermodes.h"
 #include "display.h"
 #include "coil.h"
-#include "input.h"
+#include "inbuttons.h"
+#include "inencoder.h"
 #include "samples.h"
 
 
@@ -22,7 +23,7 @@ void mode_setup_pulse()
 			return;
 		}
 		
-		if ( buttons_is_pressed(SWITCH_AUTO) ) {
+		if ( buttons_is_pressed(BUTTON_AUTO) ) {
 			reference_5v = coil_peak_ref();
 			dsp_setup_coil_pulse_ref( reference_5v );
 			delay_ms(1000);
@@ -48,7 +49,7 @@ void mode_setup_autozero_threshold()
 			return;
 		}
 		
-		if ( buttons_is_pressed(SWITCH_AUTO) ) {
+		if ( buttons_is_pressed(BUTTON_AUTO) ) {
 			coil.auto_zero_threshold = noise;
 		}
 
@@ -86,7 +87,7 @@ void mode_setup_delay()
 			return;
 		}
 		
-		if ( buttons_is_pressed(SWITCH_AUTO) ) {
+		if ( buttons_is_pressed(BUTTON_AUTO) ) {
 			coil.sample_delay = autoset_sample_delay();
 		}
 		

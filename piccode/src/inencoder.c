@@ -26,6 +26,7 @@ struct InEncoder {
 	int8 state;
 	int16 time_periods;
 	signed int8 pulses;
+	int8 losses;
 };
 
 struct InEncoder encoder;
@@ -35,7 +36,7 @@ struct
 	int16 min;
 	int16 max;
 	int16 rate;
-} encoder_increment_state;
+} encoder_settings;
 
 
 void encoder_update( int1 channelA, int1 channelB ) 
@@ -53,7 +54,7 @@ void encoder_update( int1 channelA, int1 channelB )
 		else if ( encoder.state == ENCODER_STATE_IDLE ) {
 		}
 		else {
-			printf( "L" );
+			encoder.losses++;
 		}
 		encoder.state = ENCODER_STATE_IDLE;
 		return;
@@ -120,49 +121,62 @@ void encoder_update( int1 channelA, int1 channelB )
 }
 
 
-void encoder_set_increment(int16 min, int16 max, int16 rate)
+void encoder_set_increment(int16 min, int16 max, int8 rate)
 {
 	disable_interrupts(INT_TIMER0);
 	encoder.time_periods=0;
 	encoder.pulses=0;
 	encoder.state=ENCODER_STATE_IDLE;
+	encoder.losses=0;
 	enable_interrupts(INT_TIMER0);
 	
-	encoder_increment_state.min = min;
-	encoder_increment_state.max = max;
+	encoder_settings.min = min;
+	encoder_settings.max = max;
 
 	if (rate == INCREMENT_AUTO_RATE) {
-		rate = 15000 / (max - min); //All range in 15s
+		rate = ((max-min) / 100) + 1;
 	}
-	encoder_increment_state.rate = rate;
+	encoder_settings.rate = rate;
 }
 
+
+#define ENCODER_MIN_TIME_PERIODS 32		//~512us*32 = 16ms
 
 signed int16 encoder_increment(int16 current)
 {
 	disable_interrupts(INT_TIMER0);
+	if( encoder.time_periods < ENCODER_MIN_TIME_PERIODS ) {
+		enable_interrupts(INT_TIMER0);
+		return;
+	}
 	signed int16 pulses = encoder.pulses;
 	int16 time_periods = encoder.time_periods;
 	encoder.time_periods=0;
 	encoder.pulses=0;
+	encoder.losses=0;
 	enable_interrupts(INT_TIMER0);
 	
-	printf( "P: %Ld\r\n", pulses );
+	int16 pulse_count = abs(pulses);
 	
-	signed int16 increment = (pulses<<7) / time_periods;
-	
-	if ( pulses>0 ) {
-		if ( pulses>increment ) {
-			increment = pulses;
-		}
-		int16 max_increment = encoder_increment_state.max - current;
-		return max_increment > increment ? increment : max_increment;
-	}
-	
-	if ( pulses<increment ) {
+	int16 increment;
+	if ( pulse_count ) {
 		increment = pulses;
 	}
-	signed int16 max_decrement = encoder_increment_state.min - current;
-	return max_decrement < increment ? increment : max_decrement;
+	else {
+		increment = pulse_count<<8;
+		increment /= time_periods;
+	}
+	
+	if ( pulse_count>increment ) {
+		increment = pulse_count;
+	}
+	
+	if ( pulses>0 ) {
+		int16 max_increment = encoder_settings.max - current;
+		return (max_increment > increment) ? increment : max_increment;
+	}
+	
+	int16 max_decrement = current - encoder_settings.min;
+	return -((max_decrement > increment) ? increment : max_decrement);
 }
 	

@@ -4,9 +4,10 @@
 
 //At 16Mhz counter increments every 64us:
 //	- For 250 counts, overflows every 16ms
-//	- For 78 counts, overflows every 5ms
-#define IN_TIMER_INIT_TIME (255-8)
-#define IN_TIMER_PERIOD_MS 5
+//	- For 8 counts, overflows every 512us
+#define IN_TIMER_INIT_TIME (256-8)
+#define IN_ENCODER_SCAN_PERIOD_US 512
+#define IN_BUTTONS_SCAN_PERIOD_MS 4     //512us*8
 
 void in_init();
 

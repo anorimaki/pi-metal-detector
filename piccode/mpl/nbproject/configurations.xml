@@ -197,6 +197,11 @@
         <property key="memories.eeprom" value="true"/>
         <property key="memories.flashdata" value="true"/>
         <property key="memories.id" value="true"/>
+        <property key="memories.instruction.ram" value="true"/>
+        <property key="memories.instruction.ram.end"
+                  value="${memories.instruction.ram.end.value}"/>
+        <property key="memories.instruction.ram.start"
+                  value="${memories.instruction.ram.start.value}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.end" value="0x57fb"/>
         <property key="memories.programmemory.partition2" value="true"/>
@@ -238,11 +243,11 @@
         <property key="keep-if-errors" value="false"/>
         <property key="keep-if-no-errors" value="false"/>
         <property key="keep-scratch-files-on-disk" value="true"/>
-        <property key="list-file" value="+LY"/>
+        <property key="list-file" value="+LN"/>
         <property key="list-file-extension" value=""/>
         <property key="old-error-file-format" value="false"/>
         <property key="opt-level" value="9"/>
-        <property key="output-flags" value="+DS +DM"/>
+        <property key="output-flags" value=""/>
         <property key="preprocessor-macros" value=""/>
       </ccscompiler>
     </conf>

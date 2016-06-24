@@ -13,11 +13,11 @@ struct InButton {
 
 extern struct InButton in_buttons[BUTTONS_SIZE];
 
-#define SWITCH_MAIN 		0
-#define SWITCH_SETUP_DELAY	1
-#define SWITCH_SETUP_ZERO	2
-#define SWITCH_SETUP_PULSE	3
-#define SWITCH_AUTO     	4
+#define BUTTON_MAIN 		0
+#define BUTTON_SETUP_DELAY	1
+#define BUTTON_SETUP_ZERO	2
+#define BUTTON_SETUP_PULSE	3
+#define BUTTON_AUTO     	4
 
 void buttons_init();
 

@@ -30,8 +30,8 @@ void buttons_update( int8 switches_state )
 	
 		if (current_state == sw->state) {
 			sw->change_confident_count = 0;
-			if (sw->state_time < (0xFFFF - IN_TIMER_PERIOD_MS))
-				sw->state_time += IN_TIMER_PERIOD_MS;
+			if (sw->state_time < (0xFFFF - IN_BUTTONS_SCAN_PERIOD_MS))
+				sw->state_time += IN_BUTTONS_SCAN_PERIOD_MS;
 		}
 		else {
 			if (++sw->change_confident_count == CHANGE_CONFIDENT_THRESHOLD) {
