@@ -366,3 +366,21 @@ void dsp_setup_sample_delay( int16 signal, int16 noise_estimation, int1 mode )
 	lcd_gotoxy( 1, 4 );
 	dis_noise( noise_estimation, mode );
 }
+
+
+void dsp_autoset_sample_delay( int8 first, int8 selected, 
+                            int16* signals, int16* noises)
+{
+	for( int8 line=0; line<DSP_AUTOSET_DELAY_MAX_LINES; ++line ) {
+		lcd_gotoxy( 1, line+1 );
+		lcd_putc( (selected==line) ? '>' : ' ' );
+		
+		printf(lcd_putc, "%2u ", first+line+SAMPLE_DELAY_CORRECTION );
+		
+		int16 signal = signals[line];
+		dsp_strength_bar( line, 12, signal, COIL_MAX_ADC_VALUE );
+		
+		printf(lcd_putc, "%4Ld", signal);
+	}
+	
+}

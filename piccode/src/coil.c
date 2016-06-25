@@ -167,13 +167,19 @@ int16 coil_custom_sample( int8 delay, int8 n_log2 )
 }
 
 
-int16 coil_sample()
+int16 coil_custom_sample( int8 delay )
 {
-	coil_check_samples_history(COIL_HISTORY_DECAY, coil.sample_delay);
+	coil_check_samples_history(COIL_HISTORY_DECAY, delay);
 	
-	int16 measure = coil_read_decay( coil.sample_delay );
+	int16 measure = coil_read_decay( delay );
 	
 	return samples_add( measure );
+}
+
+
+int16 coil_sample()
+{
+	return coil_custom_sample(coil.sample_delay);
 }
 
 

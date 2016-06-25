@@ -50,6 +50,7 @@ void main() {
 #include "modesetup.c"
 #include "samples.c"
 #include "tone.c"
-#include "usermodes.c"
 #include "mathutil.c"
+#include "modesetdelay.c"
+#include "usermodes.c"
 #endif

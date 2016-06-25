@@ -30,6 +30,7 @@ void coil_init();
 int16 coil_peak_ref();
 int16 coil_peak();
 
+int16 coil_custom_sample( int8 delay );
 int16 coil_sample();
 int16 coil_custom_sample( int8 delay, int8 n );
 

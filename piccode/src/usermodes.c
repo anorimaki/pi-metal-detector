@@ -7,6 +7,7 @@
 #include "inbuttons.h"
 #include "inencoder.h"
 #include "modesetup.h"
+#include "modesetdelay.h"
 
 
 ModeFuction mode_current;
@@ -70,11 +71,6 @@ void mode_main()
 	tone_begin();
 
 	while (TRUE) {
-		lcd_gotoxy( 1, 4 );
-		dis_noise( 64000, 0 );
-				
-		continue;
-		
 		int8 mode_button = mode_check_buttons();
 		if ( mode_button == BUTTON_MAIN ) {
 			show_mode++;
