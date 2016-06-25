@@ -187,36 +187,45 @@ void dsp_show_zero( int16 min_zero )
 }
 
 
+void dsp_percent( signed int8 percent ) 
+{
+	if ( percent == -100 ) {
+		percent = -99;
+	}
+	printf(lcd_putc, "%3d%%", percent);
+}
 
-// 10 mid positions with 3 possibilities in each
+
+// DSP_RANGE_CHARACTERS-2 mid positions with 3 possibilities in each
 // 2 possibilities for begin and end range marks
-#define DSP_RANGE_POSITIONS 3*10 + 2 + 2
-void dsp_show_zero_range( int8 line ) {
+#define DSP_RANGE_CHARACTERS	16
+#define DSP_RANGE_POSITIONS		(3*(DSP_RANGE_CHARACTERS-2)) + 2 + 2
+void dsp_show_zero_range( int8 line, int1 mode ) {
 	int8 mark = coil_normalize(coil.zero, 0, DSP_RANGE_POSITIONS);
 	
 	int8 start_glyph;
 	int8 end_glyph;
 	int8 mark_glyph;
 	int8 mark_pos;
-	if ( mark < 2 ) {
+	if ( mark < 2 ) {								//Mark at start range
 		mark_pos = 0;
 		mark_glyph = 0xFF;
 		start_glyph = mark;
 		end_glyph = 2;
 	}
-	else if ( mark > (DSP_RANGE_POSITIONS-2) ) {
+	else if ( mark > (DSP_RANGE_POSITIONS-2) ) {	//Mark at end range
 		mark_pos = 0;
 		mark_glyph = 0xFF;
 		start_glyph = 2;
 		end_glyph = (DSP_RANGE_POSITIONS-mark);
 	}
-	else if ( mark == (DSP_RANGE_POSITIONS-2) ) {
+	else if ( mark == (DSP_RANGE_POSITIONS-2) ) {	//Mark just before end range
 		mark_pos = 0;
 		mark_glyph = 0xFF;
 		start_glyph = 2;
 		end_glyph = 1;
 	}
-	else {
+	else {											//Mark at mid range
 		mark -= 2;
 		mark_pos = mark/3;
 		mark_glyph = mark-(mark_pos*3);
@@ -241,20 +250,31 @@ void dsp_show_zero_range( int8 line ) {
 		lcd_putc('-');
 	}
 	lcd_putc( (mark_glyph==0xFF) ? '-' : CHAR_RANGE_POSITION);
-	for( i=mark_pos+1; i<10; ++i ) {
+	for( i=mark_pos+1; i<(DSP_RANGE_CHARACTERS-2); ++i ) {
 		lcd_putc('-');
 	}
 	lcd_putc(CHAR_END_RANGE);
 	
-	signed int8 percent = coil_normalize(coil.zero, 0, 100);
-	printf(lcd_putc, "%3d%%", percent);
+	if ( mode == DSP_SHOW_PERCENT ) {
+		signed int8 percent = coil_normalize(coil.zero, 0, 100);
+		dsp_percent( percent );
+	}
+	else {
+		printf(lcd_putc, "%4Ld", coil.zero);
+	} 
 }
 
-// 12 LCD position
+
+//void dsp_strength_line( int8 y, int8 x, int8 width, )
+
+
+
+
+// STRENGTH_CHARACTERS LCD position
 //	6 possibles values per position
-#define STRENGTH_CHARACTERS	11
+#define STRENGTH_CHARACTERS	16
 #define STRENGTH_POSITIONS	STRENGTH_CHARACTERS*6
-void dsp_show_signal_strength( int8 line, int16 sample )
+void dsp_show_signal_strength( int8 line, int16 sample, int1 mode )
 {
 	signed int8 mark = coil_normalize(sample, coil.zero, STRENGTH_POSITIONS);
 	if ( mark < 0 ) {
@@ -271,25 +291,26 @@ void dsp_show_signal_strength( int8 line, int16 sample )
 	for( i=0; i<mark_pos; ++i ) {
 		lcd_putc(CHAR_FULL_SIGNAL);
 	}
-	lcd_putc(CHAR_END_SIGNAL);
+	if ( mark_pos != STRENGTH_CHARACTERS ) {
+		lcd_putc(CHAR_END_SIGNAL);
+	}
 	for( i=mark_pos+1; i<STRENGTH_CHARACTERS; ++i ) {
 		lcd_putc(' ');
 	}
 	
-	signed int8 percent = coil_normalize(sample, coil.zero, 100);
-	if ( percent == -100 ) {
-		percent = -99;
+	if ( mode == DSP_SHOW_PERCENT ) {
+		signed int8 percent = coil_normalize(sample, coil.zero, 100);
+		dsp_percent( percent );
 	}
-
-	printf(lcd_putc, "%3d%%", percent);
-	
-	signed int16 ret = (signed int16)sample - coil.zero;
-	printf(lcd_putc, " %4Ld", ret);
+	else {
+		signed int16 val = (signed int16)sample - coil.zero;
+		printf(lcd_putc, "%4Ld", val);
+	}
 }
 
 
-void dsp_sample( int16 sample )
+void dsp_sample( int16 sample, int1 mode )
 {
-	dsp_show_zero_range( 1 );
-	dsp_show_signal_strength( 2, sample );
+	dsp_show_zero_range( 3, mode );
+	dsp_show_signal_strength( 4, sample, mode );
 }

@@ -21,7 +21,9 @@ void dsp_show_zero( int16 min_zero ) ;
 
 void dsp_setup_autozero_threshold(int16 noise);
 
-void dsp_sample( int16 sample );
+#define DSP_SHOW_PERCENT    0
+#define DSP_SHOW_VALUES     1
+void dsp_sample( int16 sample, int1 showMode );
 
 #endif	/* DISPLAY_H */
 

@@ -16,25 +16,37 @@ void mode_init()
 	mode_current = mode_main;
 }
 
-int1 mode_changed()
+int8 mode_check_buttons()
 {
-	ModeFuction mode_next = mode_current;
-
-	if (buttons_is_pressed(BUTTON_MAIN))
-		mode_next = mode_main;
-	else if (buttons_is_pressed(BUTTON_SETUP_DELAY))
-		mode_next = mode_setup_delay;
-	else if (buttons_is_pressed(BUTTON_SETUP_AUTOZERO))
-		mode_next = mode_setup_autozero_threshold;
-	else if (buttons_is_pressed(BUTTON_SETUP_PULSE))
-		mode_next = mode_setup_pulse;
-
-	int1 ret = (mode_next != mode_current);
-
-	mode_current = mode_next;
-
-	return ret;
+	if (buttons_is_pressed(BUTTON_MAIN)) {
+		mode_current = mode_main;
+		return BUTTON_MAIN;
+	}
+	if (buttons_is_pressed(BUTTON_SETUP_DELAY)) {
+		mode_current = mode_setup_delay;
+		return BUTTON_SETUP_DELAY;
+	}
+	if (buttons_is_pressed(BUTTON_SETUP_AUTOZERO)) {
+		mode_current = mode_setup_autozero_threshold;
+		return BUTTON_SETUP_AUTOZERO;
+	}
+	if (buttons_is_pressed(BUTTON_SETUP_PULSE)) {
+		mode_current = mode_setup_pulse;
+		return BUTTON_SETUP_PULSE;
+	}
+	return NO_MODE_BUTTON;
 }
+
+
+int1 mode_changed() 
+{
+	ModeFuction previous_mode = mode_current;
+
+	mode_check_buttons();
+	
+	return previous_mode != mode_current;
+}
+
 
 void mode_execute_current()
 {
@@ -48,6 +60,7 @@ void mode_execute_current()
 
 void mode_main()
 {
+	static int1 show_mode = DSP_SHOW_PERCENT;
 	int16 sample = 0;
 
 	encoder_set_increment( 0, COIL_MAX_ADC_VALUE, INCREMENT_AUTO_RATE );
@@ -55,15 +68,15 @@ void mode_main()
 	tone_begin();
 
 	while (TRUE) {
-		if (mode_changed()) {
+		int8 mode_button = mode_check_buttons();
+		if ( mode_button == BUTTON_MAIN ) {
+			show_mode++;
+		}
+		else if ( mode_button != NO_MODE_BUTTON ) {
 			tone_end();
 			return;
 		}
 		
-		if (buttons_is_pressed(BUTTON_AUTO)) {
-			
-		}
-
 		if (buttons_is_pressed(BUTTON_AUTO)) {
 			int16 min_zero =
 					coil_custom_sample(COIL_CALCULATE_MIN_ZERO_DELAY, 3);
@@ -76,7 +89,7 @@ void mode_main()
 		coil.zero += encoder_increment( coil.zero );
 		
 		sample = coil_sample();
-		dsp_sample(sample);
+		dsp_sample(sample, show_mode);
 		tone_apply(sample);
 
 		delay_ms( COIL_PULSE_PERIOD );

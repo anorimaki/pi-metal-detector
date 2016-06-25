@@ -179,9 +179,7 @@ typedef struct
    #define LCD_TYPE 2           // 0=5x7, 1=5x10, 2=2 lines
 #endif
 
-#ifndef LCD_LINE_TWO
-   #define LCD_LINE_TWO 0x40    // LCD RAM address for the second line
-#endif
+static int8 line_addresses[4] = {0, 0x40, 0x14, 0x54 };
 
 #ifndef LCD_LINE_LENGTH
    #define LCD_LINE_LENGTH 20
@@ -344,12 +342,7 @@ void lcd_init(void)
 
 void lcd_gotoxy(unsigned int8 x, unsigned int8 y)
 {
-   unsigned int8 address;
-   
-   if(y!=1)
-      address=LCD_LINE_TWO;
-   else
-      address=0;
+   unsigned int8 address = line_addresses[y-1];
      
    address+=x-1;
    lcd_send_byte(0,0x80|address);

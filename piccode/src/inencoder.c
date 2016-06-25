@@ -148,7 +148,7 @@ signed int16 encoder_increment(int16 current)
 	disable_interrupts(INT_TIMER0);
 	if( encoder.time_periods < ENCODER_MIN_TIME_PERIODS ) {
 		enable_interrupts(INT_TIMER0);
-		return;
+		return 0;
 	}
 	signed int16 pulses = encoder.pulses;
 	int16 time_periods = encoder.time_periods;

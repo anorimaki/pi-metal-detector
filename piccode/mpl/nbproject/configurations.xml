@@ -16,9 +16,6 @@
       <itemPath>../include/tone.h</itemPath>
       <itemPath>../include/usermodes.h</itemPath>
       <itemPath>../include/modesetup.h</itemPath>
-      <itemPath>../include/inencoder.h</itemPath>
-      <itemPath>../include/mathov.h</itemPath>
-      <itemPath>../include/inbuttons.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -45,8 +42,6 @@
       <itemPath>../src/tone.c</itemPath>
       <itemPath>../src/usermodes.c</itemPath>
       <itemPath>../src/modesetup.c</itemPath>
-      <itemPath>../src/inencoder.c</itemPath>
-      <itemPath>../src/inbuttons.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -103,10 +98,6 @@
         </ccscompiler>
       </item>
       <item path="../src/display.c" ex="true" overriding="false">
-        <ccscompiler>
-        </ccscompiler>
-      </item>
-      <item path="../src/inencoder.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
       </item>
@@ -188,6 +179,7 @@
         <property key="ToolFirmwareFilePath"
                   value="Press to browse for a specific firmware version"/>
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
@@ -197,11 +189,6 @@
         <property key="memories.eeprom" value="true"/>
         <property key="memories.flashdata" value="true"/>
         <property key="memories.id" value="true"/>
-        <property key="memories.instruction.ram" value="true"/>
-        <property key="memories.instruction.ram.end"
-                  value="${memories.instruction.ram.end.value}"/>
-        <property key="memories.instruction.ram.start"
-                  value="${memories.instruction.ram.start.value}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.end" value="0x57fb"/>
         <property key="memories.programmemory.partition2" value="true"/>
@@ -243,11 +230,11 @@
         <property key="keep-if-errors" value="false"/>
         <property key="keep-if-no-errors" value="false"/>
         <property key="keep-scratch-files-on-disk" value="true"/>
-        <property key="list-file" value="+LN"/>
+        <property key="list-file" value="+LY"/>
         <property key="list-file-extension" value=""/>
         <property key="old-error-file-format" value="false"/>
         <property key="opt-level" value="9"/>
-        <property key="output-flags" value=""/>
+        <property key="output-flags" value="+DS +DM"/>
         <property key="preprocessor-macros" value=""/>
       </ccscompiler>
     </conf>
