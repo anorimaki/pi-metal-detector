@@ -1,6 +1,6 @@
 #include "main.h"
 #include "inencoder.h"
-#include "mathov.h"
+#include "mathutil.h"
 #include <stdlib.h>
 
 

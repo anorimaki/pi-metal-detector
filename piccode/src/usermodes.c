@@ -61,6 +61,8 @@ void mode_execute_current()
 void mode_main()
 {
 	static int1 show_mode = DSP_SHOW_PERCENT;
+	
+	int8 update_display = 0;
 	int16 sample = 0;
 
 	encoder_set_increment( 0, COIL_MAX_ADC_VALUE, INCREMENT_AUTO_RATE );
@@ -68,6 +70,11 @@ void mode_main()
 	tone_begin();
 
 	while (TRUE) {
+		lcd_gotoxy( 1, 4 );
+		dis_noise( 64000, 0 );
+				
+		continue;
+		
 		int8 mode_button = mode_check_buttons();
 		if ( mode_button == BUTTON_MAIN ) {
 			show_mode++;
@@ -89,8 +96,12 @@ void mode_main()
 		coil.zero += encoder_increment( coil.zero );
 		
 		sample = coil_sample();
-		dsp_sample(sample, show_mode);
-		tone_apply(sample);
+		
+		if ( ++update_display & 0x07 ) {
+				//Only update user interface every 8 loops
+			dsp_main_mode( sample, samples_efficiency(), show_mode );
+			tone_apply(sample);
+		}
 
 		delay_ms( COIL_PULSE_PERIOD );
 	}

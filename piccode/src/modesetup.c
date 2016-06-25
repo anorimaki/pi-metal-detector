@@ -68,7 +68,7 @@ int16 autoset_sample_delay() {
 	int16 ret = COIL_MIN_SAMPLE_DELAY;
 	while( ret < COIL_MAX_SAMPLE_DELAY ) {
 		int16 sample = coil_custom_sample( ret, 4 );
-		dsp_setup_sample_delay( sample );
+	//	dsp_setup_sample_delay( sample );
 		if( sample <= coil.zero )
 			return ret;
 		++ret;
@@ -79,11 +79,18 @@ int16 autoset_sample_delay() {
 
 void mode_setup_delay()
 {
+	static int1 show_mode = DSP_SHOW_PERCENT;
+	int8 update_display = 0;
+	
 	encoder_set_increment( COIL_MIN_SAMPLE_DELAY, COIL_MAX_SAMPLE_DELAY,
 						INCREMENT_AUTO_RATE );
 			
 	while (TRUE) {
-		if ( mode_changed() ) {
+		int8 mode_button = mode_check_buttons();
+		if ( mode_button == BUTTON_SETUP_DELAY ) {
+			show_mode++;
+		}
+		else if ( mode_button != NO_MODE_BUTTON ) {
 			return;
 		}
 		
@@ -94,7 +101,10 @@ void mode_setup_delay()
 		coil.sample_delay += encoder_increment( coil.sample_delay );
 		
 		int16 sample = coil_sample();
-		dsp_setup_sample_delay( sample );
+		if ( ++update_display & 0x07 ) {
+				//Only update user interface every 8 loops
+			dsp_setup_sample_delay( sample, samples_efficiency(), show_mode );
+		}
 		
 		delay_ms( COIL_PULSE_PERIOD );
 	}

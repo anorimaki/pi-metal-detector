@@ -2,6 +2,7 @@
 #include "coil.h"
 #include "config.h"
 #include "samples.h"
+#include "mathutil.h"
 #include "picconfig.h"
 
 
@@ -123,7 +124,7 @@ int16 coil_peak()
 	disable_interrupts(GLOBAL);
 
 	coil_pulse();
-	delay_us(2);
+	delay_us(4);
 	int16 measure = coil_read_peak();
 
 	//Enable interrupts to capture read input switches
@@ -176,29 +177,8 @@ int16 coil_sample()
 }
 
 
-signed int32 coil_normalize(int16 sample, int16 zero, int16 new_max_value)
+signed int32 coil_normalize(int16 value, int16 zero, int16 new_max_value)
 {
-        int16 max_value = COIL_MAX_ADC_VALUE - zero;
-
-        int1 negative = zero > sample;
-
-        int32 ret = negative ? zero - sample : sample - zero;
-
-        ret *= new_max_value;        //Can't overlay (12bits * 16bits = 28bits)
-        ret <<= 3;                                //Multiply x8 to round final value (31 bits)
-        ret /= max_value;
-
-        int8 remainder = ret & 0x07;
-        ret >>= 3;
-
-        if ( remainder > 0x03 )
-                ++ret;
-
-        if (negative) {
-                if (ret > new_max_value)
-                        ret = new_max_value;
-                return -(signed int32)ret;
-        }
-
-        return ret;
+	return math_change_range( value - zero, 
+				COIL_MAX_ADC_VALUE - zero, new_max_value );
 } 
