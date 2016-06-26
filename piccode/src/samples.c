@@ -56,7 +56,10 @@ int16 samples_add( int16 value )
 	return samples.mean;
 }
 	
-
+/*
+ * Calculates variance with the formula: sum(x{i}^2)/N - u^2
+ * Where u is the mean: sum(x{i})/N
+ */
 int32 samples_variance() 
 {
 	int32 aux = samples.sum >> 1;	//Divide before square to avoid overflows
@@ -68,6 +71,7 @@ int32 samples_variance()
 	
 	return aux;
 }
+
 
 int16 samples_std_deviation() 
 {
@@ -81,6 +85,10 @@ int16 samples_coeff_variation()
 }
 
 #define EFFICIENCY_SCALE_FACTOR 8
+/*
+ * Calculates efficiency with the formula: variance / u^2
+ * https://en.wikipedia.org/wiki/Efficiency_(statistics)#Estimators_of_u.i.d._variables
+ */
 int16 samples_efficiency()
 {
 	int32 sq_mean = samples.mean * samples.mean;
@@ -91,21 +99,3 @@ int16 samples_efficiency()
 	
 	return var / sq_mean;
 }
-
-
-
-int16 samples_upper_deviation() {
-	int16 average = (samples.sum >> SAMPLES_HISTORY_SIZE_LOG);
-	
-	int16 deviation = 0;
-	for( int8 i = 0; i<SAMPLES_HISTORY_SIZE; ++i ) {
-		int16 current = samples.values[i];
-		if ( current == SAMPLES_UNDEFINED_VALUE )
-			return 0;		//Buffer not full: Return 0
-		
-		deviation += (average>current) ? 0 : current-average;
-	}
-		
-	return deviation >> SAMPLES_HISTORY_SIZE_LOG; 
-}
-	

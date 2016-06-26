@@ -133,21 +133,19 @@ void dsp_clear()
 
 void dsp_hello()
 {
-	lcd_putc('\f');
-	printf(lcd_putc, "PI METAL DETEC.\n");
-	printf(lcd_putc, "A. & G. Corp.");
+	lcd_gotoxy( 1, 1 );
+	printf( lcd_putc, "********************");
+	
+	lcd_gotoxy( 1, 2 );
+	printf( lcd_putc, " PI METAL DETECTOR  ");
+	
+	lcd_gotoxy( 1, 3 );
+	printf( lcd_putc, "A. & G. Corp. (2016)");
+	
+	lcd_gotoxy( 1, 4 );
+	printf( lcd_putc, "********************");
 }
 
-
-
-void dsp_show_zero( int16 min_zero ) 
-{
-	signed int8 zero_per_cent = coil_normalize(coil.zero, 0, 100);
-	signed int8 min_zero_per_cent = coil_normalize(min_zero, 0, 100);
-	lcd_putc('\f');
-	printf(lcd_putc, "Zero: %Lu (%d%%)\n", coil.zero, zero_per_cent);
-	printf(lcd_putc, "Min: %Lu (%d%%)", min_zero, min_zero_per_cent);
-}
 
 
 void dsp_percent( signed int8 percent ) 
@@ -212,7 +210,7 @@ void dsp_range_line( int8 width, int16 value,
 									CHAR_RANGE_POSITION_GLYPH[mark_glyph] );
 	}
 	
-	lcd_send_byte(0,0x80|current_address);
+	lcd_send_byte( 0, 0x80|current_address );	//Restore DDRAM address
 	
 	int8 i;
 	lcd_putc(CHAR_START_RANGE);
@@ -228,6 +226,9 @@ void dsp_range_line( int8 width, int16 value,
 
 /*
  * Display a stength bar with 6 possibles values per position
+ * Multiples strength bars can be displayed in LCD at same time but
+ * end_signal_char_index must be different in each one (is the glyph of last
+ * character)
  */
 #define STRENGTH_VALUES_PER_CHAR	6
 void dsp_strength_bar( int8 end_signal_char_index,
@@ -244,7 +245,7 @@ void dsp_strength_bar( int8 end_signal_char_index,
 	
 	dsp_create_signal_character( end_signal_char_index, mark_glyph );
 	
-	lcd_send_byte(0,0x80|current_address);
+	lcd_send_byte( 0, 0x80|current_address );	//Restore DDRAM address
 	
 	int8 i;
 	for( i=0; i<mark_pos; ++i ) {
@@ -354,14 +355,6 @@ void dsp_autoset_sample_delay( int8 first, int8 selected,
 		
 		printf(lcd_putc, "%4Ld", signal);
 	}
-}
-
-
-void dsp_setup_coil_pulse_ref(int16 reference_5v)
-{
-	lcd_putc('\f');
-	printf(lcd_putc, "SET: coil pulse\n");
-	printf(lcd_putc, "5V ref.: %Lu", reference_5v);
 }
 
 

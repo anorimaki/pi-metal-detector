@@ -25,9 +25,9 @@
 
 struct InEncoder {
 	int8 state;
-	int16 time_periods;
-	signed int8 pulses;
-	int8 losses;
+	int16 time_periods;		//Time counter from last encoder read.
+	signed int8 pulses;		//Pulse counter from last encoder read.
+	int8 losses;			//Error counter from last encoder read.
 };
 
 struct InEncoder encoder;
@@ -39,10 +39,21 @@ struct
 	int16 rate;
 } encoder_settings;
 
-
+/*
+ * Updtes encoder state with current channels value
+ * 
+ * It infers missing states if they can be inferred. For example, 
+ * complete increment states are: 
+ *		{A=1, B=1}, {A=0, B=1}, {A=0, B=0}, {A=1, B=0}, {A=1, B=1}
+ * If states {A=0, B=1} or {A=0, B=0} are missing, it infferes that is an
+ * increment.
+ * But if {A=0, B=1} and {A=0, B=0} are missing, it counts as an error.
+ * This is usefull if encoder scan is too slow to sample all channel variations.
+ */
 void encoder_update( int1 channelA, int1 channelB ) 
 {
 	encoder.time_periods++;
+	
 	if ( channelA && channelB ) {
 		if ( (encoder.state == ENCODER_STATE_INC_1) ||
 			(encoder.state == ENCODER_STATE_INC_2) ) {
@@ -60,6 +71,7 @@ void encoder_update( int1 channelA, int1 channelB )
 		encoder.state = ENCODER_STATE_IDLE;
 		return;
 	}
+	
 	if ( !channelA && channelB ) {
 		if ( encoder.state == ENCODER_STATE_IDLE ) {
 			encoder.state = ENCODER_STATE_INC_0;
@@ -81,6 +93,7 @@ void encoder_update( int1 channelA, int1 channelB )
 		}
 		return;
 	}
+	
 	if ( channelA && !channelB ) {
 		if ( encoder.state == ENCODER_STATE_IDLE ) {
 			encoder.state = ENCODER_STATE_DEC_0;
@@ -102,22 +115,21 @@ void encoder_update( int1 channelA, int1 channelB )
 		}
 		return;
 	}
-	if ( !channelA && !channelB ) {
-		if ( (encoder.state == ENCODER_STATE_INC_0) ||
-			(encoder.state == ENCODER_STATE_A0B1) ) {
-			encoder.state = ENCODER_STATE_INC_1;
-		}
-		else if ( encoder.state == ENCODER_STATE_DEC_0 ||
-			(encoder.state == ENCODER_STATE_A1B0) ) {
-			encoder.state = ENCODER_STATE_DEC_1;
-		}
-        else if ( (encoder.state==ENCODER_STATE_DEC_1) ||
-				 (encoder.state==ENCODER_STATE_INC_1) ) {
-        }
-		else {
-			encoder.state = ENCODER_STATE_A0B0;
-		}
-		return;
+			
+			//!channelA && !channelB
+	if ( (encoder.state == ENCODER_STATE_INC_0) ||
+		(encoder.state == ENCODER_STATE_A0B1) ) {
+		encoder.state = ENCODER_STATE_INC_1;
+	}
+	else if ( encoder.state == ENCODER_STATE_DEC_0 ||
+		(encoder.state == ENCODER_STATE_A1B0) ) {
+		encoder.state = ENCODER_STATE_DEC_1;
+	}
+	else if ( (encoder.state==ENCODER_STATE_DEC_1) ||
+			 (encoder.state==ENCODER_STATE_INC_1) ) {
+	}
+	else {
+		encoder.state = ENCODER_STATE_A0B0;
 	}
 }
 

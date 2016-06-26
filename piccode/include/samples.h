@@ -6,7 +6,6 @@
 
 void samples_init();
 int16 samples_add( int16 value );
-int16 samples_upper_deviation();
 int16 samples_std_deviation() ;
 int16 samples_efficiency();
 

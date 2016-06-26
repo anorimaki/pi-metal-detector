@@ -81,12 +81,7 @@ void mode_main()
 		}
 		
 		if (buttons_is_pressed(BUTTON_AUTO)) {
-			int16 min_zero =
-					coil_custom_sample(COIL_CALCULATE_MIN_ZERO_DELAY, 3);
-			//Set it a little greater than sample
 			coil.zero = sample + coil.auto_zero_threshold;
-			dsp_show_zero(min_zero);
-			delay_ms(1000);
 		}
 		
 		coil.zero += encoder_increment( coil.zero );

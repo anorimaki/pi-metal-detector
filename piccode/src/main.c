@@ -28,10 +28,13 @@ void init() {
 }
 
 
-void main() {
+void main()
+{
     init();
     
     dsp_hello();
+	delay_ms(2000);
+	
     cnf_load();
 	
 	while( TRUE ) {

@@ -20,7 +20,7 @@ void cnf_load() {
     
 	coil.zero = INITIAL_SAMPLE_ZERO_POINT;
 	
-	coil.auto_zero_threshold = 0;
+	coil.auto_zero_threshold = 10;
 }
 
 
