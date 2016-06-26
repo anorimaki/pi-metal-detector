@@ -6,7 +6,9 @@ void dsp_clear();
 void dsp_hello();
 
 void dsp_setup_coil_pulse_ref( int16 reference_5v );
-void dsp_setup_coil_pulse(int16 measure, int16 reference_5v);
+
+#define DSP_SHOW_VOLTS      0
+void dsp_setup_coil_pulse( int16 measure, int16 reference_5v, int1 mode );
 
 #define DSP_AUTOSET_DELAY_MAX_LINES 4
 void dsp_autoset_sample_delay( int8 first, int8 selected, 

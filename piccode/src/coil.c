@@ -105,14 +105,13 @@ int16 coil_read_peak()
 
 int16 coil_peak_ref()
 {
-		//Wait to guaranty that previous pulse does not affect measure
-	delay_ms( COIL_PULSE_PERIOD );
+	coil_check_samples_history(COIL_HISTORY_PEAK, 0);
 						
 	disable_interrupts(GLOBAL);
-	int16 ret = coil_read_peak();
+	int16 measure = coil_read_peak();
 	enable_interrupts(GLOBAL);
 
-	return ret;
+	return samples_add( measure );
 }
 
 

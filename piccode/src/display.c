@@ -1,6 +1,7 @@
 #include "main.h"
 #include "display.h"
 #include "mathutil.h"
+#include "modesetup.h"
 #include "lcd.c"
 #include "coil.h"
 
@@ -136,35 +137,6 @@ void dsp_hello()
 	printf(lcd_putc, "PI METAL DETEC.\n");
 	printf(lcd_putc, "A. & G. Corp.");
 }
-
-
-void dsp_setup_coil_pulse_ref(int16 reference_5v)
-{
-	lcd_putc('\f');
-	printf(lcd_putc, "SET: coil pulse\n");
-	printf(lcd_putc, "5V ref.: %Lu", reference_5v);
-}
-
-
-void dsp_setup_coil_pulse(int16 measure, int16 reference_5v)
-{
-	lcd_putc('\f');
-	printf(lcd_putc, "SET: coil pulse\n");
-	printf(lcd_putc, "%Luus", coil.pulse_length);
-	lcd_gotoxy(8, 2);
-	int16 volts = (measure * 5) / reference_5v;
-	printf(lcd_putc, "-->  %LuV", volts);
-}
-
-
-void dsp_setup_autozero_threshold( int16 noise )
-{
-	lcd_putc('\f');
-	printf(lcd_putc, "SET: autozero thrs\n");
-	printf(lcd_putc, "%Lu (Noise: %Lu)", coil.auto_zero_threshold, noise);
-}
-
-
 
 
 
@@ -382,5 +354,64 @@ void dsp_autoset_sample_delay( int8 first, int8 selected,
 		
 		printf(lcd_putc, "%4Ld", signal);
 	}
+}
+
+
+void dsp_setup_coil_pulse_ref(int16 reference_5v)
+{
+	lcd_putc('\f');
+	printf(lcd_putc, "SET: coil pulse\n");
+	printf(lcd_putc, "5V ref.: %Lu", reference_5v);
+}
+
+
+void dsp_setup_coil_pulse(int16 measure, int16 reference_5v, int1 mode)
+{
+	lcd_gotoxy( 1, 1 );
+	printf( lcd_putc, "* Setup pulse time *");
 	
+	lcd_gotoxy( 1, 2 );
+	printf( lcd_putc, "Pul " );
+	dsp_range_line( 11, coil.pulse_length,
+				 MODE_SETUP_PULSE_TIME_MAX-MODE_SETUP_PULSE_TIME_MIN );
+	printf(lcd_putc, "%3Luus", coil.pulse_length);
+	
+	lcd_gotoxy( 1, 3 );
+	printf( lcd_putc, "Vol " );
+	dsp_strength_bar( 0, 12, measure, COIL_MAX_ADC_VALUE );
+	if ( mode == DSP_SHOW_VOLTS ) {
+		int16 volts = (measure * 5) / reference_5v;
+		if ( volts > 999 ) {
+			volts = 999;
+		}
+		printf(lcd_putc, "%3LuV", volts);
+	}
+	else {
+		printf(lcd_putc, "%4Lu", measure);
+	}
+	
+	lcd_gotoxy( 1, 4 );
+	printf(lcd_putc, "5V reference:   %4Lu", reference_5v);
+}
+
+
+void dsp_setup_autozero_threshold( int16 noise )
+{
+	lcd_gotoxy( 1, 1 );
+	printf( lcd_putc, "** Setup autozero **");
+	
+	lcd_gotoxy( 1, 2 );
+	printf( lcd_putc, "Thr " );
+	dsp_range_line( 12, coil.auto_zero_threshold, 
+					MODE_SETUP_AUTOZERO_THRESHOLD_MAX );
+	printf( lcd_putc, "%4Lu", coil.auto_zero_threshold );
+	
+	lcd_gotoxy( 1, 3 );
+	printf( lcd_putc, "Noi " );
+	dsp_strength_bar( 0, 12, noise, COIL_MAX_ADC_VALUE );
+	printf( lcd_putc, "%4Lu", noise );
+	
+	lcd_gotoxy( 1, 4 );
+	printf( lcd_putc, "Zero relation:  %4Lu", coil.zero /
+								coil.auto_zero_threshold );
 }

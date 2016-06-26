@@ -10,7 +10,7 @@
 int16 autoset_delay_noises[DSP_AUTOSET_DELAY_MAX_LINES];
 int16 autoset_delay_signals[DSP_AUTOSET_DELAY_MAX_LINES];
 
-int16 autoset_delay( int8 delay, int8 index ) 
+void autoset_delay( int8 delay, int8 index ) 
 {
 	for( int8 j=0; j<SAMPLES_HISTORY_SIZE+1; ++j ) {
 		coil_custom_sample( delay );
@@ -94,7 +94,7 @@ void mode_setup_delay()
 		coil.sample_delay += encoder_increment( coil.sample_delay );
 		
 		int16 sample = coil_sample();
-		if ( ++update_display & 0x07 ) {
+		if ( ++update_display | 0x07 ) {
 				//Only update user interface every 8 loops
 			dsp_setup_sample_delay( sample, samples_efficiency(), show_mode );
 		}

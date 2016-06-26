@@ -93,7 +93,7 @@ void mode_main()
 		
 		sample = coil_sample();
 		
-		if ( ++update_display & 0x07 ) {
+		if ( ++update_display | 0x07 ) {
 				//Only update user interface every 8 loops
 			dsp_main_mode( sample, samples_efficiency(), show_mode );
 			tone_apply(sample);

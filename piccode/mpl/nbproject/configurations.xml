@@ -108,8 +108,12 @@
         </ccscompiler>
       </item>
       <item path="../src/inbuttons.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
       </item>
       <item path="../src/inencoder.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
       </item>
       <item path="../src/input.c" ex="true" overriding="false">
         <ccscompiler>
@@ -124,6 +128,8 @@
         </ccscompiler>
       </item>
       <item path="../src/modesetdelay.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
       </item>
       <item path="../src/modesetup.c" ex="true" overriding="false">
         <ccscompiler>
