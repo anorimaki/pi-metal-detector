@@ -232,13 +232,10 @@ void dsp_range_line( int8 width, int16 value,
  */
 #define STRENGTH_VALUES_PER_CHAR	6
 void dsp_strength_bar( int8 end_signal_char_index,
-						int8 width, int16 value, 
-						int16 max_value ) 
+						int8 width, int8 value ) 
 {
-	int8 mark = math_change_range(value, max_value, 
-								width*STRENGTH_VALUES_PER_CHAR);
-	int8 mark_pos = mark/STRENGTH_VALUES_PER_CHAR;
-	int8 mark_glyph = mark-(mark_pos*STRENGTH_VALUES_PER_CHAR);
+	int8 mark_pos = value/STRENGTH_VALUES_PER_CHAR;
+	int8 mark_glyph = value-(mark_pos*STRENGTH_VALUES_PER_CHAR);
 	
 	lcd_output_rs(0);
 	int8 current_address = lcd_read_byte() & 0x7F;
@@ -260,15 +257,36 @@ void dsp_strength_bar( int8 end_signal_char_index,
 }
 
 
+void dsp_prop_strength_bar( int8 end_signal_char_index,
+						int8 width, int16 value, 
+						int16 max_value ) 
+{
+	value = math_change_range(value, max_value, 
+							width*STRENGTH_VALUES_PER_CHAR);
+	dsp_strength_bar( end_signal_char_index, width, value );
+}
+
+
+void dsp_log_strength_bar( int8 end_signal_char_index,
+						int8 width, int16 value, 
+						int16 max_value ) 
+{
+	value = math_change_log_range(value, max_value, 
+							width*STRENGTH_VALUES_PER_CHAR);
+	dsp_strength_bar( end_signal_char_index, width, value );
+}
+
+
 void dis_signal( int16 signal, int1 mode ) 
 {
 	signed int16 adjusted_signal = signal - coil.zero;
-	int16 adjusted_range = COIL_MAX_ADC_VALUE - coil.zero;
+	int16 adjusted_max_signal = COIL_MAX_ADC_VALUE - coil.zero;
+	
 	int16 signal_strength_bar = (adjusted_signal<0) ? 0 : adjusted_signal;
-	dsp_strength_bar( 0, 12, signal_strength_bar, adjusted_range );
+	dsp_log_strength_bar( 0, 12, signal_strength_bar, adjusted_max_signal );
 	if ( mode == DSP_SHOW_PERCENT ) {
-		signed int8 percent = math_change_range(adjusted_signal, 
-												adjusted_range, 100);
+		signed int8 percent = math_change_log_range(adjusted_signal, 
+												adjusted_max_signal, 100);
 		dsp_percent( percent );
 	}
 	else {
@@ -282,7 +300,7 @@ void dis_noise( int16 noise_estimation, int1 mode )
 	noise_estimation &= 0x7FFF;		//Limit noise to max positive sign int16
 	
 	printf( lcd_putc, "Noi " );
-	dsp_strength_bar( 1, 12, noise_estimation, COIL_MAX_ADC_VALUE );
+	dsp_prop_strength_bar( 1, 12, noise_estimation, COIL_MAX_ADC_VALUE );
 	if ( mode == DSP_SHOW_PERCENT ) {
 		signed int8 percent = math_change_range(noise_estimation, 
 												COIL_MAX_ADC_VALUE, 100);
@@ -351,7 +369,7 @@ void dsp_autoset_sample_delay( int8 first, int8 selected,
 		printf(lcd_putc, "%2u ", first+line+SAMPLE_DELAY_CORRECTION );
 		
 		int16 signal = signals[line];
-		dsp_strength_bar( line, 12, signal, COIL_MAX_ADC_VALUE );
+		dsp_log_strength_bar( line, 12, signal, COIL_MAX_ADC_VALUE );
 		
 		printf(lcd_putc, "%4Ld", signal);
 	}
@@ -371,7 +389,7 @@ void dsp_setup_coil_pulse(int16 measure, int16 reference_5v, int1 mode)
 	
 	lcd_gotoxy( 1, 3 );
 	printf( lcd_putc, "Vol " );
-	dsp_strength_bar( 0, 12, measure, COIL_MAX_ADC_VALUE );
+	dsp_prop_strength_bar( 0, 12, measure, COIL_MAX_ADC_VALUE );
 	if ( mode == DSP_SHOW_VOLTS ) {
 		int16 volts = (measure * 5) / reference_5v;
 		if ( volts > 999 ) {
@@ -401,7 +419,7 @@ void dsp_setup_autozero_threshold( int16 noise )
 	
 	lcd_gotoxy( 1, 3 );
 	printf( lcd_putc, "Noi " );
-	dsp_strength_bar( 0, 12, noise, COIL_MAX_ADC_VALUE );
+	dsp_prop_strength_bar( 0, 12, noise, COIL_MAX_ADC_VALUE );
 	printf( lcd_putc, "%4Lu", noise );
 	
 	lcd_gotoxy( 1, 4 );

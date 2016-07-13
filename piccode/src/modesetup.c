@@ -56,6 +56,7 @@ void mode_setup_autozero_threshold()
 						 INCREMENT_AUTO_RATE );
 	
 	int16 noise = 0;
+	int8 update_display = 0;
 	while (TRUE) {
 		if ( mode_changed() ) {
 			return;
@@ -68,8 +69,16 @@ void mode_setup_autozero_threshold()
 		coil.auto_zero_threshold += encoder_increment( coil.auto_zero_threshold  );
 		
 		coil_sample();
-		noise = samples_efficiency();
-		dsp_setup_autozero_threshold( noise );
+		int16 current_noise = samples_efficiency();
+		
+		if ( current_noise>noise )	 //Take max noise signal to show
+			noise = current_noise;
+		
+		if ( ++update_display | 0x07 ) {
+				//Only update user interface every 8 loops
+			dsp_setup_autozero_threshold( noise );
+			noise = 0;
+		}
 		
 		delay_ms( COIL_PULSE_PERIOD );
 	}

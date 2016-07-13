@@ -7,7 +7,7 @@
 #include "usermodes.h"
 #include "tone.h"
 
-//#use rs232( UART2, baud=9600, parity=N, bits=8 )
+#use rs232( UART2, baud=9600, parity=N, bits=8 )
 
 void init() {
     setup_adc_ports(NO_ANALOGS);
@@ -33,7 +33,7 @@ void main()
     init();
     
     dsp_hello();
-	delay_ms(2000);
+//	delay_ms(2000);
 	
     cnf_load();
 	
