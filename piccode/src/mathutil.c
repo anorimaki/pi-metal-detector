@@ -49,8 +49,5 @@ signed int32 math_change_log_range(signed int16 value, int16 max_value,
 	
 	int32 ret = (value_log*new_max_value) / max_log;
 	
-//	printf( "v: %Ld, m: %Lu, lv=%f, lm=%f, r=%Ld\r\n", value, 
-//			max_value, value_log, max_log, ret );
-	
 	return (value<0) ? -ret : ret;
 }

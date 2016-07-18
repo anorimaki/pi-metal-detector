@@ -312,10 +312,11 @@ void dis_noise( int16 noise_estimation, int1 mode )
 }
 
 
-void dsp_main_mode( int16 signal, int16 noise_estimation, int1 mode )
+void dsp_main_mode( int16 signal, int16 noise_estimation, int16 battery_volts,
+					int1 mode )
 {
 	lcd_gotoxy( 1, 1 );
-	printf( lcd_putc, "  *** Main mode *** ");
+	printf( lcd_putc, "* Main mode * %5.2wV", battery_volts);
 	
 	lcd_gotoxy( 1, 2 );
 	printf( lcd_putc, "Zer " );

@@ -8,6 +8,7 @@
 #include "inencoder.h"
 #include "modesetup.h"
 #include "modesetdelay.h"
+#include "battery.h"
 
 
 ModeFuction mode_current;
@@ -65,6 +66,7 @@ void mode_main()
 	
 	int8 update_display = 0;
 	int16 sample = 0;
+	int16 battery_volts = 0;
 
 	encoder_set_increment( 0, COIL_MAX_ADC_VALUE, INCREMENT_AUTO_RATE );
 	
@@ -90,7 +92,9 @@ void mode_main()
 		
 		if ( ++update_display | 0x07 ) {
 				//Only update user interface every 8 loops
-			dsp_main_mode( sample, samples_efficiency(), show_mode );
+			battery_volts = battery_read_volts();
+			dsp_main_mode( sample, samples_efficiency(), battery_volts,
+							show_mode );
 			tone_apply(sample);
 		}
 

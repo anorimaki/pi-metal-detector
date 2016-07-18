@@ -44,6 +44,7 @@ void main()
 
 
 #if 1
+#include "adconvert.c"
 #include "config.c"
 #include "display.c"
 #include "input.c"
@@ -56,4 +57,5 @@ void main()
 #include "mathutil.c"
 #include "modesetdelay.c"
 #include "usermodes.c"
+#include "battery.c"
 #endif

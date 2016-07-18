@@ -19,7 +19,8 @@ void dsp_setup_autozero_threshold(int16 noise);
 
 #define DSP_SHOW_PERCENT    0
 #define DSP_SHOW_VALUES     1
-void dsp_main_mode( int16 signal, int16 noise_estimation, int1 mode );
+void dsp_main_mode( int16 signal, int16 noise_estimation, int16 battery_volts,
+                    int1 mode );
 
 #endif
 

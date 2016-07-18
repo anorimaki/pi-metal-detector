@@ -20,6 +20,8 @@
       <itemPath>../include/modesetdelay.h</itemPath>
       <itemPath>../include/inbuttons.h</itemPath>
       <itemPath>../include/inencoder.h</itemPath>
+      <itemPath>../include/battery.h</itemPath>
+      <itemPath>../include/adconvert.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -50,6 +52,8 @@
       <itemPath>../src/modesetdelay.c</itemPath>
       <itemPath>../src/inbuttons.c</itemPath>
       <itemPath>../src/inencoder.c</itemPath>
+      <itemPath>../src/battery.c</itemPath>
+      <itemPath>../src/adconvert.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -97,6 +101,12 @@
         <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
+      <item path="../src/adconvert.c" ex="true" overriding="false">
+      </item>
+      <item path="../src/battery.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
       <item path="../src/coil.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
