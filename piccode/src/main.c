@@ -6,22 +6,21 @@
 #include "config.h"
 #include "usermodes.h"
 #include "tone.h"
+#include "adconvert.h"
 
 #use rs232( UART2, baud=9600, parity=N, bits=8 )
 
 void init() {
-    setup_adc_ports(NO_ANALOGS);
-    setup_adc(ADC_OFF);
-
-    set_tris_a( 0xFFFF );      //All inputs by default
+	set_tris_a( 0xFFFF );      //All inputs by default
     set_tris_b( 0xFFFF );      //All inputs by default
     set_tris_c( 0xFFFF );      //All inputs by default
     
-    dsp_init();
+	adc_init();
+	coil_init();
 	tone_init();
-    coil_init();
     in_init();
 	buttons_init();
+	dsp_init();
 	mode_init();
     
     enable_interrupts(GLOBAL);

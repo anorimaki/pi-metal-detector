@@ -83,7 +83,7 @@ int16 coil_peak()
 	disable_interrupts(GLOBAL);
 
 	coil_pulse();
-	delay_us(4);
+	delay_us(2);
 	int16 measure = coil_read_peak();
 
 	//Enable interrupts to capture read input switches

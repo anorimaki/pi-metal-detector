@@ -23,7 +23,7 @@
 
 #elif defined(USE_PIC18F26K80)
 
-#define PI_COIL_CTRL_PIN            PIN_A2
+#define PI_COIL_CTRL_PIN            PIN_A1
 #define PI_ADC_INDICATOR_PIN        PIN_A6
 
 #define PI_DECAY_SIGNAL_PIN         PIN_A0
@@ -32,12 +32,9 @@
 #define PI_COIL_VOLTAGE_PIN         PIN_A3 
 #define PI_COIL_VOLTAGE_AN          sAN3
 #define PI_COIL_VOLTAGE_CH          3
-#define PI_BATTERY_VOLTAGE_PIN      PIN_A1
-#define PI_BATTERY_VOLTAGE_AN       sAN1
-#define PI_BATTERY_VOLTAGE_CH       1
-#define PI_ANALOGIC_REF_PIN         PIN_A5
-#define PI_ANALOGIC_REF_AN          sAN4
-#define PI_ANALOGIC_REF_CH          4
+#define PI_BATTERY_VOLTAGE_PIN      PIN_A2
+#define PI_BATTERY_VOLTAGE_AN       sAN2
+#define PI_BATTERY_VOLTAGE_CH       2
 
 #define PI_CHARLIEPLEX_SWITCH_1_PIN PIN_B0
 #define PI_CHARLIEPLEX_SWITCH_2_PIN PIN_B1

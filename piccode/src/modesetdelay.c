@@ -7,19 +7,7 @@
 #include "samples.h"
 #include "mathutil.h"
 
-int16 autoset_delay_noises[DSP_AUTOSET_DELAY_MAX_LINES];
 int16 autoset_delay_signals[DSP_AUTOSET_DELAY_MAX_LINES];
-
-void autoset_delay( int8 delay, int8 index ) 
-{
-	for( int8 j=0; j<SAMPLES_HISTORY_SIZE+1; ++j ) {
-		coil_custom_sample( delay );
-		delay_ms( 1 );
-	}
-	autoset_delay_signals[index] = samples.mean;
-	autoset_delay_noises[index] = samples_efficiency();
-}
-
 
 int8 mode_autoset_sample_delay() 
 {
@@ -27,7 +15,8 @@ int8 mode_autoset_sample_delay()
 	
 	int8 selected = coil.sample_delay;
 	int8 first = CHECKED_SUB( selected, 1, COIL_MIN_SAMPLE_DELAY );
-	int8 to_calculate = 0;
+	int8 index_to_calculate = 0;
+	int8 samples_to_next = 0;
 	
 	while (TRUE) {
 		int8 mode_button = mode_check_buttons();
@@ -44,24 +33,28 @@ int8 mode_autoset_sample_delay()
 		
 		selected += encoder_increment( selected );
 		if ( first > selected ) {
-			first = selected;
-			to_calculate = 0;
+			first = selected;			//Scroll down LCD
+			index_to_calculate = 0;
+			samples_to_next = 0;
 		}
 		else if ( selected >= first+DSP_AUTOSET_DELAY_MAX_LINES ) {
+										//Scroll up LCD
 			first = selected - (DSP_AUTOSET_DELAY_MAX_LINES-1);
-			to_calculate = 0;
+			index_to_calculate = 0;		
+			samples_to_next = 0;
+		}
+		else if ( ++samples_to_next == SAMPLES_HISTORY_SIZE+1 ) {
+			samples_to_next = 0;
+			if ( ++index_to_calculate == DSP_AUTOSET_DELAY_MAX_LINES ) {
+				index_to_calculate = 0;
+			}
 		}
 		
-		autoset_delay( first+to_calculate, to_calculate );
+		autoset_delay_signals[index_to_calculate] = 
+							coil_custom_sample( first+index_to_calculate );
 		
-		if ( ++to_calculate == DSP_AUTOSET_DELAY_MAX_LINES ) {
-			to_calculate = 0;
-		}
-		
-				//Only update user interface every 8 loops
 		dsp_autoset_sample_delay( first, selected-first, 
-								 autoset_delay_signals, 
-								 autoset_delay_noises );
+								 autoset_delay_signals );
 	}
 }
 

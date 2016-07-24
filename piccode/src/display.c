@@ -5,9 +5,9 @@
 #include "lcd.c"
 #include "coil.h"
 
-//Time wasted in uP instructions (measured with Proteus-Isis)
+//Time wasted in microcontroller instructions (measured with Proteus-Isis)
 //This is the real minimum delay
-#define SAMPLE_DELAY_CORRECTION		4		//In us
+#define SAMPLE_DELAY_CORRECTION		7		//In us
 
 #define CHAR_FULL_STRENGTH			6
 #define CHAR_START_RANGE			5
@@ -361,7 +361,7 @@ void dsp_setup_sample_delay( int16 signal, int16 noise_estimation, int1 mode )
 
 
 void dsp_autoset_sample_delay( int8 first, int8 selected, 
-                            int16* signals, int16* noises)
+                            int16* signals )
 {
 	for( int8 line=0; line<DSP_AUTOSET_DELAY_MAX_LINES; ++line ) {
 		lcd_gotoxy( 1, line+1 );
