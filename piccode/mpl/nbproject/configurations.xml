@@ -54,6 +54,8 @@
       <itemPath>../src/inencoder.c</itemPath>
       <itemPath>../src/battery.c</itemPath>
       <itemPath>../src/adconvert.c</itemPath>
+      <itemPath>../src/inencoder1.c</itemPath>
+      <itemPath>../src/inencoder2.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -126,6 +128,14 @@
         </ccscompiler>
       </item>
       <item path="../src/inencoder.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
+      <item path="../src/inencoder1.c" ex="true" overriding="false">
+        <ccscompiler>
+        </ccscompiler>
+      </item>
+      <item path="../src/inencoder2.c" ex="true" overriding="false">
         <ccscompiler>
         </ccscompiler>
       </item>

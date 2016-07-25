@@ -15,8 +15,8 @@ void tone_init()
 #if 1
 		//Just to configure CCP1 but not to activate it. See comments of
 		// tone_being() function.
-	setup_ccp1( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER1_AND_TIMER2 );
-	setup_ccp1( CCP_OFF );
+	setup_ccp5( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER1_AND_TIMER2 );
+	setup_ccp5( CCP_OFF );
 #else
 #asm
 			//This is equivale to setup_ccp1 but it's done in assemble
@@ -51,7 +51,7 @@ void tone_begin()
 		//resistors are configured
 		//Here, CPP1 is only activated with previous configuration
 	MOVLW  CCP_COMPARE_INT_AND_TOGGLE
-	MOVWF  CCP1CON		//Compare mode, toggle output on match
+	MOVWF  CCP5CON		//Compare mode, toggle output on match
 #endasm
 	
 	
@@ -72,7 +72,7 @@ void tone_begin()
 void tone_end()
 {
 	setup_timer_1(T1_DISABLED);
-	setup_ccp1( CCP_OFF );
+	setup_ccp5( CCP_OFF );
 	setup_ccp2( CCP_OFF );
 }
 
@@ -90,7 +90,7 @@ void tone_apply( int16 value )
 	freq += TONE_MIN_FREQUENCY;
 	
 	int16 ccp = (int32)250000/freq;			//1000000*2/8 = 250000
-	CCP_1 = ccp;		//Set toggle delay
+	CCP_5 = ccp;		//Set toggle delay
 	CCP_2 = ccp;		//Set reset delay (period)
 	
 	TMR1ON = 1;

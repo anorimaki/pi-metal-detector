@@ -92,6 +92,9 @@
 //  1 = ECCP1 is based off of TMR3/TMR4
 #bit C1TSEL = CCPTMRS.0
 
+// CCP5CON: CCP5 CONTROL REGISTER
+#byte CCP5CON = 0xF47
+
 #else
 
 #error Define one microcotroller type

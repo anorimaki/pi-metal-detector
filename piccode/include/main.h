@@ -42,7 +42,7 @@
 #define PI_CHARLIEPLEX_SWITCH_4_PIN PIN_B3
 #define PI_BUTTON_PULLUP_RESISTORS  0x0F
 
-#define PI_TONE_PIN                 PIN_B4
+#define PI_TONE_PIN                 PIN_B5
 
 #if 1
 #define LCD_DATA_PORT           getenv("SFR:PORTC")
