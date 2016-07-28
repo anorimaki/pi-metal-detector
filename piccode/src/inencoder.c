@@ -1,5 +1,5 @@
 #if 1
-#include "encoder1.c"
+#include "inencoder1.c"
 #else
-#include "encoder2.c"
+#include "inencoder2.c"
 #endif

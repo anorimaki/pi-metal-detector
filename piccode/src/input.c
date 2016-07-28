@@ -12,11 +12,11 @@ void in_init()
 	output_low(PI_CHARLIEPLEX_SWITCH_1_PIN);
 	output_low(PI_CHARLIEPLEX_SWITCH_2_PIN);
 	output_low(PI_CHARLIEPLEX_SWITCH_3_PIN);
-	output_low(PI_CHARLIEPLEX_SWITCH_4_PIN);
 	output_float(PI_CHARLIEPLEX_SWITCH_1_PIN);
 	output_float(PI_CHARLIEPLEX_SWITCH_2_PIN);
 	output_float(PI_CHARLIEPLEX_SWITCH_3_PIN);
-	output_float(PI_CHARLIEPLEX_SWITCH_4_PIN);
+	output_float(PI_ENCODER_A_PIN);
+	output_float(PI_ENCODER_B_PIN);
 
 	RBPU = 0; //Enable pull-up resistors on PORT B
 	WPUB = PI_BUTTON_PULLUP_RESISTORS; //Enable pull-ups for buttons
@@ -27,23 +27,17 @@ void in_init()
 }
 
 
-int8 in_read_encoder_inputs()
+void in_encoder_read_and_update()
 {
-	output_drive(PI_CHARLIEPLEX_SWITCH_2_PIN);
-	int8 encoder = input_state(PI_CHARLIEPLEX_SWITCH_4_PIN);	//channel A
-	encoder <<= 1;
-	encoder |= input_state(PI_CHARLIEPLEX_SWITCH_3_PIN);		//channel B
-	output_high(PI_CHARLIEPLEX_SWITCH_2_PIN);
-	output_float(PI_CHARLIEPLEX_SWITCH_2_PIN);
-	output_low(PI_CHARLIEPLEX_SWITCH_2_PIN);
-	
-	return encoder;
+	int1 channelA = input_state(PI_ENCODER_A_PIN);
+	int1 channelB = input_state(PI_ENCODER_B_PIN);
+	encoder_update( channelA, channelB );
 }
 	
 
-int8 in_read_all_inputs()
+int8 in_read_charlieplex_inputs()
 {
-	int8 switches, encoder;
+	int8 switches;
 
 	output_drive(PI_CHARLIEPLEX_SWITCH_3_PIN);
 	switches = input_state(PI_CHARLIEPLEX_SWITCH_1_PIN);
@@ -52,9 +46,8 @@ int8 in_read_all_inputs()
 	output_low(PI_CHARLIEPLEX_SWITCH_3_PIN);
 
 	output_drive(PI_CHARLIEPLEX_SWITCH_2_PIN);
-	encoder = input_state(PI_CHARLIEPLEX_SWITCH_4_PIN);		//channel A
-	encoder <<= 1;
-	encoder |= input_state(PI_CHARLIEPLEX_SWITCH_3_PIN);	//channel B
+	switches <<= 1;
+	switches |= input_state(PI_CHARLIEPLEX_SWITCH_3_PIN);	
 	switches <<= 1;
 	switches |= input_state(PI_CHARLIEPLEX_SWITCH_1_PIN);
 	output_high(PI_CHARLIEPLEX_SWITCH_2_PIN);
@@ -63,8 +56,6 @@ int8 in_read_all_inputs()
 
 	output_drive(PI_CHARLIEPLEX_SWITCH_1_PIN);
 	switches <<= 1;
-	switches |= input_state(PI_CHARLIEPLEX_SWITCH_4_PIN);
-	switches <<= 1;
 	switches |= input_state(PI_CHARLIEPLEX_SWITCH_3_PIN);
 	switches <<= 1;
 	switches |= input_state(PI_CHARLIEPLEX_SWITCH_2_PIN);
@@ -72,7 +63,7 @@ int8 in_read_all_inputs()
 	output_float(PI_CHARLIEPLEX_SWITCH_1_PIN);
 	output_low(PI_CHARLIEPLEX_SWITCH_1_PIN);
 
-	return (encoder << BUTTONS_SIZE) | (~switches & IN_STATE_BUTTONS_MASK);
+	return (~switches & IN_STATE_BUTTONS_MASK);
 }
 
 
@@ -84,19 +75,10 @@ void isr_timer0()
 	
 	set_timer0(IN_TIMER_INIT_TIME);
 	
-	int8 current_states;
 	if ( (counter++ & 0x07) == 0 ) {
-		current_states = in_read_all_inputs();
+		int8 current_states = in_read_charlieplex_inputs();
 		buttons_update( current_states );
-		current_states >>= BUTTONS_SIZE;
 	}
-	else {
-		current_states = in_read_encoder_inputs();
-	}
-
-	int1 channelA = current_states & 0x01;
-	current_states >>= 1;
-	int1 channelB = current_states & 0x01;
-	current_states >>= 1;
-	encoder_update( channelA, channelB );
+	
+	in_encoder_read_and_update();
 }
