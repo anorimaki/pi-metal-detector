@@ -46,7 +46,9 @@
 #define PI_TONE_PIN                 PIN_B5
 
 #if 1
-#define LCD_DATA_PORT           getenv("SFR:PORTC")
+#define LCD_DATA_PORT               getenv("SFR:PORTC")
+#define LCD_RW_PIN  				PIN_C1
+#define LCD_RS_PIN     				PIN_C2
 #else
 #define LCD_RW_PIN  				PIN_B2
 #define LCD_ENABLE_PIN  			PIN_B0

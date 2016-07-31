@@ -9,7 +9,7 @@ struct InButton {
 };
 
 
-#define BUTTONS_SIZE       5
+#define BUTTONS_SIZE       6
 
 extern struct InButton in_buttons[BUTTONS_SIZE];
 
@@ -17,7 +17,7 @@ extern struct InButton in_buttons[BUTTONS_SIZE];
 #define BUTTON_SETUP_DELAY      1
 #define BUTTON_SETUP_AUTOZERO	2
 #define BUTTON_SETUP_PULSE      3
-#define BUTTON_AUTO             4
+#define BUTTON_AUTO             5
 
 void buttons_init();
 

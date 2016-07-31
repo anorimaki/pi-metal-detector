@@ -39,11 +39,13 @@ int8 in_read_charlieplex_inputs()
 {
 	int8 switches;
 
-	output_drive(PI_CHARLIEPLEX_SWITCH_3_PIN);
-	switches = input_state(PI_CHARLIEPLEX_SWITCH_1_PIN);
-	output_high(PI_CHARLIEPLEX_SWITCH_3_PIN);
-	output_float(PI_CHARLIEPLEX_SWITCH_3_PIN);
-	output_low(PI_CHARLIEPLEX_SWITCH_3_PIN);
+	output_drive(PI_CHARLIEPLEX_SWITCH_1_PIN);
+	switches = input_state(PI_CHARLIEPLEX_SWITCH_3_PIN);
+	switches <<= 1;
+	switches |= input_state(PI_CHARLIEPLEX_SWITCH_2_PIN);
+	output_high(PI_CHARLIEPLEX_SWITCH_1_PIN);
+	output_float(PI_CHARLIEPLEX_SWITCH_1_PIN);
+	output_low(PI_CHARLIEPLEX_SWITCH_1_PIN);
 
 	output_drive(PI_CHARLIEPLEX_SWITCH_2_PIN);
 	switches <<= 1;
@@ -54,16 +56,16 @@ int8 in_read_charlieplex_inputs()
 	output_float(PI_CHARLIEPLEX_SWITCH_2_PIN);
 	output_low(PI_CHARLIEPLEX_SWITCH_2_PIN);
 
-	output_drive(PI_CHARLIEPLEX_SWITCH_1_PIN);
-	switches <<= 1;
-	switches |= input_state(PI_CHARLIEPLEX_SWITCH_3_PIN);
+	output_drive(PI_CHARLIEPLEX_SWITCH_3_PIN);
 	switches <<= 1;
 	switches |= input_state(PI_CHARLIEPLEX_SWITCH_2_PIN);
-	output_high(PI_CHARLIEPLEX_SWITCH_1_PIN);
-	output_float(PI_CHARLIEPLEX_SWITCH_1_PIN);
-	output_low(PI_CHARLIEPLEX_SWITCH_1_PIN);
+	switches <<= 1;
+	switches |= input_state(PI_CHARLIEPLEX_SWITCH_1_PIN);
+	output_high(PI_CHARLIEPLEX_SWITCH_3_PIN);
+	output_float(PI_CHARLIEPLEX_SWITCH_3_PIN);
+	output_low(PI_CHARLIEPLEX_SWITCH_3_PIN);
 
-	return (~switches & IN_STATE_BUTTONS_MASK);
+	return switches;
 }
 
 
