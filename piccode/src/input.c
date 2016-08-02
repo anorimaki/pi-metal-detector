@@ -4,8 +4,6 @@
 #include "inbuttons.h"
 
 
-#define IN_STATE_BUTTONS_MASK     0x1F		//For 5 buttons
-
 
 void in_init()
 {
@@ -65,7 +63,7 @@ int8 in_read_charlieplex_inputs()
 	output_float(PI_CHARLIEPLEX_SWITCH_3_PIN);
 	output_low(PI_CHARLIEPLEX_SWITCH_3_PIN);
 
-	return switches;
+	return ~switches;
 }
 
 

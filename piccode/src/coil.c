@@ -25,9 +25,6 @@ void coil_init()
 	output_low(PI_COIL_CTRL_PIN);
 	output_drive(PI_COIL_CTRL_PIN);
 
-	output_low(PI_ADC_INDICATOR_PIN);
-	output_drive(PI_ADC_INDICATOR_PIN);
-
 	samples_init();
 }
 

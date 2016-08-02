@@ -24,7 +24,7 @@
 #elif defined(USE_PIC18F26K80)
 
 #define PI_COIL_CTRL_PIN            PIN_A1
-#define PI_ADC_INDICATOR_PIN        PIN_A6
+#define PI_ADC_INDICATOR_PIN        PIN_C3
 
 #define PI_DECAY_SIGNAL_PIN         PIN_A0
 #define PI_DECAY_SIGNAL_AN          sAN0
@@ -36,19 +36,19 @@
 #define PI_BATTERY_VOLTAGE_AN       sAN2
 #define PI_BATTERY_VOLTAGE_CH       2
 
-#define PI_CHARLIEPLEX_SWITCH_1_PIN PIN_B0
-#define PI_CHARLIEPLEX_SWITCH_2_PIN PIN_B1
+#define PI_CHARLIEPLEX_SWITCH_1_PIN PIN_B4
+#define PI_CHARLIEPLEX_SWITCH_2_PIN PIN_B3
 #define PI_CHARLIEPLEX_SWITCH_3_PIN PIN_B2
-#define PI_ENCODER_A_PIN            PIN_B3
-#define PI_ENCODER_B_PIN            PIN_B4
-#define PI_BUTTON_PULLUP_RESISTORS  0x1F
+#define PI_ENCODER_A_PIN            PIN_B1
+#define PI_ENCODER_B_PIN            PIN_B0
+#define PI_BUTTON_PULLUP_RESISTORS  0x1C
 
 #define PI_TONE_PIN                 PIN_B5
 
 #if 1
 #define LCD_DATA_PORT               getenv("SFR:PORTC")
 #define LCD_RW_PIN  				PIN_C1
-#define LCD_RS_PIN     				PIN_C2
+#define LCD_RS_PIN     				PIN_C2 
 #else
 #define LCD_RW_PIN  				PIN_B2
 #define LCD_ENABLE_PIN  			PIN_B0

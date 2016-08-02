@@ -7,7 +7,7 @@
 
 //Time wasted in microcontroller instructions (measured with Proteus-Isis)
 //This is the real minimum delay
-#define SAMPLE_DELAY_CORRECTION		7		//In us
+#define SAMPLE_DELAY_CORRECTION		6		//In us
 
 #define CHAR_FULL_STRENGTH			6
 #define CHAR_START_RANGE			5
@@ -370,7 +370,7 @@ void dsp_autoset_sample_delay( int8 first, int8 selected,
 		printf(lcd_putc, "%2u ", first+line+SAMPLE_DELAY_CORRECTION );
 		
 		int16 signal = signals[line];
-		dsp_log_strength_bar( line, 12, signal, COIL_MAX_ADC_VALUE );
+		dsp_prop_strength_bar( line, 12, signal, COIL_MAX_ADC_VALUE );
 		
 		printf(lcd_putc, "%4Ld", signal);
 	}

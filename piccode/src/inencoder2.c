@@ -8,10 +8,15 @@
 // Encoder
 ///////////////////////////////////////////////////////////////
 #define ENCODER_STATE_IDLE		0
-#define ENCODER_STATE_INC		1
-#define ENCODER_STATE_DEC		2
-#define ENCODER_STATE_UP		3
-#define ENCODER_STATE_DOWN		4
+#define ENCODER_STATE_INC_0		1		//A=0, B=1 after ENCODER_STATE_IDLE
+#define ENCODER_STATE_INC_1		2		//A=0, B=0 after ENCODER_STATE_INC_0
+#define ENCODER_STATE_INC_2		3		//A=1, B=0 after ENCODER_STATE_INC_X
+#define ENCODER_STATE_DEC_0		4		//A=1, B=0 after ENCODER_STATE_IDLE
+#define ENCODER_STATE_DEC_1		5		//A=0, B=0 after ENCODER_STATE_DEC_0
+#define ENCODER_STATE_DEC_2		6		//A=1, B=0 after ENCODER_STATE_INC_X
+#define ENCODER_STATE_A0B0		7
+#define ENCODER_STATE_A0B1		8
+#define ENCODER_STATE_A1B0		9
 
 #define ENCODER_MAX_ACCUMULATED_SPEED	0x7FFF
 #define ENCODER_MIN_ACCUMULATED_SPEED	0x8000
@@ -49,33 +54,82 @@ void encoder_update( int1 channelA, int1 channelB )
 {
 	encoder.time_periods++;
 	
-	if  ( channelA == channelB ) {
-		if ( encoder.state == ENCODER_STATE_INC ) {
+	if ( channelA && channelB ) {
+		if ( (encoder.state == ENCODER_STATE_INC_1) ||
+			(encoder.state == ENCODER_STATE_INC_2) ) {
 			encoder.pulses++;
 		}
-		else if ( encoder.state == ENCODER_STATE_DEC ) {
+		else if ( (encoder.state == ENCODER_STATE_DEC_1) ||
+				 (encoder.state == ENCODER_STATE_DEC_2) ) {
 			encoder.pulses--;
 		}
-		encoder.state = channelA ? ENCODER_STATE_UP : ENCODER_STATE_DOWN ;
+		else if ( encoder.state == ENCODER_STATE_IDLE ) {
+		}
+		else {
+			encoder.losses++;
+		}
+		encoder.state = ENCODER_STATE_IDLE;
 		return;
 	}
 	
-	if ( channelA ) {	//A && !B
-		if ( encoder.state == ENCODER_STATE_UP ) {
-			encoder.state = ENCODER_STATE_INC ;		//First change on B
+	if ( !channelA && channelB ) {
+		if ( encoder.state == ENCODER_STATE_IDLE ) {
+			encoder.state = ENCODER_STATE_INC_0;
 		}
-		else if ( encoder.state == ENCODER_STATE_DOWN ) {
-			encoder.state = ENCODER_STATE_DEC ;		//First change on A
+		else if ( encoder.state == ENCODER_STATE_INC_2 ) {
+			encoder.state = ENCODER_STATE_INC_0;
+			encoder.pulses++;
+		}
+		else if ( (encoder.state==ENCODER_STATE_DEC_0) ||
+				 (encoder.state==ENCODER_STATE_DEC_1) ||
+				 (encoder.state==ENCODER_STATE_A0B0) ) {
+			encoder.state = ENCODER_STATE_DEC_2;
+		}
+        else if ( (encoder.state==ENCODER_STATE_INC_0) ||
+				 (encoder.state==ENCODER_STATE_DEC_2) ) {
+        }
+		else {
+			encoder.state = ENCODER_STATE_A0B1;
 		}
 		return;
 	}
 	
-			//!A && B
-	if ( encoder.state == ENCODER_STATE_UP ) {
-		encoder.state = ENCODER_STATE_DEC ;		//First change on A
+	if ( channelA && !channelB ) {
+		if ( encoder.state == ENCODER_STATE_IDLE ) {
+			encoder.state = ENCODER_STATE_DEC_0;
+		}
+		else if ( encoder.state == ENCODER_STATE_DEC_2 ) {
+			encoder.state = ENCODER_STATE_DEC_0;
+			encoder.pulses--;
+		}
+		else if ( (encoder.state==ENCODER_STATE_INC_0) ||
+				 (encoder.state==ENCODER_STATE_INC_1) ||
+				 (encoder.state==ENCODER_STATE_A0B0) ) {
+			encoder.state = ENCODER_STATE_INC_2;
+		}
+        else if ( (encoder.state==ENCODER_STATE_DEC_0) ||
+				 (encoder.state==ENCODER_STATE_INC_2) ) {
+        }
+		else {
+			encoder.state = ENCODER_STATE_A1B0;
+		}
+		return;
 	}
-	else if ( encoder.state == ENCODER_STATE_DOWN ) {
-		encoder.state = ENCODER_STATE_INC ;		//First change on B
+			
+			//!channelA && !channelB
+	if ( (encoder.state == ENCODER_STATE_INC_0) ||
+		(encoder.state == ENCODER_STATE_A0B1) ) {
+		encoder.state = ENCODER_STATE_INC_1;
+	}
+	else if ( encoder.state == ENCODER_STATE_DEC_0 ||
+		(encoder.state == ENCODER_STATE_A1B0) ) {
+		encoder.state = ENCODER_STATE_DEC_1;
+	}
+	else if ( (encoder.state==ENCODER_STATE_DEC_1) ||
+			 (encoder.state==ENCODER_STATE_INC_1) ) {
+	}
+	else {
+		encoder.state = ENCODER_STATE_A0B0;
 	}
 }
 

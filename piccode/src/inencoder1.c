@@ -34,17 +34,7 @@ struct
 	int16 rate;
 } encoder_settings;
 
-/*
- * Updtes encoder state with current channels value
- * 
- * It infers missing states if they can be inferred. For example, 
- * complete increment states are: 
- *		{A=1, B=1}, {A=0, B=1}, {A=0, B=0}, {A=1, B=0}, {A=1, B=1}
- * If states {A=0, B=1} or {A=0, B=0} are missing, it infferes that is an
- * increment.
- * But if {A=0, B=1} and {A=0, B=0} are missing, it counts as an error.
- * This is usefull if encoder scan is too slow to sample all channel variations.
- */
+
 void encoder_update( int1 channelA, int1 channelB ) 
 {
 	encoder.time_periods++;
@@ -62,20 +52,20 @@ void encoder_update( int1 channelA, int1 channelB )
 	
 	if ( channelA ) {	//A && !B
 		if ( encoder.state == ENCODER_STATE_UP ) {
-			encoder.state = ENCODER_STATE_INC ;		//First change on B
+			encoder.state = ENCODER_STATE_DEC ;		//First change on B
 		}
 		else if ( encoder.state == ENCODER_STATE_DOWN ) {
-			encoder.state = ENCODER_STATE_DEC ;		//First change on A
+			encoder.state = ENCODER_STATE_INC ;		//First change on A
 		}
 		return;
 	}
 	
 			//!A && B
 	if ( encoder.state == ENCODER_STATE_UP ) {
-		encoder.state = ENCODER_STATE_DEC ;		//First change on A
+		encoder.state = ENCODER_STATE_INC ;		//First change on A
 	}
 	else if ( encoder.state == ENCODER_STATE_DOWN ) {
-		encoder.state = ENCODER_STATE_INC ;		//First change on B
+		encoder.state = ENCODER_STATE_DEC ;		//First change on B
 	}
 }
 
