@@ -6,6 +6,7 @@
 #include "config.h"
 #include "usermodes.h"
 #include "tone.h"
+#include "samples.h"
 #include "adconvert.h"
 
 #use rs232( UART2, baud=9600, parity=N, bits=8 )
@@ -27,14 +28,32 @@ void init() {
 }
 
 
+void init_calibration() 
+{
+	tone_begin();
+	int16 sample = COIL_MAX_ADC_VALUE;
+	coil.zero = 0;
+	while( coil.zero < sample ) {
+		sample = coil_sample();
+		tone_apply(sample);
+		coil.zero += 2;
+		delay_ms( COIL_PULSE_PERIOD );
+	}
+	coil.auto_zero_threshold = samples_efficiency();
+	coil.zero = sample + coil.auto_zero_threshold;
+	tone_end();
+}
+
+
+
 void main()
 {
     init();
     
     dsp_hello();
-//	delay_ms(2000);
-	
-    cnf_load();
+	delay_ms(500);
+	cnf_load();
+	init_calibration();
 	
 	while( TRUE ) {
 		mode_execute_current();

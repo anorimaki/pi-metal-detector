@@ -2,7 +2,7 @@
 #include "tone.h"
 #include "coil.h"
 
-#define TONE_MIN_FREQUENCY	100		//In Hz
+#define TONE_MIN_FREQUENCY	4		//In Hz
 #define TONE_MAX_FREQUENCY	9000	//In Hz
 
 // (1Mhz instruction frequency && T1_DIV_BY_8)
@@ -43,9 +43,9 @@ void tone_init()
 void tone_begin()
 {
 	// CCP1 generates output signal
-	//setup_ccp1( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER1_AND_TIMER2 );
+	//setup_ccp5( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER1_AND_TIMER2 );
 #asm
-		//setup_ccp1() sould be here but 'MOVWF  PSTR1CON' of this function
+		//setup_ccp5() sould be here but 'MOVWF  PSTR1CON' of this function
 		//resets pull-ups resistors configuration. setup_ccp1 has been
 		//moved to tone_init() function and must be called before pull-ups 
 		//resistors are configured

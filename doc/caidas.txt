@@ -1,0 +1,28 @@
+bobina grande:
+	Cutre cable (R dump:1110, C: 3p9) (Com hembra bnc identico) 
+		- 19us = 0V (Empieza caida)
+		- 25us = 2V
+		- 39us = 4,1V
+		
+	Cox rg58	(R dump:940, C: 3p9)
+		- 20us = 0V (Empieza caida)
+		- 25us = 1,5V
+		- 40us = 3,8V
+		- 45us = 4,1V
+		
+bobina pequeña
+	Cox rg58	(R dump:490, C: 3p9) (un poco 
+		- 9,5us = 0V (Empieza caida)
+		- 10s = 1V
+		- 11s = 2V
+		- 15s = 3,5V
+		- 20s = 4V
+		- 30us = 4,2V
+		- 45us = 4,1V
+		
+	Cutre cable (R dump:512, C: 3p9) (un poco 
+		- 9,5us = 0V (Empieza caida)
+		- 10s = 1V
+		- 11s = 2V
+		- 15s = 4V
+		- 20s = 4,8V

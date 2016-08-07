@@ -74,10 +74,10 @@ void mode_setup_autozero_threshold()
 		if ( current_noise>noise )	 //Take max noise signal to show
 			noise = current_noise;
 		
-		if ( ++update_display | 0x07 ) {
+		if ( ++update_display | 0x80 ) {
 				//Only update user interface every 8 loops
 			dsp_setup_autozero_threshold( noise );
-			noise = 0;
+			noise = current_noise;
 		}
 		
 		delay_ms( COIL_PULSE_PERIOD );

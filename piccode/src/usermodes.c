@@ -59,15 +59,14 @@ void mode_execute_current()
 //
 // Sampling state: Normal operation state
 //
-
 void mode_main()
 {
 	static int1 show_mode = DSP_SHOW_PERCENT;
 	
-	int8 update_display = 0;
+	int8 update_display_period = 0;
 	int16 sample = 0;
-	int16 battery_volts = 0;
-
+	int16 battery_volts = battery_read_volts();
+	int16 read_battery_period = 0;
 	encoder_set_increment( 0, COIL_MAX_ADC_VALUE, INCREMENT_AUTO_RATE );
 	
 	tone_begin();
@@ -90,12 +89,19 @@ void mode_main()
 		
 		sample = coil_sample();
 		
-		if ( ++update_display | 0x07 ) {
+		if ( ++update_display_period > 8 ) {
 				//Only update user interface every 8 loops
-			battery_volts = battery_read_volts();
 			dsp_main_mode( sample, samples_efficiency(), battery_volts,
 							show_mode );
 			tone_apply(sample);
+			
+			update_display_period = 0;
+			read_battery_period++;
+		}
+		
+		if ( read_battery_period > 1000 ) {
+			battery_volts = battery_read_volts();
+			read_battery_period = 0;
 		}
 
 		delay_ms( COIL_PULSE_PERIOD );

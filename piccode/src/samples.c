@@ -84,7 +84,7 @@ int16 samples_coeff_variation()
 	return samples_std_deviation() / samples.mean;
 }
 
-#define EFFICIENCY_SCALE_FACTOR 8
+#define EFFICIENCY_SCALE_FACTOR 10
 /*
  * Calculates efficiency with the formula: variance / u^2
  * https://en.wikipedia.org/wiki/Efficiency_(statistics)#Estimators_of_u.i.d._variables
