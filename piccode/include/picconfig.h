@@ -72,6 +72,14 @@
 //  0 = Stops Timer1
 #bit TMR1ON = T1CON.0
 
+//T3CON: TIMER3 CONTROL REGISTER
+#byte T3CON = 0xFB1
+
+//TMR3ON: Timer3 On bit
+//  1 = Enables Timer1
+//  0 = Stops Timer1
+#bit TMR3ON = T3CON.0
+
 //ENHANCED CAPTURE/COMPARE/PWM1 CONTROL
 #byte CCP1CON = 0xFBB
 

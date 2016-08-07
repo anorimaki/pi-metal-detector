@@ -3,6 +3,7 @@
 
 #define SAMPLES_HISTORY_SIZE_LOG	3
 #define SAMPLES_HISTORY_SIZE		(1<<SAMPLES_HISTORY_SIZE_LOG)
+#define SAMPLES_UNDEFINED_VALUE		0xFFFF
 
 void samples_init();
 int16 samples_add( int16 value );

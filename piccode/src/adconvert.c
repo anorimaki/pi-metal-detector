@@ -5,6 +5,14 @@
 
 //#define ADC_IN_SLEEP
 #define ADQUISITION_TIME	1	//In us
+#define ADC_INVALID_VALUE	0xFFFF
+
+AdcReadCallback adc_read_callback;
+
+struct 
+{
+	int16 last_value;
+} adc_internal;
 
 
 void adc_init()
@@ -15,44 +23,68 @@ void adc_init()
 					VSS_VDD);
 	setup_adc(ADC_OFF);
 	disable_interrupts(INT_AD);
+	disable_interrupts(INT_TIMER3);
 	
-	output_low(PI_ADC_INDICATOR_PIN);
-	output_drive(PI_ADC_INDICATOR_PIN);
-}
-
-
-#inline
-int16 a2d_converter()
-{
+	//At 4Mhz instruction frequency (ClockF=16Mhz/4), it increments evey us.
+	setup_timer_3( T3_INTERNAL| T3_DIV_BY_4 );
+	TMR3ON = 0;		//Stops timer3 but it's already configured
+		
+	setup_ccp1( CCP_COMPARE_RESET_TIMER | CCP_USE_TIMER3_AND_TIMER4 );
+	
 #if defined(ADC_IN_SLEEP)
-	clear_interrupt(INT_AD);
-	enable_interrupts(INT_AD); //We want the ADC to wake from sleep
-	read_adc(ADC_START_ONLY);
-#asm
-	SLEEP
-#endasm
-	int16 ret = read_adc(ADC_READ_ONLY); //Conversion time: 13 TADs -> 13*4 = 52us
-	disable_interrupts(INT_AD);
-#else
-//	output_high(PI_ADC_INDICATOR_PIN);
-	int16 ret = read_adc(ADC_START_AND_READ); //Conv. time: 13 TADs -> 13*1 = 13us
-//	output_low(PI_ADC_INDICATOR_PIN);
-	
-#endif 
-	return (ret & 0x8000) ? 0 : ret;
+	IDLEN = 0; //Enter in Sleep mode if SLEEP is executed
+#endif
 }
 
 
+#int_ad
+void isr_adc()
+{
+	adc_internal.last_value = read_adc(ADC_READ_ONLY);
+	if ( adc_internal.last_value & 0x8000 ) {
+		adc_internal.last_value = 0;		//Avoid negative values
+	}
+	disable_interrupts(INT_AD);
+	setup_adc(ADC_OFF);
+	TMR3ON = 0;				//Stops timer3
+	if ( adc_read_callback != 0 ) {
+		(*adc_read_callback)( adc_internal.last_value );
+	}
+}
 
 int16 adc_read( int8 channel ) 
 {
-	//TAD: 1us for a 16Mhz clock
-	//Automatic adqusition time disabled
-	setup_adc(ADC_CLOCK_DIV_16);
-	delay_us( ADQUISITION_TIME );
-	set_adc_channel( channel );
-	int16 ret = a2d_converter(); //Conv. time: 13 TADs -> 13*1 = 13us
-	setup_adc(ADC_OFF);
+	AdcReadCallback callback = adc_read_callback;
+	adc_read_callback = 0;
 	
-	return ret;
+	adc_internal.last_value = ADC_INVALID_VALUE;
+	adc_read_async( channel, 0 ) ;
+	while( adc_internal.last_value == ADC_INVALID_VALUE );
+	
+	adc_read_callback = callback;
+	
+	return adc_internal.last_value;
+}
+
+
+void adc_read_async( int8 channel, int8 delay ) 
+{
+	set_timer3( 0 );
+	TMR3ON = 1;			//Start timer3 
+	CCP_1 = delay;		//Program adc (TODO: Adjust adquisition time and instructions wasted time)
+	
+	//Automatic adqusition time disabled
+	//TAD: 1us for a 16Mhz clock
+	setup_adc(ADC_CLOCK_DIV_16);
+	set_adc_channel( channel );
+	
+	clear_interrupt(INT_AD);
+	enable_interrupts(INT_AD);
+	//read_adc(ADC_START_ONLY);		//Do not start read. Read will be started 
+									//when CCP1 matches timer3
+#if defined(ADC_IN_SLEEP)
+#asm
+	SLEEP
+#endasm
+#endif
 }

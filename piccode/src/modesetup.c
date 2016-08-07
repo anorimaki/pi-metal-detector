@@ -4,7 +4,16 @@
 #include "coil.h"
 #include "inbuttons.h"
 #include "inencoder.h"
-#include "samples.h"
+
+#define SETUP_PULSE_LOOP_PAUSE				5		//In ms
+
+#define SETUP_PULSE_READ_REFERENCE_PERIOD	1000	//In ms
+#define SETUP_PULSE_READ_REFERENCE_COUNTER \
+		(SETUP_PULSE_READ_REFERENCE_PERIOD/SETUP_PULSE_LOOP_PAUSE)
+
+#define SETUP_PULSE_UPDATE_DISPLAY_PERIOD	100		//In ms
+#define SETUP_PULSE_UPDATE_DISPLAY_COUNTER \
+		(SETUP_PULSE_UPDATE_DISPLAY_PERIOD/SETUP_PULSE_LOOP_PAUSE)
 
 
 void mode_setup_pulse()
@@ -14,11 +23,12 @@ void mode_setup_pulse()
 	encoder_set_increment( MODE_SETUP_PULSE_TIME_MIN, MODE_SETUP_PULSE_TIME_MAX,
 						 INCREMENT_AUTO_RATE );
 	
-	int8 measuresLeft = SAMPLES_HISTORY_SIZE+2;
-	int8 measureRef = 0;
+	int16 read_reference_counter = SETUP_PULSE_READ_REFERENCE_COUNTER;
+	int8 update_display_counter = SETUP_PULSE_UPDATE_DISPLAY_COUNTER;
 	
-	int16 reference_5v;
-	int16 peak = 0;
+	coil_read_peak_begin();
+	
+	int16 reference_5v = coil_peak_ref();
 	
 	while (TRUE) {
 		int8 mode_button = mode_check_buttons();
@@ -26,28 +36,36 @@ void mode_setup_pulse()
 			++show_mode;		
 		}
 		else if ( mode_button != NO_MODE_BUTTON ) {
+			coil_end();
 			return;
 		}
 		
-		coil.pulse_length += encoder_increment( coil.pulse_length );
+		coil_set_pulse_length( encoder_increment( coil_get_pulse_length() ) );
 		
-		if ( --measuresLeft == 0 ) {
-			measuresLeft = SAMPLES_HISTORY_SIZE+2;
-			++measureRef;
+		if ( coil_fetch_result() ) {
+			read_reference_counter--;
 		}
 		
-		if ( measureRef & 0x07 ) {	//Measure peak 8 times more than reference
-			peak = coil_peak();
-		}
-		else {
+		if ( read_reference_counter == 0 ) {
 			reference_5v = coil_peak_ref();
+			read_reference_counter = SETUP_PULSE_READ_REFERENCE_COUNTER;
 		}
 		
-		dsp_setup_coil_pulse(peak, reference_5v, show_mode);
+		if ( --update_display_counter == 0 ) {
+			dsp_setup_coil_pulse( coil.result.value, reference_5v, show_mode);
+			update_display_counter = SETUP_PULSE_UPDATE_DISPLAY_COUNTER;
+		}
 		
-		delay_ms( 3 );
+		delay_ms( SETUP_PULSE_LOOP_PAUSE );
 	}
 }
+
+
+#define SETUP_AUTOZERO_THRES_LOOP_PAUSE		5		//In ms
+
+#define SETUP_AUTOZERO_THRES_DISPLAY_PERIOD	100		//In ms
+#define SETUP_AUTOZERO_THRES_DISPLAY_COUNTER \
+		(SETUP_AUTOZERO_THRES_DISPLAY_PERIOD/SETUP_AUTOZERO_THRES_LOOP_PAUSE)
 
 
 void mode_setup_autozero_threshold() 
@@ -56,9 +74,13 @@ void mode_setup_autozero_threshold()
 						 INCREMENT_AUTO_RATE );
 	
 	int16 noise = 0;
-	int8 update_display = 0;
+	int8 update_display_counter = SETUP_AUTOZERO_THRES_DISPLAY_COUNTER;
+	
+	coil_read_decay_begin();
+
 	while (TRUE) {
 		if ( mode_changed() ) {
+			coil_end();
 			return;
 		}
 		
@@ -66,21 +88,21 @@ void mode_setup_autozero_threshold()
 			coil.auto_zero_threshold = noise;
 		}
 
-		coil.auto_zero_threshold += encoder_increment( coil.auto_zero_threshold  );
+		coil.auto_zero_threshold = encoder_increment( coil.auto_zero_threshold );
 		
-		coil_sample();
-		int16 current_noise = samples_efficiency();
+		coil_fetch_result();
 		
-		if ( current_noise>noise )	 //Take max noise signal to show
-			noise = current_noise;
+		if ( coil.result.noise>noise )	 //Take max noise signal to show
+			noise = coil.result.noise;
 		
-		if ( ++update_display | 0x80 ) {
+		if ( --update_display_counter == 0 ) {
 				//Only update user interface every 8 loops
 			dsp_setup_autozero_threshold( noise );
-			noise = current_noise;
+			noise = 0;
+			update_display_counter = SETUP_AUTOZERO_THRES_DISPLAY_COUNTER;
 		}
 		
-		delay_ms( COIL_PULSE_PERIOD );
+		delay_ms( SETUP_PULSE_LOOP_PAUSE );
 	}
 }
 

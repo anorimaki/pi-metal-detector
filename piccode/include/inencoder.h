@@ -16,13 +16,13 @@ void encoder_update( int1 channelA, int1 channelB ) ;
 void encoder_set_increment( int16 min, int16 max, int8 rate );
 
 /*
- * Returns increment (or decrement) based on the encode state and
- * settings: min and max value and rate.
+ * Returns current value incremented (or decremented) based on the encode
+ * state and settings: min and max value and rate.
  * 'current' is the value to be updated. This function nevers return an 
- * increment that exceeds maximun or mininum settings.
+ * a value that exceeds maximun or mininum settings.
  * It clears encoder state.
  */
-signed int16 encoder_increment( int16 current );
+int16 encoder_increment( int16 current );
 
 #endif
 

@@ -11,12 +11,7 @@
 	
 int16 battery_read_adc()
 {
-	disable_interrupts(GLOBAL);
-
 	int16 ret = adc_read(PI_BATTERY_VOLTAGE_CH);
-	
-	enable_interrupts(GLOBAL);
-	
 	return COIL_MAX_ADC_VALUE-ret;
 }
 

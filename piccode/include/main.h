@@ -24,7 +24,6 @@
 #elif defined(USE_PIC18F26K80)
 
 #define PI_COIL_CTRL_PIN            PIN_A1
-#define PI_ADC_INDICATOR_PIN        PIN_C3
 
 #define PI_DECAY_SIGNAL_PIN         PIN_A0
 #define PI_DECAY_SIGNAL_AN          sAN0

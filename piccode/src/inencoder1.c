@@ -91,7 +91,7 @@ void encoder_set_increment(int16 min, int16 max, int8 rate)
 
 #define ENCODER_MIN_TIME_PERIODS 32		//~512us*32 = 16ms
 
-signed int16 encoder_increment(int16 current)
+int16 encoder_increment(int16 current)
 {
 	disable_interrupts(INT_TIMER0);
 	if( encoder.time_periods < ENCODER_MIN_TIME_PERIODS ) {
@@ -120,11 +120,8 @@ signed int16 encoder_increment(int16 current)
 	}
 	
 	if ( pulses>0 ) {
-		int16 max_increment = encoder_settings.max - current;
-		return (max_increment > increment) ? increment : max_increment;
+		return CHECKED_ADD( current, increment, encoder_settings.max );
 	}
-	
-	int16 max_decrement = current - encoder_settings.min;
-	return -((max_decrement > increment) ? increment : max_decrement);
+	return CHECKED_SUB( current, increment, encoder_settings.min );
 }
 	

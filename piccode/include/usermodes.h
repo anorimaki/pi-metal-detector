@@ -12,7 +12,6 @@ int1 mode_changed();
 
 void mode_execute_current();
 
-
 void mode_main();
 
 

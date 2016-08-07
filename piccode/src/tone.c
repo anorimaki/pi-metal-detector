@@ -60,10 +60,7 @@ void tone_begin()
 	// Note: Do not use CCP1 for Special Event Trigger or ADC will be started
 	setup_ccp2( CCP_COMPARE_RESET_TIMER | CCP_USE_TIMER1_AND_TIMER2 );
 	
-	//At 1Mhz instruction frequency (ClockF/4):
-	//	- It increments every: 8us
-	//	- Min frequency selectable is: 1/8us * 16^2 * 2 ->
-	//	- Max frequency selectable is: 1/8us * 2 -> 
+	//At 4Mhz instruction frequency (ClockF=16Mhz/4): It increments every: 2us
 	setup_timer_1( T1_INTERNAL| T1_DIV_BY_8 );
 	
 	TMR1ON = 0;		//Stops output signal

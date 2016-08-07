@@ -3,8 +3,6 @@
 #include <math.h>
 
 
-#define SAMPLES_UNDEFINED_VALUE		0xFFFF
-
 struct Samples
 {
 	int16 values[SAMPLES_HISTORY_SIZE];
@@ -24,6 +22,7 @@ void samples_init()
 	samples.position = 0;
 	samples.sum = 0;
 	samples.sum_sq = 0;
+	samples.mean = SAMPLES_UNDEFINED_VALUE;
 }
 
 // To avoid overflow in sum_sq,
@@ -91,6 +90,10 @@ int16 samples_coeff_variation()
  */
 int16 samples_efficiency()
 {
+	if ( samples.mean == SAMPLES_UNDEFINED_VALUE ) {
+		return SAMPLES_UNDEFINED_VALUE;
+	}
+	
 	int32 sq_mean = samples.mean * samples.mean;
 	int32 var = samples_variance();
 	

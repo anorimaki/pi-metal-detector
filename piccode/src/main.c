@@ -31,16 +31,26 @@ void init() {
 void init_calibration() 
 {
 	tone_begin();
+	coil_read_decay_begin();
+	
+	int1 stable_result = 0;
 	int16 sample = COIL_MAX_ADC_VALUE;
 	coil.zero = 0;
 	while( coil.zero < sample ) {
-		sample = coil_sample();
+		stable_result = coil_fetch_result();
+		sample = coil.result.value;
 		tone_apply(sample);
 		coil.zero += 2;
-		delay_ms( COIL_PULSE_PERIOD );
+		delay_ms( 3 );
 	}
-	coil.auto_zero_threshold = samples_efficiency();
-	coil.zero = sample + coil.auto_zero_threshold;
+	while( !stable_result ) {
+		stable_result = coil_fetch_result();
+	}
+	
+	coil.auto_zero_threshold = coil.result.noise;
+	coil.zero = coil.result.value + coil.auto_zero_threshold;
+	
+	coil_end();
 	tone_end();
 }
 
@@ -53,7 +63,7 @@ void main()
     dsp_hello();
 	delay_ms(500);
 	cnf_load();
-	init_calibration();
+//	init_calibration();
 	
 	while( TRUE ) {
 		mode_execute_current();
