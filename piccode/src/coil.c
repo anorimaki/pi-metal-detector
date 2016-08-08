@@ -12,7 +12,7 @@
 //
 // http://chemelec.com/Projects/Metal-AV/Metal-AV.htm
 // 'The Present Frequency of Operation is 300 Hz.'
-#define COIL_PULSE_PERIOD               20000    //In us
+#define COIL_PULSE_PERIOD               16000    //In us
 
 
 struct Coil coil;
@@ -34,8 +34,6 @@ void coil_init()
 {
 	output_low(PI_COIL_CTRL_PIN);
 	output_drive(PI_COIL_CTRL_PIN);
-
-	samples_init();
 }
 
 
@@ -65,8 +63,8 @@ void coil_begin( int8 channel, int8 read_delay )
 	//		Min period: 64us (15.625 KHz) 
 	//		Max period: 255*64us = 16.320 ms (61Hz)
 	adc_read_callback = coil_add_value;
-//	setup_timer_4( T4_DIV_BY_16, COIL_PULSE_PERIOD>>6, 16 );
-//	coil_wakeup();
+	setup_timer_4( T4_DIV_BY_16, COIL_PULSE_PERIOD>>6, 16 );
+	coil_wakeup();
 }
 
 

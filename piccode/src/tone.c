@@ -58,7 +58,7 @@ void tone_begin()
 	// CCP2 reset timer to create a period (Special Event Trigger). 
 	// It avoid the use of interrupt ISR
 	// Note: Do not use CCP1 for Special Event Trigger or ADC will be started
-	setup_ccp2( CCP_COMPARE_RESET_TIMER | CCP_USE_TIMER1_AND_TIMER2 );
+	setup_ccp3( CCP_COMPARE_RESET_TIMER | CCP_USE_TIMER1_AND_TIMER2 );
 	
 	//At 4Mhz instruction frequency (ClockF=16Mhz/4): It increments every: 2us
 	setup_timer_1( T1_INTERNAL| T1_DIV_BY_8 );
@@ -70,7 +70,7 @@ void tone_end()
 {
 	setup_timer_1(T1_DISABLED);
 	setup_ccp5( CCP_OFF );
-	setup_ccp2( CCP_OFF );
+	setup_ccp3( CCP_OFF );
 }
 
 
@@ -88,7 +88,7 @@ void tone_apply( int16 value )
 	
 	int16 ccp = (int32)250000/freq;			//1000000*2/8 = 250000
 	CCP_5 = ccp;		//Set toggle delay
-	CCP_2 = ccp;		//Set reset delay (period)
+	CCP_3 = ccp;		//Set reset delay (period)
 	
 	TMR1ON = 1;
 }

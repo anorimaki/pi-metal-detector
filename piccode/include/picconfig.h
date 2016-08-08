@@ -17,6 +17,7 @@
 
 #include <18F26K80.h>
 
+//#FUSES DEBUG
 #FUSES NOWDT                    //No Watch Dog Timer
 #FUSES VREGSLEEP             	//Ultra low-power regulator is disabled
 #FUSES SOSC_DIG              	//Digital mode, I/O port functionality of RC0 and RC1
@@ -79,6 +80,11 @@
 //  1 = Enables Timer1
 //  0 = Stops Timer1
 #bit TMR3ON = T3CON.0
+
+//RD16: 16-Bit Read/Write Mode Enable bit
+//1 = Enables register read/write of Timer3 in one 16-bit operation
+//0 = Enables register read/write of Timer3 in two eight-bit operations
+#bit TMR3RD16 = T3CON.1
 
 //ENHANCED CAPTURE/COMPARE/PWM1 CONTROL
 #byte CCP1CON = 0xFBB
