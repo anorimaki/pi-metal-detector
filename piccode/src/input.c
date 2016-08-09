@@ -54,11 +54,14 @@ int8 in_read_charlieplex_inputs()
 	output_float(PI_CHARLIEPLEX_SWITCH_2_PIN);
 	output_low(PI_CHARLIEPLEX_SWITCH_2_PIN);
 
+	//Note: In this block charliplex1 must be read before charliplex2
+	// just to charliplex2 has enough time to recover because charliplex2 was 
+	// low in previous block. This avoid to put a delay here.
 	output_drive(PI_CHARLIEPLEX_SWITCH_3_PIN);
 	switches <<= 1;
-	switches |= input_state(PI_CHARLIEPLEX_SWITCH_2_PIN);
-	switches <<= 1;
 	switches |= input_state(PI_CHARLIEPLEX_SWITCH_1_PIN);
+	switches <<= 1;
+	switches |= input_state(PI_CHARLIEPLEX_SWITCH_2_PIN);
 	output_high(PI_CHARLIEPLEX_SWITCH_3_PIN);
 	output_float(PI_CHARLIEPLEX_SWITCH_3_PIN);
 	output_low(PI_CHARLIEPLEX_SWITCH_3_PIN);
