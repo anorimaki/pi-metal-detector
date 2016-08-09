@@ -18,7 +18,8 @@
 struct Coil coil;
 
 void coil_add_value( int16 value ) ;
-void coil_begin( int8 channel, int8 read_delay );
+void coil_add_invert_value( int16 value ) ;
+void coil_begin( int8 channel, int8 read_delay, int1 invert_signal );
 
 
 struct
@@ -27,6 +28,7 @@ struct
 	int8 working_read_delay;			//In us
 	int16 last_value;
 	int1 is_active;
+	int1 invert_signal;
 } coil_internal;
 
 
@@ -39,17 +41,17 @@ void coil_init()
 
 void coil_read_decay_begin()
 {
-	coil_begin( PI_DECAY_SIGNAL_CH, coil.sample_delay );
+	coil_begin( PI_DECAY_SIGNAL_CH, coil.sample_delay, 1 );
 }
 
 
 void coil_read_peak_begin()
 {
-	coil_begin( PI_COIL_VOLTAGE_CH, 2 );
+	coil_begin( PI_COIL_VOLTAGE_CH, 2, 0 );
 }
 
 
-void coil_begin( int8 channel, int8 read_delay )
+void coil_begin( int8 channel, int8 read_delay, int1 invert_signal )
 {
 	coil_internal.read_channel = channel;
 	coil_internal.working_read_delay = read_delay;
@@ -57,12 +59,16 @@ void coil_begin( int8 channel, int8 read_delay )
 	
 	samples_init();
 	
+	if ( invert_signal )
+		adc_read_callback = coil_add_invert_value;
+	else
+		adc_read_callback = coil_add_value;
+	
 	//At 4Mhz instruction frequency (ClockF=16Mhz/4): it increments every 4us
 	//	With post scaler: generate an interrupt every 16 periods:
 	//		Resolution: 64us
 	//		Min period: 64us (15.625 KHz) 
 	//		Max period: 255*64us = 16.320 ms (61Hz)
-	adc_read_callback = coil_add_value;
 	setup_timer_4( T4_DIV_BY_16, COIL_PULSE_PERIOD>>6, 16 );
 	coil_wakeup();
 }
@@ -108,11 +114,19 @@ void coil_pulse_and_read()
 				coil_internal.working_read_delay ); 
 }
 
+#define COIL_ADD_VALUE_IMPL(value) \
+	coil_internal.last_value = samples_add( value ); \
+	coil_internal.is_active = 0;
 
 void coil_add_value( int16 value ) 
 {
-	coil_internal.last_value = samples_add( value );
-	coil_internal.is_active = 0;
+	COIL_ADD_VALUE_IMPL(value)
+}
+
+
+void coil_add_invert_value( int16 value ) 
+{
+	COIL_ADD_VALUE_IMPL( COIL_MAX_ADC_VALUE-value );
 }
 
 

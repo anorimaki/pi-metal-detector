@@ -42,6 +42,20 @@
 #FUSES NOEBTR                	//Memory not protected from table reads
 #FUSES NOEBTRB               	//Boot block not protected from table reads
 
+// A/D CONTROL REGISTER 0
+#byte ADCON0 = 0xFC2
+
+//ADON: A/D On bit
+//1 = A/D Converter is operating
+//0 = A/D conversion module is shut off and consuming no operating current
+#bit ADON = ADCON0.0
+
+// A/D CONTROL REGISTER 1
+#byte ADCON1 = 0xFC1
+
+// A/D CONTROL REGISTER 2
+#byte ADCON2 = 0xFC0
+
 //OSCCON register (Register 3-1) controls the main
 //  aspects of the device clock?s operation
 #byte OSCCON = 0xFD3
@@ -72,6 +86,11 @@
 //  1 = Enables Timer1
 //  0 = Stops Timer1
 #bit TMR1ON = T1CON.0
+
+//RD16: 16-Bit Read/Write Mode Enable bit
+//1 = Enables register read/write of Timer1 in one 16-bit operation
+//0 = Enables register read/write of Timer1 in two eight-bit operations
+#bit TMR1RD16 = T1CON.1
 
 //T3CON: TIMER3 CONTROL REGISTER
 #byte T3CON = 0xFB1

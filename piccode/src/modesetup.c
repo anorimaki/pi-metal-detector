@@ -1,9 +1,11 @@
 #include "main.h"
+#include "modesetup.h"
 #include "usermodes.h"
 #include "display.h"
 #include "coil.h"
 #include "inbuttons.h"
 #include "inencoder.h"
+
 
 #define SETUP_PULSE_LOOP_PAUSE				5		//In ms
 
@@ -14,7 +16,6 @@
 #define SETUP_PULSE_UPDATE_DISPLAY_PERIOD	100		//In ms
 #define SETUP_PULSE_UPDATE_DISPLAY_COUNTER \
 		(SETUP_PULSE_UPDATE_DISPLAY_PERIOD/SETUP_PULSE_LOOP_PAUSE)
-
 
 void mode_setup_pulse()
 {
@@ -102,7 +103,6 @@ void mode_setup_autozero_threshold()
 			update_display_counter = SETUP_AUTOZERO_THRES_DISPLAY_COUNTER;
 		}
 		
-		delay_ms( SETUP_PULSE_LOOP_PAUSE );
+		delay_ms( SETUP_AUTOZERO_THRES_LOOP_PAUSE );
 	}
 }
-

@@ -5,7 +5,7 @@
 #define TONE_MIN_FREQUENCY	4		//In Hz
 #define TONE_MAX_FREQUENCY	9000	//In Hz
 
-// (1Mhz instruction frequency && T1_DIV_BY_8)
+// (1Mhz instruction frequency && T3_DIV_BY_8)
 #define CPP_TIMER_PERIOD		8			//In us  
 
 
@@ -15,8 +15,9 @@ void tone_init()
 #if 1
 		//Just to configure CCP1 but not to activate it. See comments of
 		// tone_being() function.
-	setup_ccp5( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER1_AND_TIMER2 );
+	setup_ccp5( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER3_AND_TIMER4 );
 	setup_ccp5( CCP_OFF );
+	disable_interrupts( INT_CCP5 );	
 #else
 #asm
 			//This is equivale to setup_ccp1 but it's done in assemble
@@ -42,7 +43,7 @@ void tone_init()
 
 void tone_begin()
 {
-	// CCP1 generates output signal
+	// CCP5 generates output signal
 	//setup_ccp5( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER1_AND_TIMER2 );
 #asm
 		//setup_ccp5() sould be here but 'MOVWF  PSTR1CON' of this function
@@ -55,20 +56,22 @@ void tone_begin()
 #endasm
 	
 	
-	// CCP2 reset timer to create a period (Special Event Trigger). 
+	// CCP3 reset timer to create a period (Special Event Trigger). 
 	// It avoid the use of interrupt ISR
 	// Note: Do not use CCP1 for Special Event Trigger or ADC will be started
-	setup_ccp3( CCP_COMPARE_RESET_TIMER | CCP_USE_TIMER1_AND_TIMER2 );
+	setup_ccp3( CCP_COMPARE_RESET_TIMER | CCP_USE_TIMER3_AND_TIMER4 );
+	disable_interrupts( INT_CCP3 );	
 	
 	//At 4Mhz instruction frequency (ClockF=16Mhz/4): It increments every: 2us
-	setup_timer_1( T1_INTERNAL| T1_DIV_BY_8 );
+	setup_timer_3( T3_INTERNAL| T3_DIV_BY_8 );
+	disable_interrupts( INT_TIMER3 );	
 	
-	TMR1ON = 0;		//Stops output signal
+	TMR3ON = 0;		//Stops output signal
 }
 
 void tone_end()
 {
-	setup_timer_1(T1_DISABLED);
+	setup_timer_3(T3_DISABLED);
 	setup_ccp5( CCP_OFF );
 	setup_ccp3( CCP_OFF );
 }
@@ -80,7 +83,7 @@ void tone_apply( int16 value )
 	signed int16 freq = coil_normalize( value, coil.zero,
 						TONE_MAX_FREQUENCY-TONE_MIN_FREQUENCY );
 	if ( freq <= 0 ) {
-		TMR1ON = 0;		//Stops timer1 -> stops output signal
+		TMR3ON = 0;		//Stops timer3 -> stops output signal
 		return;
 	}
 	
@@ -90,6 +93,6 @@ void tone_apply( int16 value )
 	CCP_5 = ccp;		//Set toggle delay
 	CCP_3 = ccp;		//Set reset delay (period)
 	
-	TMR1ON = 1;
+	TMR3ON = 1;
 }
 

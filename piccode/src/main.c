@@ -63,7 +63,7 @@ void main()
     dsp_hello();
 	delay_ms(500);
 	cnf_load();
-//	init_calibration();
+	init_calibration();
 	
 	while( TRUE ) {
 		mode_execute_current();
@@ -74,16 +74,16 @@ void main()
 #if 1
 #include "adconvert.c"
 #include "config.c"
-#include "display.c"
 #include "input.c"
 #include "inencoder.c"
 #include "inbuttons.c"
 #include "coil.c"
-#include "modesetup.c"
 #include "samples.c"
 #include "tone.c"
 #include "mathutil.c"
 #include "modesetdelay.c"
 #include "usermodes.c"
 #include "battery.c"
+#include "modesetup.c"
+#include "display.c"
 #endif
