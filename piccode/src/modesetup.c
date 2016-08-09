@@ -9,9 +9,14 @@
 
 #define SETUP_PULSE_LOOP_PAUSE				5		//In ms
 
-#define SETUP_PULSE_READ_REFERENCE_PERIOD	1000	//In ms
+#define SETUP_PULSE_READ_REFERENCE_PERIOD	2000	//In ms
 #define SETUP_PULSE_READ_REFERENCE_COUNTER \
 		(SETUP_PULSE_READ_REFERENCE_PERIOD/SETUP_PULSE_LOOP_PAUSE)
+
+//Time needed to discharge peak detector capacitor
+#define SETUP_PULSE_READ_REFERENCE_WAIT		100		//In ms
+#define SETUP_PULSE_READ_REFERENCE_WAIT_COUNTER \
+		(SETUP_PULSE_READ_REFERENCE_WAIT/SETUP_PULSE_LOOP_PAUSE)
 
 #define SETUP_PULSE_UPDATE_DISPLAY_PERIOD	100		//In ms
 #define SETUP_PULSE_UPDATE_DISPLAY_COUNTER \
@@ -27,9 +32,10 @@ void mode_setup_pulse()
 	int16 read_reference_counter = SETUP_PULSE_READ_REFERENCE_COUNTER;
 	int8 update_display_counter = SETUP_PULSE_UPDATE_DISPLAY_COUNTER;
 	
-	coil_read_peak_begin();
-	
 	int16 reference_5v = coil_peak_ref();
+	int1 wait_for_read_reference = 0;
+	
+	coil_read_peak_begin();
 	
 	while (TRUE) {
 		int8 mode_button = mode_check_buttons();
@@ -43,13 +49,22 @@ void mode_setup_pulse()
 		
 		coil_set_pulse_length( encoder_increment( coil_get_pulse_length() ) );
 		
-		if ( coil_fetch_result() ) {
-			read_reference_counter--;
+		if ( wait_for_read_reference ) {
+			if ( --read_reference_counter == 0 ) {
+				reference_5v = coil_peak_ref();
+				coil_wakeup();
+				wait_for_read_reference = 0;
+				read_reference_counter = SETUP_PULSE_READ_REFERENCE_COUNTER;
+			}
 		}
-		
-		if ( read_reference_counter == 0 ) {
-			reference_5v = coil_peak_ref();
-			read_reference_counter = SETUP_PULSE_READ_REFERENCE_COUNTER;
+		else {
+			if ( coil_fetch_result() ) {
+				if ( --read_reference_counter == 0) {
+					coil_sleep();
+					wait_for_read_reference = 1;
+					read_reference_counter = SETUP_PULSE_READ_REFERENCE_WAIT_COUNTER;
+				}
+			}
 		}
 		
 		if ( --update_display_counter == 0 ) {

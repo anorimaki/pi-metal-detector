@@ -171,13 +171,7 @@ void coil_set_working_read_delay( int8 delay )
 
 int16 coil_peak_ref()
 {
-	coil_sleep();
-	
-	int16 ret = adc_read( PI_COIL_VOLTAGE_CH ); 
-		
-	coil_wakeup();
-	
-	return ret;
+	return adc_read( PI_COIL_VOLTAGE_CH ); 
 }
 
 
