@@ -26,8 +26,8 @@ void adc_init()
 	disable_interrupts(INT_AD);
 	disable_interrupts(INT_TIMER3);
 	
-	output_low( INDICATOR_PIN );
-	output_drive( INDICATOR_PIN );
+//	output_low( INDICATOR_PIN );
+//	output_drive( INDICATOR_PIN );
 	
 	//At 4Mhz instruction frequency (ClockF=16Mhz/4), it increments evey us.
 	setup_timer_1( T1_INTERNAL| T3_DIV_BY_4 );
@@ -57,8 +57,6 @@ void isr_adc()
 {
 	TMR1ON = 0;			//Stops timer1
 
-	output_low( INDICATOR_PIN );
-	
 	adc_internal.last_value = read_adc(ADC_READ_ONLY);
 	if ( adc_internal.last_value & 0x8000 ) {
 		adc_internal.last_value = 0;		//Avoid negative values
@@ -91,16 +89,16 @@ int16 adc_read( int8 channel )
 // This is not the true delay. It must be added the overhead of ADC setup.
 void adc_read_async( int8 channel, int8 delay ) 
 {
-	ADCON0 = (channel << 2);		//Select channel
-	ADON=1;							//Turn on ADC module
+	ADCON0 = (channel << 2);			//Select channel
+	ADON=1;								//Turn on ADC module
 
 	enable_interrupts(INT_AD);
 
 	set_timer1( 0xFF00 | -delay );
 	TMR1ON = 1;						//Start timer1
 
-//read_adc(ADC_START_ONLY);		//Do not start read. Read will be started 
-									//when CCP1 matches timer3
+//read_adc(ADC_START_ONLY);			//Do not start read. Read will be started 
+									//when timer1 reach 0
 #if defined(ADC_IN_SLEEP)
 #asm
 	SLEEP
