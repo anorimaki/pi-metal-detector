@@ -30,8 +30,8 @@ void adc_init()
 //	output_drive( INDICATOR_PIN );
 	
 	//At 4Mhz instruction frequency (ClockF=16Mhz/4), it increments evey us.
-	setup_timer_1( T1_INTERNAL| T3_DIV_BY_4 );
-	TMR1ON = 0;		//Stops timer3 but it's already configured
+	setup_timer_1( T1_INTERNAL| T1_DIV_BY_4 );
+	TMR1ON = 0;		//Stops timer1 but it's already configured
 	
 	//Automatic adqusition time disabled
 	//TAD: 1us for a 16Mhz clock
@@ -68,6 +68,7 @@ void isr_adc()
 	}
 }
 
+
 int16 adc_read( int8 channel ) 
 {
 	AdcReadCallback callback = adc_read_callback;
@@ -83,8 +84,6 @@ int16 adc_read( int8 channel )
 }
 
 
-
-#define ADC_SETUP_TIME	6		//In us
 // delay must be greater than 0! CCP_1 ca not be 
 // This is not the true delay. It must be added the overhead of ADC setup.
 void adc_read_async( int8 channel, int8 delay ) 

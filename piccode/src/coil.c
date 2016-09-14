@@ -12,7 +12,7 @@
 //
 // http://chemelec.com/Projects/Metal-AV/Metal-AV.htm
 // 'The Present Frequency of Operation is 300 Hz.'
-#define COIL_PULSE_PERIOD               16000    //In us
+#define COIL_PULSE_PERIOD               5000    //In us
 
 
 struct Coil coil;
@@ -57,7 +57,7 @@ void coil_begin( int8 channel, int8 read_delay, int1 invert_signal )
 	coil_internal.working_read_delay = read_delay;
 	coil_internal.is_active = 0;
 	
-	samples_init();
+	samples_init( coil.samples_history_size_log );
 	
 	if ( invert_signal )
 		adc_read_callback = coil_add_invert_value;
@@ -140,12 +140,23 @@ int1 coil_fetch_result()
 }
 
 
+void coil_set_pulse_period( int16 pulse_period )
+{
+	if ( pulse_period == coil.pulse_period )
+		return;
+	coil_sleep();
+	samples_init( coil.samples_history_size_log );
+	coil.pulse_period = pulse_period;
+	coil_wakeup();
+}
+
+
 void coil_set_pulse_length( int16 pulse_length ) 
 {
 	if ( pulse_length == coil.pulse_length )
 		return;
 	coil_sleep();
-	samples_init();
+	samples_init( coil.samples_history_size_log );
 	coil.pulse_length = pulse_length;
 	coil_wakeup();
 }
@@ -163,7 +174,7 @@ void coil_set_working_read_delay( int8 delay )
 	if ( delay == coil_internal.working_read_delay )
 		return;
 	coil_sleep();
-	samples_init();
+	samples_init( coil.samples_history_size_log );
 	coil_internal.working_read_delay = delay;
 	coil_wakeup();
 }

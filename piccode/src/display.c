@@ -109,6 +109,8 @@ void dsp_clear_character( int8 which ) {
 
 
 //////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
 
 
 void dsp_init()
@@ -162,7 +164,10 @@ void dsp_percent( signed int8 percent )
  *	- 2 possibles values per position in start and end characters
  * Note: Only one range line is allowed.
  */
-void dsp_range_line( int8 width, int16 value, 
+void dsp_range_line( int8 start_char_index, 
+					int8 mid_char_index, 
+					int8 end_char_index, 
+					int8 width, int16 value, 
 					int16 max_value ) 
 {
 	int8 range_positions = (3*(width-2)) + 2 + 2;
@@ -201,28 +206,32 @@ void dsp_range_line( int8 width, int16 value,
 	lcd_output_rs(0);
 	int8 current_address = lcd_read_byte() & 0x7F;
 	
-	dsp_write_mid_glyph( CHAR_START_RANGE, 
+				// Set glyphs
+	dsp_write_mid_glyph( start_char_index, 
 								CHAR_START_RANGE_MID_GLYPH[start_glyph] );
-	dsp_write_mid_glyph( CHAR_END_RANGE, 
+	dsp_write_mid_glyph( mid_char_index, 
 								CHAR_END_RANGE_MID_GLYPH[end_glyph] );
 	if ( mark_glyph != 0xFF ) {
-		dsp_write_mid_glyph( CHAR_MID_RANGE, 
+		dsp_write_mid_glyph( end_char_index, 
 									CHAR_RANGE_POSITION_GLYPH[mark_glyph] );
 	}
 	
 	lcd_send_byte( 0, 0x80|current_address );	//Restore DDRAM address
 	
+				// Write range line
 	int8 i;
-	lcd_putc(CHAR_START_RANGE);
+	lcd_putc(start_char_index);
 	for( i=0; i<mark_pos; ++i ) {
 		lcd_putc('-');
 	}
-	lcd_putc( (mark_glyph==0xFF) ? '-' : CHAR_MID_RANGE);
+	lcd_putc( (mark_glyph==0xFF) ? '-' : mid_char_index);
 	for( i=mark_pos+1; i<(width-2); ++i ) {
 		lcd_putc('-');
 	}
-	lcd_putc(CHAR_END_RANGE);
+	lcd_putc(end_char_index);
 }
+
+
 
 /*
  * Display a stength bar with 6 possibles values per position
@@ -311,6 +320,17 @@ void dis_noise( int16 noise_estimation, int1 mode )
 	}
 }
 
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+
+void dsp_main_mode_init()
+{
+	dsp_clear_character( 0 );		//Signal char
+	dsp_clear_character( 1 );		//Noise char
+	lcd_set_cgram_char( 2, CHAR_START_RANGE_GLYPH );
+    lcd_set_cgram_char( 4, CHAR_END_RANGE_GLYPH );
+}
 
 void dsp_main_mode( int16 signal, int16 noise_estimation, int16 battery_volts,
 					int1 mode )
@@ -320,7 +340,7 @@ void dsp_main_mode( int16 signal, int16 noise_estimation, int16 battery_volts,
 	
 	lcd_gotoxy( 1, 2 );
 	printf( lcd_putc, "Zer " );
-	dsp_range_line( 12, coil.zero, COIL_MAX_ADC_VALUE );
+	dsp_range_line( 2, 3, 4, 12, coil.zero, COIL_MAX_ADC_VALUE );
 	if ( mode == DSP_SHOW_PERCENT ) {
 		signed int8 percent = math_change_range(coil.zero, 
 												COIL_MAX_ADC_VALUE, 100);
@@ -339,6 +359,15 @@ void dsp_main_mode( int16 signal, int16 noise_estimation, int16 battery_volts,
 }
 
 
+void dsp_setup_sample_delay_init()
+{
+	dsp_clear_character( 0 );		//Signal char
+	dsp_clear_character( 1 );		//Noise char
+	lcd_set_cgram_char( 2, CHAR_START_RANGE_GLYPH );
+    lcd_set_cgram_char( 4, CHAR_END_RANGE_GLYPH );
+}
+
+
 void dsp_setup_sample_delay( int16 signal, int16 noise_estimation, int1 mode )
 {
 	lcd_gotoxy( 1, 1 );
@@ -346,8 +375,8 @@ void dsp_setup_sample_delay( int16 signal, int16 noise_estimation, int1 mode )
 	
 	lcd_gotoxy( 1, 2 );
 	printf( lcd_putc, "Del " );
-	dsp_range_line( 12, coil.sample_delay, COIL_MAX_SAMPLE_DELAY-
-											COIL_MIN_SAMPLE_DELAY );
+	dsp_range_line( 2, 3, 4, 12, coil.sample_delay, 
+				COIL_MAX_SAMPLE_DELAY-COIL_MIN_SAMPLE_DELAY );
 	printf(lcd_putc, "%2uus",
 				coil.sample_delay + SAMPLE_DELAY_CORRECTION);
 	
@@ -357,6 +386,14 @@ void dsp_setup_sample_delay( int16 signal, int16 noise_estimation, int1 mode )
 	
 	lcd_gotoxy( 1, 4 );
 	dis_noise( noise_estimation, mode );
+}
+
+
+void dsp_autoset_sample_delay_init()
+{
+	for( int8 i=0; i<DSP_AUTOSET_DELAY_MAX_LINES; ++i ) {
+		dsp_clear_character( i );
+	}
 }
 
 
@@ -377,6 +414,14 @@ void dsp_autoset_sample_delay( int8 first, int8 selected,
 }
 
 
+void dsp_setup_coil_pulse_init()
+{
+	dsp_clear_character( 0 );		//Volts
+	lcd_set_cgram_char( 2, CHAR_START_RANGE_GLYPH );
+    lcd_set_cgram_char( 4, CHAR_END_RANGE_GLYPH );
+}
+
+
 void dsp_setup_coil_pulse(int16 measure, int16 reference_5v, int1 mode)
 {
 	lcd_gotoxy( 1, 1 );
@@ -384,8 +429,8 @@ void dsp_setup_coil_pulse(int16 measure, int16 reference_5v, int1 mode)
 	
 	lcd_gotoxy( 1, 2 );
 	printf( lcd_putc, "Pul " );
-	dsp_range_line( 11, coil.pulse_length,
-				 MODE_SETUP_PULSE_TIME_MAX-MODE_SETUP_PULSE_TIME_MIN );
+	dsp_range_line( 2, 3, 4, 11, coil.pulse_length,
+				 COIL_MAX_PULSE_TIME-COIL_MIN_PULSE_TIME );
 	printf(lcd_putc, "%3Luus", coil.pulse_length);
 	
 	lcd_gotoxy( 1, 3 );
@@ -407,6 +452,14 @@ void dsp_setup_coil_pulse(int16 measure, int16 reference_5v, int1 mode)
 }
 
 
+void dsp_setup_autozero_threshold_init()
+{
+	dsp_clear_character( 0 );		//Noise
+	lcd_set_cgram_char( 2, CHAR_START_RANGE_GLYPH );
+    lcd_set_cgram_char( 4, CHAR_END_RANGE_GLYPH );
+}
+
+
 void dsp_setup_autozero_threshold( int16 noise )
 {
 	lcd_gotoxy( 1, 1 );
@@ -414,7 +467,7 @@ void dsp_setup_autozero_threshold( int16 noise )
 	
 	lcd_gotoxy( 1, 2 );
 	printf( lcd_putc, "Thr " );
-	dsp_range_line( 12, coil.auto_zero_threshold, 
+	dsp_range_line( 2, 3, 4, 12, coil.auto_zero_threshold, 
 					MODE_SETUP_AUTOZERO_THRESHOLD_MAX );
 	printf( lcd_putc, "%4Lu", coil.auto_zero_threshold );
 	
@@ -426,4 +479,80 @@ void dsp_setup_autozero_threshold( int16 noise )
 	lcd_gotoxy( 1, 4 );
 	printf( lcd_putc, "Zero relation:  %4Lu", coil.zero /
 								coil.auto_zero_threshold );
+}
+
+
+void dsp_setup_response_time_init()
+{				
+					//Pulse frequency range line
+	lcd_set_cgram_char( 0, CHAR_START_RANGE_GLYPH );
+    lcd_set_cgram_char( 2, CHAR_END_RANGE_GLYPH );
+	
+					//Samples history range line
+	lcd_set_cgram_char( 3, CHAR_START_RANGE_GLYPH );
+    lcd_set_cgram_char( 4, CHAR_END_RANGE_GLYPH );
+}
+
+
+
+#define DSP_PULSE_PERIOD_US_LIMIT	(10000/COIL_PULSE_PERIOD_STEP)
+#define DSP_PULSE_PERIOD_MS_FACTOR	(10-COIL_PULSE_PERIOD_STEP_LOG)
+
+#define DSP_TIME_UNIT_US	0
+#define DSP_TIME_UNIT_MS	1
+
+struct 
+{
+	int16 value;
+	int1 unit;
+} dsp_coil_period_step_to_time_data;
+
+void dsp_coil_period_step_to_time( int32 steps ) 
+{
+	if ( steps > DSP_PULSE_PERIOD_US_LIMIT )
+	{
+		dsp_coil_period_step_to_time_data.unit = DSP_TIME_UNIT_MS;
+		
+		//Should be steps*64/1000 but steps*64/1024 it's a good approximation.
+		//steps*64/1024 = coil.steps*2^6/2^10 = steps*2^(10-6)
+		dsp_coil_period_step_to_time_data.value =
+							steps>>DSP_PULSE_PERIOD_MS_FACTOR;
+		dsp_coil_period_step_to_time_data.unit = DSP_TIME_UNIT_MS;
+		return;
+	}
+	
+	dsp_coil_period_step_to_time_data.value = 
+							steps<<COIL_PULSE_PERIOD_STEP_LOG;
+	dsp_coil_period_step_to_time_data.unit = DSP_TIME_UNIT_US;
+}
+
+#define DSP_TIME_UNIT_STR(v) ((v==DSP_TIME_UNIT_MS) ? "ms": "us")
+
+void dsp_setup_response_time( int1 selected )
+{
+	lcd_gotoxy( 1, 1 );
+	printf( lcd_putc, "** Setup response **");
+	
+	lcd_gotoxy( 1, 2 );
+	lcd_putc( (selected == DSP_SELECTION_PULSE_PERIOD) ? '>' : ' ' );
+	dsp_range_line( 0, 1, 2, 12, 
+				coil.pulse_period-COIL_MIN_PULSE_PERIOD_COUNT, 
+				COIL_MAX_PULSE_PERIOD_COUNT-COIL_MIN_PULSE_PERIOD_COUNT );
+	dsp_coil_period_step_to_time( coil.pulse_period );
+	printf( lcd_putc, "%4Lu", dsp_coil_period_step_to_time_data.value );
+	printf( lcd_putc, DSP_TIME_UNIT_STR(dsp_coil_period_step_to_time_data.unit) );
+		
+	lcd_gotoxy( 1, 3 );
+	lcd_putc( (selected == DSP_SELECTION_SAMPLES_HISTORY) ? '>' : ' ' );
+	dsp_range_line( 3, 4, 5, 12, 
+				coil.samples_history_size_log-SAMPLES_HISTORY_MIN_SIZE_LOG, 
+				SAMPLES_HISTORY_MAX_SIZE_LOG-SAMPLES_HISTORY_MIN_SIZE_LOG );
+	printf( lcd_putc, "%4u", 1 << coil.samples_history_size_log );
+	
+	lcd_gotoxy( 1, 4 );
+	int32 response_steps = coil.pulse_period << coil.samples_history_size_log;
+	dsp_coil_period_step_to_time( response_steps );
+	printf( lcd_putc, "Response time: %4Lu", 
+				dsp_coil_period_step_to_time_data.value );
+	printf( lcd_putc, DSP_TIME_UNIT_STR(dsp_coil_period_step_to_time_data.unit) );
 }

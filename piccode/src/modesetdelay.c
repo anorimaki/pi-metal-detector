@@ -10,6 +10,8 @@ int16 autoset_delay_signals[DSP_AUTOSET_DELAY_MAX_LINES];
 
 int8 mode_autoset_sample_delay() 
 {
+	dsp_autoset_sample_delay_init();
+	
 	encoder_set_increment( COIL_MIN_SAMPLE_DELAY, COIL_MAX_SAMPLE_DELAY, 1 );
 	
 	int8 selected = coil_get_read_delay();
@@ -67,6 +69,8 @@ int8 mode_autoset_sample_delay()
 void mode_setup_delay()
 {
 	static int1 show_mode = DSP_SHOW_PERCENT;
+	
+	dsp_setup_sample_delay_init();
 	
 	int8 update_display_counter = SETUP_DELAY_UPDATE_DISPLAY_COUNTER;
 	

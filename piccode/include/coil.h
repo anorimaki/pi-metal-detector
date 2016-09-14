@@ -3,11 +3,22 @@
 
 #define COIL_MAX_ADC_VALUE              4095
 
-
-
 #define COIL_MAX_SAMPLE_DELAY           50		//In us
 #define COIL_MIN_SAMPLE_DELAY           0		//in us
 #define COIL_CALCULATE_MIN_ZERO_DELAY   COIL_MAX_SAMPLE_DELAY*4		//in us
+
+#define COIL_MAX_PULSE_TIME             500		//In us
+#define COIL_MIN_PULSE_TIME             10		//in us
+
+#define COIL_MAX_PULSE_PERIOD           1000000	//In us
+#define COIL_MIN_PULSE_PERIOD           100		//In us
+#define COIL_PULSE_PERIOD_STEP_LOG		6
+#define COIL_PULSE_PERIOD_STEP  \
+			(1<<COIL_PULSE_PERIOD_STEP_LOG)		//In us (timer0 period, 64us)
+#define COIL_MAX_PULSE_PERIOD_COUNT	\
+			(COIL_MAX_PULSE_PERIOD/COIL_PULSE_PERIOD_STEP)
+#define COIL_MIN_PULSE_PERIOD_COUNT	\
+			(COIL_MIN_PULSE_PERIOD/COIL_PULSE_PERIOD_STEP)
 
 struct CoilResult 
 {
@@ -16,6 +27,8 @@ struct CoilResult
 };
 
 struct Coil {
+    int8 samples_history_size_log; 
+    int16 pulse_period;             //In timer0 steps (64us)
     int16 pulse_length;             //In us
     int8 sample_delay;              //In us after coil pulse ends
     int16 zero;                     //In ADC units
@@ -41,6 +54,9 @@ void coil_end();
 //
 //  Function access coil parameters: Use them!
 //
+void coil_set_pulse_period( int16 pulse_period /*in us*/ );
+#define coil_get_pulse_period() (coil.pulse_period)
+
 void coil_set_pulse_length( int16 pulse_length /*in us*/ );
 #define coil_get_pulse_length() (coil.pulse_length)
 

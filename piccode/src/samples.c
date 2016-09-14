@@ -5,19 +5,23 @@
 
 struct Samples
 {
-	int16 values[SAMPLES_HISTORY_SIZE];
+	int16 values[SAMPLES_HISTORY_MAX_SIZE];
 	int8 position;
 	int32 sum;
 	int32 sum_sq;
 	int16 mean;
+	int8 size_log;
+	int8 size;
 };
 
 struct Samples samples;
 
 
-void samples_init()
+void samples_init( int8 size_log )
 {
-	for( int8 i = 0; i<SAMPLES_HISTORY_SIZE; ++i )
+	samples.size_log = size_log;
+	samples.size = 1 << size_log;
+	for( int8 i = 0; i<samples.size; ++i )
 		samples.values[i] = SAMPLES_UNDEFINED_VALUE;
 	samples.position = 0;
 	samples.sum = 0;
@@ -33,7 +37,7 @@ int16 samples_add( int16 value )
 	samples.values[samples.position] = value;
 	
 	++samples.position;
-	if ( samples.position == SAMPLES_HISTORY_SIZE )
+	if ( samples.position == samples.size )
 		samples.position = 0;
 	
 	samples.sum += value;
@@ -50,7 +54,7 @@ int16 samples_add( int16 value )
 	int32 pulled_value32 = pulled_value;
 	samples.sum_sq -= (pulled_value32*pulled_value32);
 	
-	samples.mean = samples.sum >> SAMPLES_HISTORY_SIZE_LOG; 
+	samples.mean = samples.sum >> samples.size_log; 
 	
 	return samples.mean;
 }
@@ -63,10 +67,10 @@ int32 samples_variance()
 {
 	int32 aux = samples.sum >> 1;	//Divide before square to avoid overflows
 	aux = (aux*aux); 
-	aux >>= (SAMPLES_HISTORY_SIZE_LOG-2);
+	aux >>= (samples.size_log-2);
 	
 	aux = samples.sum_sq - aux;
-	aux >>= SAMPLES_HISTORY_SIZE_LOG;
+	aux >>= samples.size_log;
 	
 	return aux;
 }

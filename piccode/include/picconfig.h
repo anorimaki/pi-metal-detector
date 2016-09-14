@@ -17,7 +17,7 @@
 
 #include <18F26K80.h>
 
-//#FUSES DEBUG
+#FUSES DEBUG
 #FUSES NOWDT                    //No Watch Dog Timer
 #FUSES VREGSLEEP             	//Ultra low-power regulator is disabled
 #FUSES SOSC_DIG              	//Digital mode, I/O port functionality of RC0 and RC1

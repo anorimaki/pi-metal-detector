@@ -35,6 +35,10 @@ int8 mode_check_buttons()
 		mode_current = mode_setup_pulse;
 		return BUTTON_SETUP_PULSE;
 	}
+	if (buttons_is_pressed(BUTTON_SETUP_RESPONSE)) {
+		mode_current = mode_setup_response_time;
+		return BUTTON_SETUP_RESPONSE;
+	}
 	return NO_MODE_BUTTON;
 }
 
@@ -71,6 +75,8 @@ void mode_execute_current()
 void mode_main()
 {
 	static int1 show_mode = DSP_SHOW_PERCENT;
+	
+	dsp_main_mode_init();
 	
 	encoder_set_increment( 0, COIL_MAX_ADC_VALUE, INCREMENT_AUTO_RATE );
 

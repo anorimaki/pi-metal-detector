@@ -26,7 +26,9 @@ void mode_setup_pulse()
 {
 	static int1 show_mode = DSP_SHOW_VOLTS;
 	
-	encoder_set_increment( MODE_SETUP_PULSE_TIME_MIN, MODE_SETUP_PULSE_TIME_MAX,
+	dsp_setup_coil_pulse_init();
+	
+	encoder_set_increment( COIL_MIN_PULSE_TIME, COIL_MAX_PULSE_TIME,
 						 INCREMENT_AUTO_RATE );
 	
 	int16 read_reference_counter = SETUP_PULSE_READ_REFERENCE_COUNTER;
@@ -83,9 +85,10 @@ void mode_setup_pulse()
 #define SETUP_AUTOZERO_THRES_DISPLAY_COUNTER \
 		(SETUP_AUTOZERO_THRES_DISPLAY_PERIOD/SETUP_AUTOZERO_THRES_LOOP_PAUSE)
 
-
 void mode_setup_autozero_threshold() 
 {
+	dsp_setup_autozero_threshold_init();
+	
 	encoder_set_increment( 0, MODE_SETUP_AUTOZERO_THRESHOLD_MAX,
 						 INCREMENT_AUTO_RATE );
 	
@@ -119,5 +122,56 @@ void mode_setup_autozero_threshold()
 		}
 		
 		delay_ms( SETUP_AUTOZERO_THRES_LOOP_PAUSE );
+	}
+}
+
+
+#define SETUP_RESPONSE_TIME_LOOP_PAUSE				5		//In ms
+
+#define SETUP_RESPONSE_TIME_UPDATE_DISPLAY_PERIOD	100		//In ms
+#define SETUP_RESPONSE_TIME_UPDATE_DISPLAY_COUNTER \
+	(SETUP_RESPONSE_TIME_UPDATE_DISPLAY_PERIOD/SETUP_RESPONSE_TIME_LOOP_PAUSE)
+
+void mode_setup_response_time() 
+{
+	dsp_setup_response_time_init();
+	
+	int8 update_display_counter = SETUP_RESPONSE_TIME_UPDATE_DISPLAY_COUNTER;
+	
+	int1 selected = DSP_SELECTION_PULSE_PERIOD;
+	
+	while (TRUE) {
+		if ( mode_changed() ) {
+			return;
+		}
+		
+		if ( buttons_is_pressed(BUTTON_AUTO) ) {
+			++selected;
+			
+			if ( selected==DSP_SELECTION_PULSE_PERIOD ) {
+				encoder_set_increment( COIL_MIN_PULSE_PERIOD_COUNT, 
+							COIL_MAX_PULSE_PERIOD_COUNT, INCREMENT_AUTO_RATE );
+			}
+			else {
+				encoder_set_increment( SAMPLES_HISTORY_MIN_SIZE_LOG, 
+							SAMPLES_HISTORY_MAX_SIZE_LOG, INCREMENT_AUTO_RATE );
+			}
+		}
+
+		if ( selected==DSP_SELECTION_PULSE_PERIOD ) {
+			coil.pulse_period = encoder_increment( coil.pulse_period );
+		}
+		else {
+			coil.samples_history_size_log = 
+						encoder_increment( coil.samples_history_size_log );
+		}
+		
+		if ( --update_display_counter == 0 ) {
+				//Only update user interface every 8 loops
+			dsp_setup_response_time( selected );
+			update_display_counter = SETUP_AUTOZERO_THRES_DISPLAY_COUNTER;
+		}
+		
+		delay_ms( SETUP_RESPONSE_TIME_LOOP_PAUSE );
 	}
 }
