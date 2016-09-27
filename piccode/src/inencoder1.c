@@ -94,7 +94,8 @@ void encoder_set_increment(int16 min, int16 max, int8 rate)
 int16 encoder_increment(int16 current)
 {
 	disable_interrupts(INT_TIMER0);
-	if( encoder.time_periods < ENCODER_MIN_TIME_PERIODS ) {
+	if( (encoder.time_periods < ENCODER_MIN_TIME_PERIODS) ||
+		(encoder.pulses==0) ) {
 		enable_interrupts(INT_TIMER0);
 		return current;
 	}

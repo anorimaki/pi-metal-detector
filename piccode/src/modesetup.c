@@ -139,6 +139,8 @@ void mode_setup_response_time()
 	int8 update_display_counter = SETUP_RESPONSE_TIME_UPDATE_DISPLAY_COUNTER;
 	
 	int1 selected = DSP_SELECTION_PULSE_PERIOD;
+	encoder_set_increment( COIL_MIN_PULSE_PERIOD_COUNT, 
+						COIL_MAX_PULSE_PERIOD_COUNT, INCREMENT_AUTO_RATE );
 	
 	while (TRUE) {
 		if ( mode_changed() ) {

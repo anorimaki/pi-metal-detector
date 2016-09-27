@@ -62,6 +62,15 @@
 
 #DEVICE ADC=12
 
+/*
+ * Timer assigmnets:
+ * Timer0: Coil pulse period
+ * Timer1: ADC special event trigger
+ * Timer2: -----
+ * Timer3: Tone generation (with CCP3 and CCP5)
+ * Timer4: Read input period
+*/
+
 #endif
 
 

@@ -10,6 +10,11 @@
 #define COIL_MAX_PULSE_TIME             500		//In us
 #define COIL_MIN_PULSE_TIME             10		//in us
 
+///http://www.whiteselectronics.com/media/wysiwyg/SurfPI_SurfMII_FieldEval_EngReport.pdf
+// 'Pi detectors tipically operate in the range of 100 pulses per second'
+//
+// http://chemelec.com/Projects/Metal-AV/Metal-AV.htm
+// 'The Present Frequency of Operation is 300 Hz.'
 #define COIL_MAX_PULSE_PERIOD           1000000	//In us
 #define COIL_MIN_PULSE_PERIOD           100		//In us
 #define COIL_PULSE_PERIOD_STEP_LOG		6

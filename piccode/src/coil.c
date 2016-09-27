@@ -7,14 +7,6 @@
 #include "picconfig.h"
 
 
-///http://www.whiteselectronics.com/media/wysiwyg/SurfPI_SurfMII_FieldEval_EngReport.pdf
-// 'Pi detectors tipically operate in the range of 100 pulses per second'
-//
-// http://chemelec.com/Projects/Metal-AV/Metal-AV.htm
-// 'The Present Frequency of Operation is 300 Hz.'
-#define COIL_PULSE_PERIOD               5000    //In us
-
-
 struct Coil coil;
 
 void coil_add_value( int16 value ) ;
@@ -64,12 +56,8 @@ void coil_begin( int8 channel, int8 read_delay, int1 invert_signal )
 	else
 		adc_read_callback = coil_add_value;
 	
-	//At 4Mhz instruction frequency (ClockF=16Mhz/4): it increments every 4us
-	//	With post scaler: generate an interrupt every 16 periods:
-	//		Resolution: 64us
-	//		Min period: 64us (15.625 KHz) 
-	//		Max period: 255*64us = 16.320 ms (61Hz)
-	setup_timer_4( T4_DIV_BY_16, COIL_PULSE_PERIOD>>6, 16 );
+	//At 4Mhz instruction frequency (ClockF=16Mhz/4): it increments every 64us
+	setup_timer_0( T0_INTERNAL | T0_DIV_256 );
 	coil_wakeup();
 }
 
@@ -77,20 +65,22 @@ void coil_begin( int8 channel, int8 read_delay, int1 invert_signal )
 void coil_end()
 {
 	coil_sleep();
-	setup_timer_4( T4_DISABLED, 0, 1 );
+	setup_timer_0( T0_OFF );
 }
 
 
 void coil_sleep()
 {
-	disable_interrupts(INT_TIMER4);
+	disable_interrupts(INT_TIMER0);
 	while( coil_internal.is_active );
 }
 
 
 void coil_wakeup()
 {
-	enable_interrupts(INT_TIMER4);
+	clear_interrupt( INT_TIMER0 );
+	set_timer0( -coil.pulse_period );
+	enable_interrupts( INT_TIMER0 );
 }
 
 
@@ -105,9 +95,10 @@ void coil_pulse()
 }
 
 
-#int_timer4
+#int_timer0
 void coil_pulse_and_read()
 {
+	set_timer0( -coil.pulse_period );
 	coil_internal.is_active = 1;
 	coil_pulse();
 	adc_read_async( coil_internal.read_channel,

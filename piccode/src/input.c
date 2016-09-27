@@ -4,7 +4,6 @@
 #include "inbuttons.h"
 
 
-
 void in_init()
 {
 	output_low(PI_CHARLIEPLEX_SWITCH_1_PIN);
@@ -18,10 +17,15 @@ void in_init()
 
 	RBPU = 0; //Enable pull-up resistors on PORT B
 	WPUB = PI_BUTTON_PULLUP_RESISTORS; //Enable pull-ups for buttons
-
-	setup_timer_0(T0_INTERNAL | T0_DIV_256 | T0_8_BIT);
-	set_timer0(IN_TIMER_INIT_TIME);
-	enable_interrupts(INT_TIMER0);
+	
+	//At 4Mhz instruction frequency (ClockF=16Mhz/4): it increments every 4us
+	//	With post scaler: generate an interrupt every 16 periods:
+	//		Resolution: 64us
+	//		Min period: 64us (15.625 KHz) 
+	//		Max period: 255*64us = 16.320 ms (61Hz)
+	//	For 8 counts period, it interrupts every 512us
+	setup_timer_4( T4_DIV_BY_16, (IN_ENCODER_SCAN_PERIOD_US/64)-1, 16 );
+	enable_interrupts(INT_TIMER4);
 }
 
 
@@ -71,12 +75,10 @@ int8 in_read_charlieplex_inputs()
 
 
 
-#int_timer0
-void isr_timer0()
+#int_timer4
+void in_read_inputs()
 {
 	static int8 counter = 0;
-	
-	set_timer0(IN_TIMER_INIT_TIME);
 	
 	if ( (counter++ & 0x07) == 0 ) {
 		int8 current_states = in_read_charlieplex_inputs();

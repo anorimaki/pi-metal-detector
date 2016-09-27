@@ -21,6 +21,10 @@ void cnf_load() {
 	coil.zero = INITIAL_SAMPLE_ZERO_POINT;
 	
 	coil.auto_zero_threshold = 10;
+	
+	coil.samples_history_size_log = 6;
+	
+	coil.pulse_period = 5000/64;			    //In 64us steps
 }
 
 
