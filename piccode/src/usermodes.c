@@ -65,7 +65,7 @@ void mode_execute_current()
 
 #define MAIN_LOOP_PAUSE						5		//In ms
 
-#define MAIN_READ_BATTERY_PERIOD			10000	//In ms
+#define MAIN_READ_BATTERY_PERIOD			30000	//In ms
 #define MAIN_READ_BATTERY_COUNTER \
 		(MAIN_READ_BATTERY_PERIOD/MAIN_LOOP_PAUSE)
 
@@ -119,7 +119,7 @@ void mode_main()
 			battery_volts = battery_read_volts();
 			coil_wakeup();
 			read_battery_counter = MAIN_READ_BATTERY_COUNTER;
-		}
+		} 
 
 		delay_ms( MAIN_LOOP_PAUSE );
 	}

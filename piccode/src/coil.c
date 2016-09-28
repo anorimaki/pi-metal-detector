@@ -90,7 +90,7 @@ void coil_pulse()
 		//It's strange a delay in a ISR but it's the only way to ensure an 
 		//accurate pulse length without usign interrupts priorities.
 	output_high(PI_COIL_CTRL_PIN);
-	delay_us(coil.pulse_length);		
+	delay_us(coil.pulse_length);
 	output_low(PI_COIL_CTRL_PIN);
 }
 

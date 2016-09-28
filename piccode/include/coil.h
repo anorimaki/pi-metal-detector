@@ -16,7 +16,7 @@
 // http://chemelec.com/Projects/Metal-AV/Metal-AV.htm
 // 'The Present Frequency of Operation is 300 Hz.'
 #define COIL_MAX_PULSE_PERIOD           1000000	//In us
-#define COIL_MIN_PULSE_PERIOD           100		//In us
+#define COIL_MIN_PULSE_PERIOD           600		//In us
 #define COIL_PULSE_PERIOD_STEP_LOG		6
 #define COIL_PULSE_PERIOD_STEP  \
 			(1<<COIL_PULSE_PERIOD_STEP_LOG)		//In us (timer0 period, 64us)
