@@ -23,15 +23,15 @@ void adc_init()
 					PI_BATTERY_VOLTAGE_AN,
 					VSS_VDD);
 	setup_adc(ADC_OFF);
-	disable_interrupts(INT_AD);
-	disable_interrupts(INT_TIMER3);
+	enable_interrupts(INT_AD);
+//	disable_interrupts(INT_AD);
+	disable_interrupts(INT_TIMER1);
 	
 //	output_low( INDICATOR_PIN );
 //	output_drive( INDICATOR_PIN );
 	
 	//At 4Mhz instruction frequency (ClockF=16Mhz/4), it increments evey us.
 	setup_timer_1( T1_INTERNAL| T1_DIV_BY_4 );
-	TMR1ON = 0;		//Stops timer1 but it's already configured
 	
 	//Automatic adqusition time disabled
 	//TAD: 1us for a 16Mhz clock
@@ -55,13 +55,11 @@ void adc_init()
 #int_ad
 void isr_adc()
 {
-	TMR1ON = 0;			//Stops timer1
-
 	adc_internal.last_value = read_adc(ADC_READ_ONLY);
 	if ( adc_internal.last_value & 0x8000 ) {
 		adc_internal.last_value = 0;		//Avoid negative values
 	}
-	disable_interrupts(INT_AD);
+	//disable_interrupts(INT_AD);
 	setup_adc(ADC_OFF);
 	if ( adc_read_callback != 0 ) {
 		(*adc_read_callback)( adc_internal.last_value );
@@ -89,12 +87,11 @@ int16 adc_read( int8 channel )
 void adc_read_async( int8 channel, int8 delay ) 
 {
 	ADCON0 = (channel << 2);			//Select channel
-	ADON=1;								//Turn on ADC module
 
-	enable_interrupts(INT_AD);
+//	enable_interrupts(INT_AD);
 
 	set_timer1( 0xFF00 | -delay );
-	TMR1ON = 1;						//Start timer1
+	ADON = 1;						//Turn on ADC module
 
 //read_adc(ADC_START_ONLY);			//Do not start read. Read will be started 
 									//when timer1 reach 0

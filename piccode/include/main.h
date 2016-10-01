@@ -61,6 +61,8 @@
 #endif
 
 #DEVICE ADC=12
+#DEVICE HIGH_INTS=TRUE
+
 
 /*
  * Timer assigmnets:

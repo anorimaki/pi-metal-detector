@@ -3,12 +3,30 @@
 
 #define COIL_MAX_ADC_VALUE              4095
 
-#define COIL_MAX_SAMPLE_DELAY           50		//In us
+//Time spent in microcontroller instructions (measured with Proteus-Isis). This
+// is the time between PI_COIL_CTRL_PIN goes down and ADC starts minus the 
+// programed time in Timer1 (ADC starts with Timer1 Special Event Trigger).
+//Most of the instructions are in ADC channel selection, ADC turn on and Timer1
+// value calculation.
+#define COIL_SAMPLE_DELAY_CORRECTION	5		//In us 
+
+//Times in us with COIL_SAMPLE_DELAY_CORRECTION
+#define COIL_MAX_SAMPLE_DELAY           50-COIL_SAMPLE_DELAY_CORRECTION		//In us
 #define COIL_MIN_SAMPLE_DELAY           0		//in us
+
 #define COIL_CALCULATE_MIN_ZERO_DELAY   COIL_MAX_SAMPLE_DELAY*4		//in us
 
-#define COIL_MAX_PULSE_TIME             500		//In us
-#define COIL_MIN_PULSE_TIME             10		//in us
+//Time spent in microcontroller instructions (measured with Proteus-Isis). This
+// is the time between PI_COIL_CTRL_PIN goes up and PI_COIL_CTRL_PIN goes down 
+// minus the programed time in Timer1.
+//Most of the instructions are in generated PIC-C code for interrupt
+//dispatcher (save registers and discover specific interrupt).
+#define COIL_PULSE_LENGTH_CORRECTION    11		//in us
+
+//Times in us with COIL_PULSE_LENGTH_CORRECTION
+#define COIL_MAX_PULSE_LENGTH   (500-COIL_PULSE_LENGTH_CORRECTION) //In us
+#define COIL_MIN_PULSE_LENGTH   (20-COIL_PULSE_LENGTH_CORRECTION)  //In us
+
 
 ///http://www.whiteselectronics.com/media/wysiwyg/SurfPI_SurfMII_FieldEval_EngReport.pdf
 // 'Pi detectors tipically operate in the range of 100 pulses per second'

@@ -84,23 +84,25 @@ void coil_wakeup()
 }
 
 
-#inline
-void coil_pulse()
-{		//This code is executed in a ISR.
-		//It's strange a delay in a ISR but it's the only way to ensure an 
-		//accurate pulse length without usign interrupts priorities.
+#int_timer0
+void coil_start_pulse()
+{
+	set_timer0( -coil.pulse_period );
+	
+	coil_internal.is_active = 1;
+
+	set_timer1( -coil.pulse_length );
+	clear_interrupt( INT_TIMER1 );
+	enable_interrupts( INT_TIMER1 );
 	output_high(PI_COIL_CTRL_PIN);
-	delay_us(coil.pulse_length);
-	output_low(PI_COIL_CTRL_PIN);
 }
 
 
-#int_timer0
-void coil_pulse_and_read()
+#int_timer1 HIGH
+void coil_end_pulse()
 {
-	set_timer0( -coil.pulse_period );
-	coil_internal.is_active = 1;
-	coil_pulse();
+	output_low(PI_COIL_CTRL_PIN);
+	disable_interrupts( INT_TIMER1 );
 	adc_read_async( coil_internal.read_channel,
 				coil_internal.working_read_delay ); 
 }

@@ -28,7 +28,7 @@ void mode_setup_pulse()
 	
 	dsp_setup_coil_pulse_init();
 	
-	encoder_set_increment( COIL_MIN_PULSE_TIME, COIL_MAX_PULSE_TIME,
+	encoder_set_increment( COIL_MIN_PULSE_LENGTH, COIL_MAX_PULSE_LENGTH,
 						 INCREMENT_AUTO_RATE );
 	
 	int16 read_reference_counter = SETUP_PULSE_READ_REFERENCE_COUNTER;
