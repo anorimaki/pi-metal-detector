@@ -104,8 +104,8 @@ inline void update_squared_sums()
 		int32* sq_value_ptr = &samples.sq_values;
 		int16* value_ptr = &samples.values;
 		for( int8 i=0; i<samples.size; ++i, ++value_ptr, ++sq_value_ptr ) {
-			int32 value = *value_ptr;
-			int32 sq_value = value*value;
+			int16 value = *value_ptr;
+			int32 sq_value = _mul( value, value );
 			*sq_value_ptr = sq_value;
 			samples.sq_sum += sq_value;
 		}
@@ -115,12 +115,12 @@ inline void update_squared_sums()
 	}
 	
 	int32* sq_value_ptr = &samples.sq_values + samples.sq_position;
-	int16 value_ptr = &samples.values + samples.sq_position;
+	int16* value_ptr = &samples.values + samples.sq_position;
 	while( samples.position != samples.sq_position ) {
 		int32 pulled_value = *sq_value_ptr;
 		
-		int32 value = *value_ptr;
-		int32 sq_value = value*value;
+		int16 value = *value_ptr;
+		int32 sq_value = _mul( value, value );
 		*sq_value_ptr = sq_value;
 		samples.sq_sum += sq_value;
 		
@@ -162,16 +162,12 @@ inline void update_squared_sums()
  */
 int32 samples_variance() 
 {
+	int32 sq_mean = _mul( samples.mean, samples.mean );
+	
 	update_squared_sums();
-	
-	int32 aux = samples.sum >> 1;	//Divide before square to avoid overflows
-	aux = (aux*aux); 
-	aux >>= (samples.size_log-2);
-	
-	aux = samples.sq_sum - aux;
-	aux >>= samples.size_log;
-	
-	return aux;
+	int32 aux = samples.sq_sum >> samples.size_log;
+
+	return aux - sq_mean;
 }
 
 
@@ -197,7 +193,7 @@ int16 samples_efficiency()
 		return SAMPLES_UNDEFINED_VALUE;
 	}
 	
-	int32 sq_mean = samples.mean * samples.mean;
+	int32 sq_mean = _mul( samples.mean, samples.mean );
 	int32 var = samples_variance();
 	
 	var <<= (EFFICIENCY_SCALE_FACTOR/2);
