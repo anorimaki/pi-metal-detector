@@ -24,7 +24,6 @@ void adc_init()
 					VSS_VDD);
 	setup_adc(ADC_OFF);
 	enable_interrupts(INT_AD);
-//	disable_interrupts(INT_AD);
 	disable_interrupts(INT_TIMER1);
 	
 //	output_low( INDICATOR_PIN );
@@ -59,7 +58,6 @@ void isr_adc()
 	if ( adc_internal.last_value & 0x8000 ) {
 		adc_internal.last_value = 0;		//Avoid negative values
 	}
-	//disable_interrupts(INT_AD);
 	setup_adc(ADC_OFF);
 	if ( adc_read_callback != 0 ) {
 		(*adc_read_callback)( adc_internal.last_value );
@@ -69,6 +67,7 @@ void isr_adc()
 
 int16 adc_read( int8 channel ) 
 {
+#if 1
 	AdcReadCallback callback = adc_read_callback;
 	adc_read_callback = 0;
 	
@@ -79,16 +78,32 @@ int16 adc_read( int8 channel )
 	adc_read_callback = callback;
 	
 	return adc_internal.last_value;
+#else
+	TMR1ON = 0;
+	channel <<= 2;
+	ADCON0 = channel;
+	ADON = 1;
+	disable_interrupts(INT_AD);
+	
+	delay_us(3);
+	
+	int16 ret = read_adc( ADC_START_AND_READ );
+	
+	enable_interrupts(INT_AD);
+	setup_adc(ADC_OFF);
+	TMR1ON = 1;
+	
+	return ret;
+#endif
 }
 
 
-// delay must be greater than 0! CCP_1 ca not be 
+// delay must be greater than 0!
 // This is not the true delay. It must be added the overhead of ADC setup.
 void adc_read_async( int8 channel, int8 delay ) 
 {
-	ADCON0 = (channel << 2);			//Select channel
-
-//	enable_interrupts(INT_AD);
+	channel <<= 2;
+	ADCON0 = channel;				//Select channel
 
 	set_timer1( 0xFF00 | -delay );
 	ADON = 1;						//Turn on ADC module

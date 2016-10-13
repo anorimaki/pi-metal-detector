@@ -63,7 +63,7 @@ void mode_execute_current()
 // Sampling state: Normal operation state
 //
 
-#define MAIN_LOOP_PAUSE						5		//In ms
+#define MAIN_LOOP_PAUSE						1		//In ms
 
 #define MAIN_READ_BATTERY_PERIOD			30000	//In ms
 #define MAIN_READ_BATTERY_COUNTER \

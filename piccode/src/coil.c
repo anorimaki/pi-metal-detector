@@ -11,13 +11,15 @@ struct Coil coil;
 
 void coil_add_value( int16 value ) ;
 void coil_add_invert_value( int16 value ) ;
-void coil_begin( int8 channel, int8 read_delay, int1 invert_signal );
+void coil_begin( int8 channel, int16 pulse_period, 
+				int8 read_delay, int1 invert_signal );
 
 
 struct
 {
 	int8 read_channel;
-	int8 working_read_delay;			//In us
+	int8 working_read_delay;		//In us
+	int16 working_pulse_period;		//In timer0 steps (64us)
 	int16 last_value;
 	int1 is_active;
 	int1 invert_signal;
@@ -33,20 +35,23 @@ void coil_init()
 
 void coil_read_decay_begin()
 {
-	coil_begin( PI_DECAY_SIGNAL_CH, coil.sample_delay, 1 );
+	coil_begin( PI_DECAY_SIGNAL_CH, coil.pulse_period, coil.sample_delay, 1 );
 }
 
 
 void coil_read_peak_begin()
 {
-	coil_begin( PI_COIL_VOLTAGE_CH, 2, 0 );
+	coil_begin( PI_COIL_VOLTAGE_CH, COIL_READ_PEAK_PULSE_PERIOD_COUNT,
+			 COIL_READ_PEAK_SAMPLE_DEPLAY, 0 );
 }
 
 
-void coil_begin( int8 channel, int8 read_delay, int1 invert_signal )
+void coil_begin( int8 channel, int16 pulse_period,
+				int8 read_delay, int1 invert_signal )
 {
 	coil_internal.read_channel = channel;
 	coil_internal.working_read_delay = read_delay;
+	coil_internal.working_pulse_period = pulse_period;
 	coil_internal.is_active = 0;
 	
 	samples_init( coil.samples_history_size_log );
@@ -78,8 +83,8 @@ void coil_sleep()
 
 void coil_wakeup()
 {
+	set_timer0( -coil_internal.working_pulse_period );
 	clear_interrupt( INT_TIMER0 );
-	set_timer0( -coil.pulse_period );
 	enable_interrupts( INT_TIMER0 );
 }
 
@@ -87,7 +92,7 @@ void coil_wakeup()
 #int_timer0
 void coil_start_pulse()
 {
-	set_timer0( -coil.pulse_period );
+	set_timer0( -coil_internal.working_pulse_period );
 	
 	coil_internal.is_active = 1;
 
@@ -130,17 +135,6 @@ int1 coil_fetch_result()
 	coil.result.value = coil_internal.last_value;
 	enable_interrupts( INT_AD );
 	return coil.result.noise != SAMPLES_UNDEFINED_VALUE;
-}
-
-
-void coil_set_pulse_period( int16 pulse_period )
-{
-	if ( pulse_period == coil.pulse_period )
-		return;
-	coil_sleep();
-	samples_init( coil.samples_history_size_log );
-	coil.pulse_period = pulse_period;
-	coil_wakeup();
 }
 
 

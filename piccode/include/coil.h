@@ -43,6 +43,12 @@
 #define COIL_MIN_PULSE_PERIOD_COUNT	\
 			(COIL_MIN_PULSE_PERIOD/COIL_PULSE_PERIOD_STEP)
 
+//Fixed values for read peak coil voltages
+#define COIL_READ_PEAK_PULSE_PERIOD		20000       //In us
+#define COIL_READ_PEAK_PULSE_PERIOD_COUNT	\
+           (COIL_READ_PEAK_PULSE_PERIOD/COIL_PULSE_PERIOD_STEP)
+#define COIL_READ_PEAK_SAMPLE_DEPLAY	1			//In us
+
 struct CoilResult 
 {
     int16 value;
@@ -77,9 +83,6 @@ void coil_end();
 //
 //  Function access coil parameters: Use them!
 //
-void coil_set_pulse_period( int16 pulse_period /*in us*/ );
-#define coil_get_pulse_period() (coil.pulse_period)
-
 void coil_set_pulse_length( int16 pulse_length /*in us*/ );
 #define coil_get_pulse_length() (coil.pulse_length)
 
