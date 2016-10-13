@@ -8,11 +8,11 @@
 // programed time in Timer1 (ADC starts with Timer1 Special Event Trigger).
 //Most of the instructions are in ADC channel selection, ADC turn on and Timer1
 // value calculation.
-#define COIL_SAMPLE_DELAY_CORRECTION	5		//In us 
+#define COIL_SAMPLE_DELAY_CORRECTION	6		//In us 
 
 //Times in us with COIL_SAMPLE_DELAY_CORRECTION
-#define COIL_MAX_SAMPLE_DELAY           50-COIL_SAMPLE_DELAY_CORRECTION		//In us
-#define COIL_MIN_SAMPLE_DELAY           0		//in us
+#define COIL_MAX_SAMPLE_DELAY           80-COIL_SAMPLE_DELAY_CORRECTION		//In us
+#define COIL_MIN_SAMPLE_DELAY           1		//in us
 
 #define COIL_CALCULATE_MIN_ZERO_DELAY   COIL_MAX_SAMPLE_DELAY*4		//in us
 

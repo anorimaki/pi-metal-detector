@@ -30,7 +30,7 @@ void mode_setup_pulse()
 	int8 update_display_counter = SETUP_PULSE_UPDATE_DISPLAY_COUNTER;
 	
 	delay_us( COIL_READ_PEAK_PULSE_PERIOD );
-	int16 reference_5v = coil_peak_ref();
+	int16 reference_5v = 28;
 	
 	coil_read_peak_begin();
 	
@@ -48,8 +48,8 @@ void mode_setup_pulse()
 		
 		if ( coil_fetch_result() && (--read_reference_counter == 0) ) {
 			coil_sleep();
-			delay_us( COIL_READ_PEAK_PULSE_PERIOD );
-			reference_5v = coil_peak_ref();
+			delay_us( COIL_READ_PEAK_PULSE_PERIOD/2 );
+		//	reference_5v = coil_peak_ref();
 			coil_wakeup();
 			read_reference_counter = SETUP_PULSE_READ_REFERENCE_COUNTER;
 		}

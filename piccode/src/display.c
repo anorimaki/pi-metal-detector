@@ -374,7 +374,8 @@ void dsp_setup_sample_delay( int16 signal, int16 noise_estimation, int1 mode )
 	
 	lcd_gotoxy( 1, 2 );
 	printf( lcd_putc, "Del " );
-	dsp_range_line( 2, 3, 4, 12, coil.sample_delay, 
+	dsp_range_line( 2, 3, 4, 12, 
+				coil.sample_delay-COIL_MIN_SAMPLE_DELAY, 
 				COIL_MAX_SAMPLE_DELAY-COIL_MIN_SAMPLE_DELAY );
 	printf(lcd_putc, "%2uus",
 				coil.sample_delay + COIL_SAMPLE_DELAY_CORRECTION);
@@ -429,7 +430,8 @@ void dsp_setup_coil_pulse(int16 measure, int16 reference_5v, int1 mode)
 	
 	lcd_gotoxy( 1, 2 );
 	printf( lcd_putc, "Pul " );
-	dsp_range_line( 2, 3, 4, 11, coil.pulse_length,
+	dsp_range_line( 2, 3, 4, 11, 
+				 coil.pulse_length-COIL_MIN_PULSE_LENGTH,
 				 COIL_MAX_PULSE_LENGTH-COIL_MIN_PULSE_LENGTH );
 	printf(lcd_putc, "%3Luus", coil.pulse_length +
 								COIL_PULSE_LENGTH_CORRECTION);
