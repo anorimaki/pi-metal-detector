@@ -23,7 +23,7 @@ void in_init()
 	//		Resolution: 64us
 	//		Min period: 64us (15.625 KHz) 
 	//		Max period: 255*64us = 16.320 ms (61Hz)
-	//	For 8 counts period, it interrupts every 512us
+	//	For 30 counts period, it interrupts every ~ 2ms
 	setup_timer_4( T4_DIV_BY_16, (IN_ENCODER_SCAN_PERIOD_US/64)-1, 16 );
 	enable_interrupts(INT_TIMER4);
 }

@@ -7,22 +7,23 @@
 ///////////////////////////////////////////////////////////////
 // Encoder
 ///////////////////////////////////////////////////////////////
-#define ENCODER_STATE_IDLE		0
+#define ENCODER_STATE_IDLE      0
 #define ENCODER_STATE_INC		1
 #define ENCODER_STATE_DEC		2
 #define ENCODER_STATE_UP		3
-#define ENCODER_STATE_DOWN		4
+#define ENCODER_STATE_DOWN      4
 
-#define ENCODER_MAX_ACCUMULATED_SPEED	0x7FFF
-#define ENCODER_MIN_ACCUMULATED_SPEED	0x8000
+#define ENCODER_MAX_ACCUMULATED_SPEED   0x7FFF
+#define ENCODER_MIN_ACCUMULATED_SPEED   0x8000
 
-#define ENCODER_INITIAL_SPEED	8
+#define ENCODER_INITIAL_SPEED   8
 
-struct InEncoder {
+struct InEncoder
+{
 	int8 state;
-	int16 time_periods;		//Time counter from last encoder read.
-	signed int8 pulses;		//Pulse counter from last encoder read.
-	int8 losses;			//Error counter from last encoder read.
+	int16 time_periods; //Time counter from last encoder read.
+	signed int8 pulses; //Pulse counter from last encoder read.
+	int8 losses; //Error counter from last encoder read.
 };
 
 struct InEncoder encoder;
@@ -34,95 +35,99 @@ struct
 	int16 rate;
 } encoder_settings;
 
-
-void encoder_update( int1 channelA, int1 channelB ) 
+void encoder_update(int1 channelA, int1 channelB)
 {
-	encoder.time_periods++;
-	
-	if  ( channelA == channelB ) {
-		if ( encoder.state == ENCODER_STATE_INC ) {
+	++encoder.time_periods;
+
+	if (channelA == channelB) {
+		if (encoder.state == ENCODER_STATE_INC) {
 			encoder.pulses++;
 		}
-		else if ( encoder.state == ENCODER_STATE_DEC ) {
+		else if (encoder.state == ENCODER_STATE_DEC) {
 			encoder.pulses--;
 		}
-		encoder.state = channelA ? ENCODER_STATE_UP : ENCODER_STATE_DOWN ;
+		encoder.state = channelA ? ENCODER_STATE_UP : ENCODER_STATE_DOWN;
 		return;
 	}
-	
-	if ( channelA ) {	//A && !B
-		if ( encoder.state == ENCODER_STATE_UP ) {
-			encoder.state = ENCODER_STATE_DEC ;		//First change on B
+
+	if (channelA) { //A && !B
+		if (encoder.state == ENCODER_STATE_UP) {
+			encoder.state = ENCODER_STATE_DEC; //First change on B
 		}
-		else if ( encoder.state == ENCODER_STATE_DOWN ) {
-			encoder.state = ENCODER_STATE_INC ;		//First change on A
+		else if (encoder.state == ENCODER_STATE_DOWN) {
+			encoder.state = ENCODER_STATE_INC; //First change on A
 		}
 		return;
 	}
-	
-			//!A && B
-	if ( encoder.state == ENCODER_STATE_UP ) {
-		encoder.state = ENCODER_STATE_INC ;		//First change on A
+
+	//!A && B
+	if (encoder.state == ENCODER_STATE_UP) {
+		encoder.state = ENCODER_STATE_INC; //First change on A
 	}
-	else if ( encoder.state == ENCODER_STATE_DOWN ) {
-		encoder.state = ENCODER_STATE_DEC ;		//First change on B
+	else if (encoder.state == ENCODER_STATE_DOWN) {
+		encoder.state = ENCODER_STATE_DEC; //First change on B
 	}
 }
 
-
 void encoder_set_increment(int16 min, int16 max, int8 rate)
 {
-	disable_interrupts(INT_TIMER0);
-	encoder.time_periods=0;
-	encoder.pulses=0;
-	encoder.state=ENCODER_STATE_IDLE;
-	encoder.losses=0;
-	enable_interrupts(INT_TIMER0);
-	
+	disable_interrupts(INT_TIMER4);
+	encoder.time_periods = 0;
+	encoder.pulses = 0;
+	encoder.state = ENCODER_STATE_IDLE;
+	encoder.losses = 0;
+	enable_interrupts(INT_TIMER4);
+
 	encoder_settings.min = min;
 	encoder_settings.max = max;
 
 	if (rate == INCREMENT_AUTO_RATE) {
-		rate = ((max-min) / 100) + 1;
+		rate = ((max - min) / 200) + 1;
 	}
 	encoder_settings.rate = rate;
 }
 
 
-#define ENCODER_MIN_TIME_PERIODS 32		//~512us*32 = 16ms
+#define ENCODER_MIN_TIME_PERIODS 100      //2ms * 100 = 200ms
 
 int16 encoder_increment(int16 current)
 {
-	disable_interrupts(INT_TIMER0);
-	if( (encoder.time_periods < ENCODER_MIN_TIME_PERIODS) ||
-		(encoder.pulses==0) ) {
-		enable_interrupts(INT_TIMER0);
+	disable_interrupts(INT_TIMER4);
+	if (encoder.time_periods < ENCODER_MIN_TIME_PERIODS) {
+		enable_interrupts(INT_TIMER4);
 		return current;
 	}
-	signed int16 pulses = encoder.pulses;
-	int16 time_periods = encoder.time_periods;
-	encoder.time_periods=0;
-	encoder.pulses=0;
-	encoder.losses=0;
-	enable_interrupts(INT_TIMER0);
-	
-	int16 pulse_count = abs(pulses);
+	signed int8 pulses = encoder.pulses;
+	int8 time_periods = encoder.time_periods;
+	encoder.time_periods = 0;
+	encoder.pulses = 0;
+	encoder.losses = 0;
+	enable_interrupts(INT_TIMER4);
+
+	if (pulses == 0) {
+		return current;
+	}
+
+	int8 pulse_count = abs(pulses);
 
 	int16 increment = pulse_count;
-	if ( pulse_count!=1 ) {
-		increment <<= 6;
-		increment /= time_periods;
-		if ( pulse_count>increment ) {
-			increment = pulse_count;
-		}
-		if ( pulse_count != increment ) {
-			increment *= encoder_settings.rate;
-		}
+
+		//Calculate velocity. Apply factor of 32 before divide.
+	int8 velocity = (increment << 5) / time_periods;
+
+		//Adjust rate to velovity. Max velocity = 5
+	int16 rate = encoder_settings.rate >> CHECKED_SUB(5, velocity, 0);
+
+	++velocity;		//Min velociy = 1
+	increment = _mul((int8) velocity, pulse_count);
+
+	if (rate != 0) {
+		increment *= rate;
 	}
-	
-	if ( pulses>0 ) {
-		return CHECKED_ADD( current, increment, encoder_settings.max );
+
+	if (pulses > 0) {
+		return CHECKED_ADD(current, increment, encoder_settings.max);
 	}
-	return CHECKED_SUB( current, increment, encoder_settings.min );
+	return CHECKED_SUB(current, increment, encoder_settings.min);
 }
-	
+
