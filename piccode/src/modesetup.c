@@ -5,6 +5,7 @@
 #include "coil.h"
 #include "inbuttons.h"
 #include "inencoder.h"
+#include "config.h"
 
 
 #define SETUP_PULSE_LOOP_PAUSE				1		//In ms
@@ -29,6 +30,8 @@ void mode_setup_pulse()
 	int16 read_reference_counter = SETUP_PULSE_READ_REFERENCE_COUNTER;
 	int8 update_display_counter = SETUP_PULSE_UPDATE_DISPLAY_COUNTER;
 	
+	int16 initial_pulse_length = coil_get_pulse_length();
+	
 	delay_us( COIL_READ_PEAK_PULSE_PERIOD );
 	int16 reference_5v = 28;
 	
@@ -41,6 +44,9 @@ void mode_setup_pulse()
 		}
 		else if ( mode_button != NO_MODE_BUTTON ) {
 			coil_end();
+			if ( initial_pulse_length != coil_get_pulse_length() ) {
+				cnf_save_pulse_length();
+			}
 			return;
 		}
 		
@@ -80,11 +86,16 @@ void mode_setup_autozero_threshold()
 	int16 noise = 0;
 	int8 update_display_counter = SETUP_AUTOZERO_THRES_DISPLAY_COUNTER;
 	
+	int16 initial_auto_zero_threshold = coil.auto_zero_threshold;
+	
 	coil_read_decay_begin();
 
 	while (TRUE) {
 		if ( mode_changed() ) {
 			coil_end();
+			if ( initial_auto_zero_threshold != coil.auto_zero_threshold ) {
+				cnf_save_zero_threshold();
+			}
 			return;
 		}
 		
@@ -100,7 +111,6 @@ void mode_setup_autozero_threshold()
 			noise = coil.result.noise;
 		
 		if ( --update_display_counter == 0 ) {
-				//Only update user interface every 8 loops
 			dsp_setup_autozero_threshold( noise );
 			noise = 0;
 			update_display_counter = SETUP_AUTOZERO_THRES_DISPLAY_COUNTER;
@@ -127,8 +137,18 @@ void mode_setup_response_time()
 	encoder_set_increment( COIL_MIN_PULSE_PERIOD_COUNT, 
 						COIL_MAX_PULSE_PERIOD_COUNT, INCREMENT_AUTO_RATE );
 	
+	int16 initial_pulse_period = coil.pulse_period;
+	int8 initial_samples_history_size_log = coil.samples_history_size_log;
+	
 	while (TRUE) {
 		if ( mode_changed() ) {
+			if ( initial_pulse_period != coil.pulse_period ) {
+				cnf_save_pulse_period();
+			}
+			if ( initial_samples_history_size_log != 
+					coil.samples_history_size_log ) {
+				cnf_save_history_size();
+			}
 			return;
 		}
 		

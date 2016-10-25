@@ -10,10 +10,11 @@
 
 
 void cnf_load();
-void cnf_save_coil_pulse();
+void cnf_save_pulse_period();
+void cnf_save_pulse_length();
 void cnf_save_start_sample_delay();
-void cnf_save_sample_time();
-void cnf_save_start_second_sample_delay();
+void cnf_save_zero_threshold();
+void cnf_save_history_size();
 
 #endif	/* CONFIG_H */
 

@@ -5,6 +5,7 @@
 #include "inencoder.h"
 #include "coil.h"
 #include "mathutil.h"
+#include "config.h"
 
 int16 autoset_delay_signals[DSP_AUTOSET_DELAY_MAX_LINES];
 
@@ -74,6 +75,8 @@ void mode_setup_delay()
 	
 	int8 update_display_counter = SETUP_DELAY_UPDATE_DISPLAY_COUNTER;
 	
+	int16 initial_read_delay = coil_get_read_delay();
+	
 	encoder_set_increment( COIL_MIN_SAMPLE_DELAY, COIL_MAX_SAMPLE_DELAY,
 						INCREMENT_AUTO_RATE );
 	
@@ -86,6 +89,9 @@ void mode_setup_delay()
 		}
 		else if ( mode_button != NO_MODE_BUTTON ) {
 			coil_end();
+			if ( initial_read_delay != coil_get_pulse_length() ) {
+				cnf_save_start_sample_delay();
+			}
 			return;
 		}
 		
@@ -93,6 +99,9 @@ void mode_setup_delay()
 			int8 autoset_value = mode_autoset_sample_delay();
 			if ( autoset_value == 0xFF ) {
 				coil_end();
+				if ( initial_read_delay != coil_get_pulse_length() ) {
+					cnf_save_start_sample_delay();
+				}
 				return;
 			}
 			coil_set_read_delay( autoset_value );

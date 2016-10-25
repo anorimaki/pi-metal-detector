@@ -11,28 +11,28 @@
 
 #use rs232( UART2, baud=9600, parity=N, bits=8 )
 
-void init() {
-	set_tris_a( 0xFFFF );      //All inputs by default
-    set_tris_b( 0xFFFF );      //All inputs by default
-    set_tris_c( 0xFFFF );      //All inputs by default
-    
+void init()
+{
+	set_tris_a(0xFFFF); //All inputs by default
+	set_tris_b(0xFFFF); //All inputs by default
+	set_tris_c(0xFFFF); //All inputs by default
+
 	adc_init();
 	coil_init();
 	tone_init();
-    in_init();
+	in_init();
 	buttons_init();
 	dsp_init();
 	mode_init();
-    
-    enable_interrupts(GLOBAL);
+
+	enable_interrupts(GLOBAL);
 }
 
-
-void init_calibration() 
+void init_calibration()
 {
 	tone_begin();
 	coil_read_decay_begin();
-	
+
 	int1 stable_result = 0;
 	int16 sample = COIL_MAX_ADC_VALUE;
 	coil.zero = 0;
@@ -41,31 +41,29 @@ void init_calibration()
 		sample = coil.result.value;
 		tone_apply(sample);
 		coil.zero += 2;
-		delay_ms( 3 );
+		delay_ms(3);
 	}
 	while( !stable_result ) {
 		stable_result = coil_fetch_result();
 	}
-	
+
 	coil.auto_zero_threshold = coil.result.noise;
 	coil.zero = coil.result.value + coil.auto_zero_threshold;
-	
+
 	coil_end();
 	tone_end();
 }
 
-
-
 void main()
 {
-    init();
-    
-    dsp_hello();
+	init();
+
+	dsp_hello();
 	delay_ms(500);
 	cnf_load();
 	init_calibration();
-	
-	while( TRUE ) {
+
+	while (TRUE) {
 		mode_execute_current();
 	}
 }
