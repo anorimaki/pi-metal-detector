@@ -17,7 +17,6 @@ struct
 	int8 sq_position;
 	int32 sq_sum;
 	int1 recalculate_sq_values;
-	int32* sq_values_last;
 } samples;
 
 #define SQ_VALUES_ADDR(pos) *(int32*)(((int8*)&samples.sq_values) + (pos<<2))
@@ -43,7 +42,6 @@ void samples_init( int8 size_log )
 {
 	samples.size_log = size_log;
 	samples.size = 1 << size_log;
-	samples.sq_values_last = &samples.sq_values + samples.size;
 
 	int16* values_ptr = &samples.values;
 	int32* sq_values_ptr = &samples.sq_values;
@@ -62,7 +60,10 @@ void samples_init( int8 size_log )
 	samples.recalculate_sq_values = 0;
 }
 
-
+#inline
+int8 samples_size_log() {
+	return samples.size_log;
+}
 
 
 // To avoid overflow in sum_sq,

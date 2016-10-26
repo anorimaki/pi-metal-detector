@@ -92,8 +92,13 @@ void coil_set_read_delay( int8 delay /*in us*/ );
 
 //Only change the delay applied to current coil actions but not the coil 
 //configuration. An other call to coil_read_decay_begin() will use
-//value from configuration and not the value set with this function
+//value from configuration and not the value set with this function.
 void coil_set_working_read_delay( int8 delay );
+
+//Only change the samples history size applied to current coil actions 
+//but not the coil configuration. An other call to coil_read_decay_begin() 
+//will use value from configuration and not the value set with this function.
+void coil_set_working_samples_history_size_log( int8 size_log );
 
 //
 // Function to make coil results accesible. Returns 1 if result has enought

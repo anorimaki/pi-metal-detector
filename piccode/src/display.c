@@ -519,7 +519,7 @@ void dsp_coil_period_step_to_time( int32 steps )
 	{
 		dsp_coil_period_step_to_time_data.unit = DSP_TIME_UNIT_MS;
 		
-		//Should be steps*64/1000 but steps*64/1024 it's a good approximation.
+		//Should be steps*64/1000 but steps*64/1024 is a good approximation.
 		//steps*64/1024 = coil.steps*2^6/2^10 = steps*2^(10-6)
 		dsp_coil_period_step_to_time_data.value =
 							steps>>DSP_PULSE_PERIOD_MS_FACTOR;

@@ -12,14 +12,17 @@ struct Coil coil;
 void coil_add_value( int16 value ) ;
 void coil_add_invert_value( int16 value ) ;
 void coil_begin( int8 channel, int16 pulse_period, 
-				int8 read_delay, int1 invert_signal );
+				int8 read_delay, int8 samples_history_size_log,
+				int1 invert_signal );
 
 
 struct
 {
+	struct {
+		int16 pulse_period;             //In timer0 steps (64us)
+		int8 sample_delay;              //In us after coil pulse ends
+	} current;
 	int8 read_channel;
-	int8 working_read_delay;		//In us
-	int16 working_pulse_period;		//In timer0 steps (64us)
 	int16 last_value;
 	int1 is_active;
 	int1 invert_signal;
@@ -35,26 +38,28 @@ void coil_init()
 
 void coil_read_decay_begin()
 {
-	coil_begin( PI_DECAY_SIGNAL_CH, coil.pulse_period, coil.sample_delay, 1 );
+	coil_begin( PI_DECAY_SIGNAL_CH, coil.pulse_period, coil.sample_delay, 
+			 coil.samples_history_size_log, 1 );
 }
 
 
 void coil_read_peak_begin()
 {
 	coil_begin( PI_COIL_VOLTAGE_CH, COIL_READ_PEAK_PULSE_PERIOD_COUNT,
-			 COIL_READ_PEAK_SAMPLE_DEPLAY, 0 );
+			 COIL_READ_PEAK_SAMPLE_DEPLAY, coil.samples_history_size_log, 0 );
 }
 
 
 void coil_begin( int8 channel, int16 pulse_period,
-				int8 read_delay, int1 invert_signal )
+				int8 read_delay, int8 samples_history_size_log,
+				int1 invert_signal )
 {
 	coil_internal.read_channel = channel;
-	coil_internal.working_read_delay = read_delay;
-	coil_internal.working_pulse_period = pulse_period;
+	coil_internal.current.sample_delay = read_delay;
+	coil_internal.current.pulse_period = pulse_period;
 	coil_internal.is_active = 0;
 	
-	samples_init( coil.samples_history_size_log );
+	samples_init( samples_history_size_log );
 	
 	if ( invert_signal )
 		adc_read_callback = coil_add_invert_value;
@@ -83,7 +88,7 @@ void coil_sleep()
 
 void coil_wakeup()
 {
-	set_timer0( -coil_internal.working_pulse_period );
+	set_timer0( -coil_internal.current.pulse_period );
 	clear_interrupt( INT_TIMER0 );
 	enable_interrupts( INT_TIMER0 );
 }
@@ -92,7 +97,7 @@ void coil_wakeup()
 #int_timer0
 void coil_start_pulse()
 {
-	set_timer0( -coil_internal.working_pulse_period );
+	set_timer0( -coil_internal.current.pulse_period );
 	
 	coil_internal.is_active = 1;
 
@@ -109,7 +114,7 @@ void coil_end_pulse()
 	output_low(PI_COIL_CTRL_PIN);
 	disable_interrupts( INT_TIMER1 );
 	adc_read_async( coil_internal.read_channel,
-				coil_internal.working_read_delay ); 
+				coil_internal.current.sample_delay ); 
 }
 
 #define COIL_ADD_VALUE_IMPL(value) \
@@ -143,7 +148,7 @@ void coil_set_pulse_length( int16 pulse_length )
 	if ( pulse_length == coil.pulse_length )
 		return;
 	coil_sleep();
-	samples_init( coil.samples_history_size_log );
+	samples_init( samples_size_log() );
 	coil.pulse_length = pulse_length;
 	coil_wakeup();
 }
@@ -158,11 +163,19 @@ void coil_set_read_delay( int8 delay )
 
 void coil_set_working_read_delay( int8 delay )
 {
-	if ( delay == coil_internal.working_read_delay )
+	if ( delay == coil_internal.current.sample_delay )
 		return;
 	coil_sleep();
-	samples_init( coil.samples_history_size_log );
-	coil_internal.working_read_delay = delay;
+	samples_init( samples_size_log() );
+	coil_internal.current.sample_delay = delay;
+	coil_wakeup();
+}
+
+
+void coil_set_working_samples_history_size_log( int8 size_log )
+{
+	coil_sleep();
+	samples_init( size_log );
 	coil_wakeup();
 }
 

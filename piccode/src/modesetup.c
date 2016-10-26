@@ -86,16 +86,11 @@ void mode_setup_autozero_threshold()
 	int16 noise = 0;
 	int8 update_display_counter = SETUP_AUTOZERO_THRES_DISPLAY_COUNTER;
 	
-	int16 initial_auto_zero_threshold = coil.auto_zero_threshold;
-	
 	coil_read_decay_begin();
 
 	while (TRUE) {
 		if ( mode_changed() ) {
 			coil_end();
-			if ( initial_auto_zero_threshold != coil.auto_zero_threshold ) {
-				cnf_save_zero_threshold();
-			}
 			return;
 		}
 		

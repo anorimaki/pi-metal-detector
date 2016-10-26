@@ -12,5 +12,8 @@ int16 samples_add( int16 value );
 int16 samples_std_deviation() ;
 int16 samples_efficiency();
 
+#inline
+int8 samples_size_log();
+
 #endif
 
