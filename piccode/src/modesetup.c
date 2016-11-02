@@ -76,6 +76,8 @@ void mode_setup_pulse()
 #define SETUP_AUTOZERO_THRES_DISPLAY_COUNTER \
 		(SETUP_AUTOZERO_THRES_DISPLAY_PERIOD/SETUP_AUTOZERO_THRES_LOOP_PAUSE)
 
+#define SETUP_AUTOZERO_NOISE_RESET_COUNTER	10
+
 void mode_setup_autozero_threshold() 
 {
 	dsp_setup_autozero_threshold_init();
@@ -84,6 +86,7 @@ void mode_setup_autozero_threshold()
 						 INCREMENT_AUTO_RATE );
 	
 	int16 noise = 0;
+	int8 noise_reset_counter = SETUP_AUTOZERO_NOISE_RESET_COUNTER;
 	int8 update_display_counter = SETUP_AUTOZERO_THRES_DISPLAY_COUNTER;
 	
 	coil_read_decay_begin();
@@ -95,7 +98,7 @@ void mode_setup_autozero_threshold()
 		}
 		
 		if ( buttons_is_pressed(BUTTON_AUTO) ) {
-			coil.auto_zero_threshold = noise;
+			coil.auto_zero_threshold = noise+3;
 		}
 
 		coil.auto_zero_threshold = encoder_increment( coil.auto_zero_threshold );
@@ -107,7 +110,12 @@ void mode_setup_autozero_threshold()
 		
 		if ( --update_display_counter == 0 ) {
 			dsp_setup_autozero_threshold( noise );
-			noise = 0;
+			
+			if ( --noise_reset_counter == 0 ) {
+				noise_reset_counter = SETUP_AUTOZERO_NOISE_RESET_COUNTER;
+				noise = 0;
+			}
+			
 			update_display_counter = SETUP_AUTOZERO_THRES_DISPLAY_COUNTER;
 		}
 		

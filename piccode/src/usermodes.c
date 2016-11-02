@@ -73,7 +73,7 @@ void mode_execute_current()
 #define MAIN_UPDATE_DISPLAY_COUNTER \
 		(MAIN_UPDATE_DISPLAY_PERIOD/MAIN_LOOP_PAUSE)
 
-#define MAIN_NOISE_RESET_COUNTER			8
+#define MAIN_NOISE_RESET_COUNTER			10
 
 void mode_main()
 {
@@ -116,14 +116,14 @@ void mode_main()
 			if ( coil.result.noise>noise )	 //Take max noise signal to show
 				noise = coil.result.noise;
 			
+			dsp_main_mode( coil.result.value, noise, 
+							battery_volts, show_mode );
+			tone_apply( coil.result.value );
+			
 			if ( --noise_reset_counter == 0 ) {
 				noise_reset_counter = MAIN_NOISE_RESET_COUNTER;
 				noise = 0;
 			}
-			
-			dsp_main_mode( coil.result.value, noise, 
-							battery_volts, show_mode );
-			tone_apply( coil.result.value );
 			
 			update_display_counter = MAIN_UPDATE_DISPLAY_COUNTER;
 		}
