@@ -172,10 +172,12 @@ void coil_set_working_read_delay( int8 delay )
 }
 
 
-void coil_set_working_samples_history_size_log( int8 size_log )
+void coil_set_working_samples_history_inertia( int16 pulse_period,
+												int8 size_log )
 {
 	coil_sleep();
 	samples_init( size_log );
+	coil_internal.current.pulse_period = pulse_period;
 	coil_wakeup();
 }
 

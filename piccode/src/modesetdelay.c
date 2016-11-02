@@ -19,12 +19,13 @@ int8 mode_autoset_sample_delay()
 	int8 first = CHECKED_SUB( selected, 1, COIL_MIN_SAMPLE_DELAY );
 	int8 index_to_calculate = 0;
 	
-	coil_set_working_samples_history_size_log(1);
+	coil_set_working_samples_history_inertia( 4000/64, 4 );
 	
 	while (TRUE) {
 		int8 mode_button = mode_check_buttons();
 		if ( mode_button == BUTTON_SETUP_DELAY ) {
-			coil_set_working_samples_history_size_log( coil.samples_history_size_log );
+			coil_set_working_samples_history_inertia( 
+					coil.pulse_period, coil.samples_history_size_log );
 			return coil_get_read_delay();		//No change
 		}
 		else if ( mode_button != NO_MODE_BUTTON ) {

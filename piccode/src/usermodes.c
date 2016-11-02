@@ -72,6 +72,9 @@ void mode_execute_current()
 #define MAIN_UPDATE_DISPLAY_PERIOD			100		//In ms
 #define MAIN_UPDATE_DISPLAY_COUNTER \
 		(MAIN_UPDATE_DISPLAY_PERIOD/MAIN_LOOP_PAUSE)
+
+#define MAIN_NOISE_RESET_COUNTER			8
+
 void mode_main()
 {
 	static int1 show_mode = DSP_SHOW_PERCENT;
@@ -87,6 +90,8 @@ void mode_main()
 	coil_read_decay_begin();
 	
 	int16 battery_volts = battery_read_volts();
+	int16 noise = 0;
+	int8 noise_reset_counter = MAIN_NOISE_RESET_COUNTER;
 
 	while (TRUE) {
 		int8 mode_button = mode_check_buttons();
@@ -107,7 +112,16 @@ void mode_main()
 		
 		if ( --update_display_counter == 0 ) {
 			coil_fetch_result();
-			dsp_main_mode( coil.result.value, coil.result.noise, 
+			
+			if ( coil.result.noise>noise )	 //Take max noise signal to show
+				noise = coil.result.noise;
+			
+			if ( --noise_reset_counter == 0 ) {
+				noise_reset_counter = MAIN_NOISE_RESET_COUNTER;
+				noise = 0;
+			}
+			
+			dsp_main_mode( coil.result.value, noise, 
 							battery_volts, show_mode );
 			tone_apply( coil.result.value );
 			
