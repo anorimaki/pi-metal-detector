@@ -105,6 +105,20 @@
 //0 = Enables register read/write of Timer3 in two eight-bit operations
 #bit TMR3RD16 = T3CON.1
 
+//T3GCON: TIMER3 GATE CONTROL REGISTER
+#byte T3GCON = 0xFB0
+
+//T3GPOL: Timer3 Gate Polarity bit
+//1 = Timer3 gate is active-high (Timer3 counts when gate is high)
+//0 = Timer3 gate is active-low (Timer3 counts when gate is low)
+#bit T3GPOL = T3GCON.6
+
+//T3GTM: Timer3 Gate Toggle Mode bit
+//1 = Timer3 Gate Toggle mode is enabled.
+//0 = Timer3 Gate Toggle mode is disabled and toggle flip-flop is cleared
+//      Timer3 gate flip-flop toggles on every rising edge.
+#bit T3GTM = T3GCON.5
+
 //ENHANCED CAPTURE/COMPARE/PWM1 CONTROL
 #byte CCP1CON = 0xFBB
 

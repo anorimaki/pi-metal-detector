@@ -68,9 +68,9 @@
  * Timer assigmnets:
  * Timer0: Coil pulse period
  * Timer1: ADC special event trigger
- * Timer2: -----
+ * Timer2: Read input period
  * Timer3: Tone generation (with CCP3 and CCP5)
- * Timer4: Read input period
+ * Timer4: Tone generation
 */
 
 #endif

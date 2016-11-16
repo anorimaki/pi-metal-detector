@@ -2,13 +2,12 @@
 #include "tone.h"
 #include "coil.h"
 
-#define TONE_MIN_FREQUENCY	4		//In Hz
-#define TONE_MAX_FREQUENCY	9000	//In Hz
+#define TONE_PERIOD_INCREMENT_US	100
+#define TONE_MIN_PERIOD_US			200			//In us. (5KHz)
+#define TONE_MAX_PERIOD_US			25000		//In us. (40Hz)
 
-// (1Mhz instruction frequency && T3_DIV_BY_8)
-#define CPP_TIMER_PERIOD		8			//In us  
-
-
+#define TONE_MIN_CCP		(TONE_MIN_PERIOD_US/TONE_PERIOD_INCREMENT_US)/2
+#define TONE_MAX_CCP		(TONE_MAX_PERIOD_US/TONE_PERIOD_INCREMENT_US)/2
 
 void tone_init()
 {
@@ -44,7 +43,7 @@ void tone_init()
 void tone_begin()
 {
 	// CCP5 generates output signal
-	//setup_ccp5( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER1_AND_TIMER2 );
+	//setup_ccp5( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER3_AND_TIMER4 );
 #asm
 		//setup_ccp5() sould be here but 'MOVWF  PSTR1CON' of this function
 		//resets pull-ups resistors configuration. setup_ccp1 has been
@@ -62,9 +61,16 @@ void tone_begin()
 	setup_ccp3( CCP_COMPARE_RESET_TIMER | CCP_USE_TIMER3_AND_TIMER4 );
 	disable_interrupts( INT_CCP3 );	
 	
-	//At 4Mhz instruction frequency (ClockF=16Mhz/4): It increments every: 2us
-	setup_timer_3( T3_INTERNAL| T3_DIV_BY_8 );
-	disable_interrupts( INT_TIMER3 );	
+	//At 4Mhz instruction frequency (ClockF=16Mhz/4): it increments every 4us.
+	setup_timer_4( T4_DIV_BY_16, TONE_PERIOD_INCREMENT_US/4, 1 );
+	disable_interrupts( INT_TIMER4 );	
+		
+	//It increments every timer4 period (100us)		
+	setup_timer_3( T3_INTERNAL | T3_GATE_TIMER4 | T3_DIV_BY_1 );
+	disable_interrupts( INT_TIMER3 );
+	
+	T3GPOL = 1;
+//	T3GTM = 0;
 	
 	TMR3ON = 0;		//Stops output signal
 }
@@ -80,16 +86,20 @@ void tone_end()
 // value is the range of 0..4095
 void tone_apply( int16 value )
 {
-	signed int16 freq = coil_normalize( value, coil.zero,
-						TONE_MAX_FREQUENCY-TONE_MIN_FREQUENCY );
-	if ( freq <= 0 ) {
+	if ( coil.zero >= value ) {
 		TMR3ON = 0;		//Stops timer3 -> stops output signal
 		return;
 	}
+	signed int16 ccp = coil_normalize( value, coil.zero,
+								TONE_MAX_CCP-TONE_MIN_CCP );
+
+	ccp = TONE_MAX_CCP-ccp;
 	
-	freq += TONE_MIN_FREQUENCY;
+	int16 safe_timer_value = ccp-1;
+	if ( get_timer3() > safe_timer_value ) {
+		set_timer3( safe_timer_value );
+	}
 	
-	int16 ccp = (int32)250000/freq;			//1000000*2/8 = 250000
 	CCP_5 = ccp;		//Set toggle delay
 	CCP_3 = ccp;		//Set reset delay (period)
 	

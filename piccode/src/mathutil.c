@@ -2,17 +2,19 @@
 #include "mathutil.h"
 #include "math.h"
 
-
+//max_value: 4095 (12 bits)
+//value should be > max_value
 signed int32 math_change_range(signed int16 value, int16 max_value, 
 								int16 new_max_value)
 {
-	int32 ret = abs(value);
+	int16 abs_value = abs(value);
 	
-	if (ret > max_value)
-		ret = max_value;
+	if (abs_value > max_value)
+		abs_value = max_value;
 
-	ret *= new_max_value;        //Can't overlay (12bits * 16bits = 28bits)
-	ret <<= 3;                   //Multiply x8 to round final value (31 bits)
+				//Can't overlay (12bits * 16bits = 28bits)
+	int32 ret = _mul( abs_value, new_max_value );     
+	ret <<= 3;			//Multiply x8 to round final value (31 bits)
 	ret /= max_value;
 
 	int8 remainder = ret & 0x07;

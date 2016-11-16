@@ -71,12 +71,12 @@ void encoder_update(int1 channelA, int1 channelB)
 
 void encoder_set_increment(int16 min, int16 max, int8 rate)
 {
-	disable_interrupts(INT_TIMER4);
+	disable_interrupts(INT_TIMER2);
 	encoder.time_periods = 0;
 	encoder.pulses = 0;
 	encoder.state = ENCODER_STATE_IDLE;
 	encoder.losses = 0;
-	enable_interrupts(INT_TIMER4);
+	enable_interrupts(INT_TIMER2);
 
 	encoder_settings.min = min;
 	encoder_settings.max = max;
@@ -92,9 +92,9 @@ void encoder_set_increment(int16 min, int16 max, int8 rate)
 
 int16 encoder_increment(int16 current)
 {
-	disable_interrupts(INT_TIMER4);
+	disable_interrupts(INT_TIMER2);
 	if (encoder.time_periods < ENCODER_MIN_TIME_PERIODS) {
-		enable_interrupts(INT_TIMER4);
+		enable_interrupts(INT_TIMER2);
 		return current;
 	}
 	signed int8 pulses = encoder.pulses;
@@ -102,7 +102,7 @@ int16 encoder_increment(int16 current)
 	encoder.time_periods = 0;
 	encoder.pulses = 0;
 	encoder.losses = 0;
-	enable_interrupts(INT_TIMER4);
+	enable_interrupts(INT_TIMER2);
 
 	if (pulses == 0) {
 		return current;
