@@ -277,7 +277,7 @@ void dsp_log_strength_bar( int8 end_signal_char_index,
 						int8 width, int16 value, 
 						int16 max_value ) 
 {
-	value = math_change_log_range(value, max_value, 
+	value = math_change_sqrt_range(value, max_value, 
 							width*STRENGTH_VALUES_PER_CHAR);
 	dsp_strength_bar( end_signal_char_index, width, value );
 }
@@ -291,7 +291,7 @@ void dis_signal( int16 signal, int1 mode )
 	int16 signal_strength_bar = (adjusted_signal<0) ? 0 : adjusted_signal;
 	dsp_log_strength_bar( 0, 12, signal_strength_bar, adjusted_max_signal );
 	if ( mode == DSP_SHOW_PERCENT ) {
-		signed int8 percent = math_change_log_range(adjusted_signal, 
+		signed int8 percent = math_change_sqrt_range(adjusted_signal, 
 												adjusted_max_signal, 100);
 		dsp_percent( percent );
 	}

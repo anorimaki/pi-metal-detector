@@ -7,6 +7,9 @@
 signed int32 math_change_range(signed int16 value, int16 max_value, 
 								int16 new_max_value);
 
+signed int32 math_change_sqrt_range(signed int16 value, int16 max_value, 
+								int16 new_max_value);
+
 signed int32 math_change_log_range(signed int16 value, int16 max_value, 
 								int16 new_max_value);
 

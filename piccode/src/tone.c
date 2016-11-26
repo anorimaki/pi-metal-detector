@@ -2,107 +2,114 @@
 #include "tone.h"
 #include "coil.h"
 
-#define TONE_PERIOD_INCREMENT_US	100
-#define TONE_MIN_PERIOD_US			200			//In us. (5KHz)
-#define TONE_MAX_PERIOD_US			25000		//In us. (40Hz)
+#define TONE_MAX_DELAY_MS	1000
 
-#define TONE_MIN_CCP		(TONE_MIN_PERIOD_US/TONE_PERIOD_INCREMENT_US)/2
-#define TONE_MAX_CCP		(TONE_MAX_PERIOD_US/TONE_PERIOD_INCREMENT_US)/2
+//Timer increments every 2us and uses only the 8 MSB.
+//	-> 1 unit = 2 * 256 = 512us
+// 8 LSM must me 0, so we do a final AND.
+#define TONE_MAX_DELAY_UNITS	(((TONE_MAX_DELAY_MS*1000/512)+1) & 0xFF00)
+
+/*
+ * It uses:
+ *	- Timer4 and CPP3 to generate a fixed ~1KHz tone
+ *	- Timer3 and its interrupt to generate tone length and tone delay
+ */
+
 
 void tone_init()
 {
-#if 1
-		//Just to configure CCP1 but not to activate it. See comments of
-		// tone_being() function.
-	setup_ccp5( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER3_AND_TIMER4 );
-	setup_ccp5( CCP_OFF );
+	//At 16Mhz clock It increments every 4us.
+	//Set it at max period (255), it resets every: ~1ms 
+	//		-> It generate a tone about 1KHz
+	setup_timer_4( T4_DIV_BY_16, 0xFF, 1 );
+	disable_interrupts( INT_TIMER4 );
+	TMR4ON = 0;
+	
+	// CCP5 generates 1KHz square signal
+	setup_ccp5( CCP_PWM | CCP_USE_TIMER3_AND_TIMER4 );
+	set_pwm5_duty( 0x1FC );			//50%
 	disable_interrupts( INT_CCP5 );	
-#else
-#asm
-			//This is equivale to setup_ccp1 but it's done in assemble
-			//because 'MOVWF  PSTR1CON' resets pull-ups resistors configuration
-	MOVLW  01
-	MOVWF  PSTR1CON		//P1A pin has the PWM waveform with polarity
-						// control from CCP1M<1:0>
-						//P1B, P1B, P1C: are assigned to ports pin
-						//Output steering update occurs at the beginning 
-						// of the instruction cycle boundary
-	CLRF   ECCP1DEL		//CCP1 Delay = 0
-						//ECCP1AS must be set by software to restart
-	CLRF   ECCP1AS		//ECCP outputs are operating
-						//Auto-shutdown is disabled
-						//Drive pins, P1A and P1C, to ?0?
-						//Drive pins, P1B and P1D, to ?0?
-	BCF    C1TSEL		//Select TMR1/TMR2 for CCP1
-#endasm
-#endif
+	
+	//At 16Mhz clock, it increments every 2us
+	//It completes a cycle every ~131ms
+	setup_timer_3( T3_INTERNAL | T3_DIV_BY_8 );
+	enable_interrupts( INT_TIMER3 );
+	TMR3ON = 0;
 	
 	output_drive( PI_TONE_PIN );
 }
 
+
 void tone_begin()
 {
-	// CCP5 generates output signal
-	//setup_ccp5( CCP_COMPARE_INT_AND_TOGGLE | CCP_USE_TIMER3_AND_TIMER4 );
-#asm
-		//setup_ccp5() sould be here but 'MOVWF  PSTR1CON' of this function
-		//resets pull-ups resistors configuration. setup_ccp1 has been
-		//moved to tone_init() function and must be called before pull-ups 
-		//resistors are configured
-		//Here, CPP1 is only activated with previous configuration
-	MOVLW  CCP_COMPARE_INT_AND_TOGGLE
-	MOVWF  CCP5CON		//Compare mode, toggle output on match
-#endasm
-	
-	
-	// CCP3 reset timer to create a period (Special Event Trigger). 
-	// It avoid the use of interrupt ISR
-	// Note: Do not use CCP1 for Special Event Trigger or ADC will be started
-	setup_ccp3( CCP_COMPARE_RESET_TIMER | CCP_USE_TIMER3_AND_TIMER4 );
-	disable_interrupts( INT_CCP3 );	
-	
-	//At 4Mhz instruction frequency (ClockF=16Mhz/4): it increments every 4us.
-	setup_timer_4( T4_DIV_BY_16, TONE_PERIOD_INCREMENT_US/4, 1 );
-	disable_interrupts( INT_TIMER4 );	
-		
-	//It increments every timer4 period (100us)		
-	setup_timer_3( T3_INTERNAL | T3_GATE_TIMER4 | T3_DIV_BY_1 );
-	disable_interrupts( INT_TIMER3 );
-	
-	T3GPOL = 1;
-//	T3GTM = 0;
-	
-	TMR3ON = 0;		//Stops output signal
 }
+
 
 void tone_end()
 {
-	setup_timer_3(T3_DISABLED);
-	setup_ccp5( CCP_OFF );
-	setup_ccp3( CCP_OFF );
+	TMR3ON = 0;
+	TMR4ON = 0;
+}
+
+
+struct {
+	struct {
+		int8 timer_isr_counts;
+		int16 timer_value;
+	} delay;
+	
+	int8 timer_isr_count;
+} tone;
+
+
+#int_timer3
+void tone_update() 
+{
+	if ( TMR4ON == 0 ) {
+		if ( tone.timer_isr_count == 0 ) {
+				//End delay and start tone
+			TMR4ON = 1;
+			return;
+		}
+		--tone.timer_isr_count;
+		if ( tone.timer_isr_count == 0 ) {
+			set_timer3( tone.delay.timer_value );
+		}
+		return;
+	}
+	
+	tone.timer_isr_count = tone.delay.timer_isr_counts;
+	if ( tone.timer_isr_count == 0 ) {
+		if ( tone.delay.timer_value == 0 ) {
+			return;		//Continue tone
+		}
+		set_timer3( tone.delay.timer_value );
+	}
+	TMR4ON = 0;			//End tone and start delay
 }
 
 
 // value is the range of 0..4095
 void tone_apply( int16 value )
 {
-	if ( coil.zero >= value ) {
+	if ( coil.zero > value ) {
 		TMR3ON = 0;		//Stops timer3 -> stops output signal
+		TMR4ON = 0;
 		return;
 	}
-	signed int16 ccp = coil_normalize( value, coil.zero,
-								TONE_MAX_CCP-TONE_MIN_CCP );
-
-	ccp = TONE_MAX_CCP-ccp;
 	
-	int16 safe_timer_value = ccp-1;
-	if ( get_timer3() > safe_timer_value ) {
-		set_timer3( safe_timer_value );
+	value = math_change_log_range( value-coil.zero, 
+					COIL_MAX_ADC_VALUE-coil.zero, TONE_MAX_DELAY_UNITS );
+	
+	int16 inv_value = TONE_MAX_DELAY_UNITS-value;
+	
+	disable_interrupts( INT_TIMER3 );
+	tone.delay.timer_isr_counts = inv_value >> 8;
+	tone.delay.timer_value = value << 8;
+	enable_interrupts( INT_TIMER3 );
+	
+	if ( TMR3ON == 0 ) {
+		TMR4ON = 1;
+		TMR3ON = 1;
 	}
-	
-	CCP_5 = ccp;		//Set toggle delay
-	CCP_3 = ccp;		//Set reset delay (period)
-	
-	TMR3ON = 1;
 }
-

@@ -119,6 +119,17 @@
 //      Timer3 gate flip-flop toggles on every rising edge.
 #bit T3GTM = T3GCON.5
 
+//T4CON: TIMER4 CONTROL REGISTER
+#byte T4CON = getenv("SFR:T4CON")
+
+//TMR4ON: Timer4 On bit
+//1 = Timer4 is on
+//0 = Timer4 is off
+#bit TMR4ON = T4CON.2
+
+//Timer4 Period Register
+#byte PR4 = getenv("SFR:PR4")
+
 //ENHANCED CAPTURE/COMPARE/PWM1 CONTROL
 #byte CCP1CON = 0xFBB
 
